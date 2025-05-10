@@ -1,0 +1,21 @@
+TY2.exe+3D4470
+
+Save data
+0x00 is length of the file
+0xC (byte) is percent
+0x10 stores the time in minutes as a float
+0x14 (int) is opal count
+
+this function writes the data to display the percentage
+TY2.exe+3B8260
+
+
+save for some reason
+
+FUN_0011c000
+
+FUN_00699990 handles updating how manyu missions are complete
+
+FUN_00697340 handles maybe mission objects loading in or out of the linked list
+
+0x00119FB0 adds opals??
