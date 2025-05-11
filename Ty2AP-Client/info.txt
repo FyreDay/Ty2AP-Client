@@ -19,3 +19,17 @@ FUN_00699990 handles updating how manyu missions are complete
 FUN_00697340 handles maybe mission objects loading in or out of the linked list
 
 0x00119FB0 adds opals??
+
+P1065_RoadBarrier
+FourbieTriggerProp
+ParkingBay
+
+Z4_M2Parking
+Z4_M18ParkingBay
+
+name CLS_PlatinumCog 
+alias CLS_Collectable
+maxDrawDist 5000
+maxUpdateDist 5000
+
+CogSpawner-> used to spawn cog/bag?
