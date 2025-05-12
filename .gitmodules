@@ -1,0 +1,6 @@
+[submodule "TygerMemory2"]
+	path = TygerMemory2
+	url = https://github.com/FyreDay/TygerMemory2
+[submodule "imgui"]
+	path = imgui
+	url = https://github.com/ocornut/imgui.git
