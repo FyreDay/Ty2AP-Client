@@ -4,16 +4,11 @@ void TickBeforeGame(float deltaSeconds) {
 }
 
 bool WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
-    if (msg == WM_KEYDOWN && wParam == VK_F2) {
-        uintptr_t result;
+    if (msg == WM_KEYDOWN && wParam == VK_F3) {
+        
         int id = 3680;
-        uintptr_t(*getObjPtr)(int) = reinterpret_cast<uintptr_t(*)(int)>(((uintptr_t)API::Get()->param()->TyHModule) + 0x00314f10);
-        __asm{
-            push id
-            call getObjPtr
-            add esp, 0x4
-            mov result, eax
-        }
+               
+        uintptr_t result = MKObject::GetMKObject(id);
         API::LogPluginMessage(std::to_string(result));
         
     }
@@ -26,9 +21,11 @@ extern "C" __declspec(dllexport) bool TygerFrameworkPluginInitialize(TygerFramew
     if (!API::Initialize(param))
         return false;
 
+    if (!Core::initialize((HMODULE)API::Get()->param()->TyHModule))
+        return false;
+
     API::AddTickBeforeGame(TickBeforeGame);
     API::AddPluginWndProc((WndProcFunc)WndProc);
-    API::LogPluginMessage(std::to_string(((int)API::Get()->param()->TyHModule)));
     return true;
 }
 
