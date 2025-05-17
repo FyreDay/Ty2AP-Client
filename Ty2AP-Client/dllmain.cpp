@@ -1,20 +1,14 @@
 #include "pch.h"
+#include "GameHandler.h"
+#include "gui.h"
 
 void TickBeforeGame(float deltaSeconds) {
+    GUI::DrawUI();
 }
 
-bool WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
-    if (msg == WM_KEYDOWN && wParam == VK_F3) {
-        
-        int id = 3680;
-               
-        uintptr_t result = MKObject::GetMKObject(id);
-        API::LogPluginMessage(std::to_string(result));
-        
-    }
-    return false;
+void OnTyInit() {
+    GameHandler::Initialize();
 }
-
 
 extern "C" __declspec(dllexport) bool TygerFrameworkPluginInitialize(TygerFrameworkPluginInitializeParam* param) {
     //Make sure to call this first before any API Functions
@@ -25,7 +19,9 @@ extern "C" __declspec(dllexport) bool TygerFrameworkPluginInitialize(TygerFramew
         return false;
 
     API::AddTickBeforeGame(TickBeforeGame);
-    API::AddPluginWndProc((WndProcFunc)WndProc);
+    API::AddPluginImGuiWantCaptureMouse((ImGuiWantCaptureMouseFunc)GUI::ImGuiWantCaptureMouse);
+    API::AddOnTyInitialized(OnTyInit);
+    API::AddPluginWndProc((WndProcFunc)GUI::WndProc);
     return true;
 }
 
