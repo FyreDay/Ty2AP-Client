@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "ItemHandler.h"
 
-void ItemHandler::HandleItem(int id)
+void ItemHandler::HandleItem(APClient::NetworkItem item))
 {
 
 }
