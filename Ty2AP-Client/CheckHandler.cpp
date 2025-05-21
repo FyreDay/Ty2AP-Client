@@ -1,9 +1,6 @@
-
-
-typedef void(__stdcall* FunctionType)();
+#include "pch.h"
 #include "CheckHandler.h"
-//0011b2ba hook
-//0011b2ba + 5 return
+typedef void(__stdcall* FunctionType)();
 FunctionType CollectCollectibleOrigin = nullptr;
 uintptr_t CollectCollectibleOriginReturnAddr;
 
@@ -92,9 +89,9 @@ void CheckHandler::SetupHooks() {
 	auto cmaddr = (char*)(Core::moduleBase + 0x0029734f);
 	MH_CreateHook((LPVOID)cmaddr, &CompleteMissionHook, reinterpret_cast<LPVOID*>(&CompleteMissionOrigin));
 
-	PurchaseItemOriginReturnAddr = Core::moduleBase + 0x001b145c + 5;
-	auto piaddr = (char*)(Core::moduleBase + 0x001b145c);
-	MH_CreateHook((LPVOID)piaddr, &PurchaseItemHook, reinterpret_cast<LPVOID*>(&PurchaseItemOrigin));
+	//PurchaseItemOriginReturnAddr = Core::moduleBase + 0x001b145c + 5;
+	//auto piaddr = (char*)(Core::moduleBase + 0x001b145c);
+	//MH_CreateHook((LPVOID)piaddr, &PurchaseItemHook, reinterpret_cast<LPVOID*>(&PurchaseItemOrigin));
 }
 
 void CheckHandler::OnCollectCollectible(int type, int id) {

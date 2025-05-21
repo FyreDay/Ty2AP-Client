@@ -5,4 +5,5 @@ class GameHandler
 {
 public:
 	static void Initialize();
+	static void SetupHooks();
 };

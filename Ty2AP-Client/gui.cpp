@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "gui.h"
-#include "InfoWindow.h"
+
 
 
 std::vector<std::unique_ptr<Window>> GUI::windows;
@@ -17,16 +17,19 @@ bool GUI::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
             }
         }
     }
+    if (msg == WM_KEYDOWN && wParam == VK_F4) {
+        for (auto& window : windows) {
+            if (auto MKObject = dynamic_cast<LoginWindow*>(window.get())) {
+                MKObject->ToggleVisibility();
+                API::LogPluginMessage("Toggle LoginWindow window.");
+                break;
+            }
+        }
+    }
+
     if (API::DrawingGUI())
         if (ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam))
             return true;
-
-    /*if (msg == WM_KEYDOWN && wParam == VK_F4) {
-
-        Missions::UpdateMissionState(reinterpret_cast<uintptr_t>(SaveData::GetData()->MissionData.CrocStruct1), 2, 1);
-        API::LogPluginMessage("Tried to update croc");
-
-    }*/
     return false;
 }
 
@@ -49,6 +52,7 @@ void GUI::Initialize() {
     ImGui_ImplWin32_InitForOpenGL(API::GetTyWindowHandle());
 
     windows.push_back(std::make_unique<InfoWindow>());
+    windows.push_back(std::make_unique<LoginWindow>());
 
     API::LogPluginMessage("Initialized ImGui successfully.");
     GUI::init = true;

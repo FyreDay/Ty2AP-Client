@@ -7,6 +7,10 @@ void GameHandler::Initialize()
 	MH_Initialize();
 
 	CheckHandler::SetupHooks();
-
+	SetupHooks();
 	MH_EnableHook(MH_ALL_HOOKS);
+}
+
+void GameHandler::SetupHooks() {
+
 }

@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "ItemHandler.h"
 
 void ItemHandler::HandleItem(int id)
