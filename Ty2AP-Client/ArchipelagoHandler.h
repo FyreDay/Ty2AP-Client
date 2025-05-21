@@ -1,6 +1,6 @@
 #pragma once
-//#include "apclient.hpp"
 #include "nlohmann/json.hpp"
+#include "LoginWindow.h"
 
 class LoginWindow;
 #define GAME_NAME "Ty the Tasmanian Tiger 2"

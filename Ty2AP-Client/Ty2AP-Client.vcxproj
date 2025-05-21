@@ -19,8 +19,6 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\apclientpp\apclient.hpp" />
-    <ClInclude Include="..\apclientpp\apuuid.hpp" />
     <ClInclude Include="..\TygerFrameworkAPI.h" />
     <ClInclude Include="..\TygerFrameworkAPI.hpp" />
     <ClInclude Include="ArchipelagoHandler.h" />
@@ -153,7 +151,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;ASIO_STANDALONE;AP_NO_SCHEMA;ASIO_NO_WIN32_LEAN_AND_MEAN;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_CONSOLE;ASIO_STANDALONE;AP_NO_SCHEMA;ASIO_NO_WIN32_LEAN_AND_MEAN;_WIN32_WINNT=0x0600;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
@@ -168,7 +166,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ModuleDefinitionFile>Source.def</ModuleDefinitionFile>
-      <AdditionalDependencies>TygerMemory2.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>TygerMemory2.lib;libssl.lib;libcrypto.lib;crypt32.lib;ws2_32.lib;opengl32.lib;zlib.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(ProjectDir)..\libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <EnableUAC>false</EnableUAC>
     </Link>

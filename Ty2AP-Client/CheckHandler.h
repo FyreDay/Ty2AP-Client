@@ -1,7 +1,8 @@
 #pragma once
 #include "pch.h"
 #include "gui.h"
-#include "InfoWindow.h"
+#include "InfoWindow.h
+#include "MinHook.h""
 
 
 

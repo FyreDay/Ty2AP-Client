@@ -1,11 +1,10 @@
 #pragma once
-
+#include "apclient.hpp"
 #include <map>
 #include <iostream>
 #include <vector>
 #include <string>
 #include <array>
-#include "MinHook.h"
 #include "imgui.h"
 #include "imgui_impl_opengl3.h"
 #include "imgui_internal.h"

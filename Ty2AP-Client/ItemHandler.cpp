@@ -1,10 +1,12 @@
 #include "pch.h"
 #include "ItemHandler.h"
 
-void ItemHandler::HandleItem(APClient::NetworkItem item))
-{
+//std::queue<APClient::NetworkItem> ItemHandler::storedItems;
 
-}
+//void ItemHandler::HandleItem(APClient::NetworkItem item)
+//{
+//	//if(item.item == ArchipelagoHandler::
+//}
 
 void ItemHandler::HandleProgressiveRang()
 {
