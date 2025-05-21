@@ -10,3 +10,6 @@
 [submodule "apclientpp"]
 	path = apclientpp
 	url = https://github.com/black-sliver/apclientpp.git
+[submodule "websocketpp"]
+	path = websocketpp
+	url = https://github.com/zaphoyd/websocketpp.git
