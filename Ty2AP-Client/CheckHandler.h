@@ -1,4 +1,7 @@
 #pragma once
+#include "pch.h"
+#include "gui.h"
+#include "InfoWindow.h"
 
 
 
@@ -9,7 +12,11 @@ public:
 	static void OnCollectCollectible(int id, int type);
 
     static void __stdcall CompleteMissionHook();
-    static void OnCompleteMission(void* mission);
+    static void OnCompleteMission(void* mission, int status);
+
+    static void __stdcall PurchaseItemHook();
+    static void OnBuyItem(void* item);
+
 	static void SetupHooks();
 
     struct Collectible {
