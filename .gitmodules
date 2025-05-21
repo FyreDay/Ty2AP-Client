@@ -4,3 +4,12 @@
 [submodule "imgui"]
 	path = imgui
 	url = https://github.com/ocornut/imgui.git
+[submodule "wswrap"]
+	path = wswrap
+	url = https://github.com/black-sliver/wswrap.git
+[submodule "websocketpp"]
+	path = websocketpp
+	url = https://github.com/zaphoyd/websocketpp.git
+[submodule "apclientpp"]
+	path = apclientpp
+	url = https://github.com/black-sliver/apclientpp.git
