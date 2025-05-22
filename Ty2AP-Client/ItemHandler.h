@@ -8,14 +8,19 @@ public:
     static void HandleItem(APClient::NetworkItem item);
     
     static void HandleRang(int id);
-    template<typename T, std::size_t N>
-    static void HandleProgressiveRang(const std::array<T, N>& arr) {
-        
-    }
     static void HandleParkingPad(int id);
     //static void HandleProgressiveParkingPad();
     static std::queue<APClient::NetworkItem> storedItems;
 private:
+    static void AddOpals(int amount) {
+        using Addopals = uint32_t(__thiscall*)(uintptr_t thisPtr, uintptr_t objPtr);
+        Addopals addopals = reinterpret_cast<Addopals>((uintptr_t)API::Get()->param()->TyHModule + 0x00119fb0);
+        uintptr_t thisPtr = (uintptr_t)API::Get()->param()->TyHModule + 0x4EB580;
+
+        addopals(thisPtr, amount);
+        return;
+    }
+
     static int progressiveBoomerang(){
         if (!SaveData::GetData()->BoomerangData.GotBoomerang) {
             return 0;
@@ -26,55 +31,56 @@ private:
         if (!SaveData::GetData()->BoomerangData.GotMegarang) {
             return 0xe;
         }
-        if (!SaveData::GetData()->BoomerangData.GotOmegarang) {
-            return 0xf;
-        }
+        return 0xf;
     };
 
-    static int progressiveBoomerang() {
+    static int progressiveFlamerang() {
         if (!SaveData::GetData()->BoomerangData.GotFlamerang) {
-            return 0;
+            return 2;
         }
-        if (!SaveData::GetData()->BoomerangData.GotLavarang) {
-            return 1;
+        return 3;
+    };
+
+    static int progressiveFrostyrang() {
+        if (!SaveData::GetData()->BoomerangData.GotFrostyrang) {
+            return 4;
         }
-        if (!SaveData::GetData()->BoomerangData.GotMegarang) {
-            return 0xe;
+        return 5;
+    };
+    static int progressiveZappyrang() {
+        if (!SaveData::GetData()->BoomerangData.GotZappyrang) {
+            return 6;
         }
-        if (!SaveData::GetData()->BoomerangData.GotOmegarang) {
-            return 0xf;
+        return 7;
+    };
+
+    static int progressiveLasharang() {
+        if (!SaveData::GetData()->BoomerangData.GotLasharang) {
+            return 8;
         }
+        return 9;
     };
 
-    static inline const std::array<int, 2> progressiveFlamerang{
-        2,
-        3
+    static int progressiveInfrarang() {
+        if (!SaveData::GetData()->BoomerangData.GotInfrarang) {
+            return 0xa;
+        }
+        return 0xb;
     };
 
-    static inline const std::array<int, 2> progressiveFrostyrang{
-        4,
-        5
-    };
-
-    static inline const std::array<int, 2> progressiveZappyrang{
-        6,
-        7
-    };
-
-    static inline const std::array<int, 2> progressiveLasharang{
-        8,
-        9
-    };
-    static inline const std::array<int, 2> progressiveInfrarang{
-        0xa,
-        0xb
-    };
-
-    static inline const std::array<int, 5> progressiveSmasharang{
-        0x14,
-        0xc,
-        0xd,
-        0x10,
-        0x11
+    static int progressiveSmasharang() {
+        if (!SaveData::GetData()->BoomerangData.GotCraftyrang) {
+            return 0x14;
+        }
+        if (!SaveData::GetData()->BoomerangData.GotSmasharang) {
+            return 0xc;
+        }
+        if (!SaveData::GetData()->BoomerangData.GotKaboomarang) {
+            return 0xd;
+        }
+        if (!SaveData::GetData()->BoomerangData.GotDeadlyrang) {
+            return 0x10;
+        }
+        return 0x11;
     };
 };
