@@ -21,6 +21,7 @@
   <ItemGroup>
     <ClInclude Include="..\TygerFrameworkAPI.h" />
     <ClInclude Include="..\TygerFrameworkAPI.hpp" />
+    <ClInclude Include="APSaveData.h" />
     <ClInclude Include="ArchipelagoHandler.h" />
     <ClInclude Include="CheckHandler.h" />
     <ClInclude Include="GameHandler.h" />
@@ -52,6 +53,7 @@
     <ClCompile Include="..\imgui\misc\cpp\imgui_stdlib.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="APSaveData.cpp" />
     <ClCompile Include="ArchipelagoHandler.cpp" />
     <ClCompile Include="CheckHandler.cpp" />
     <ClCompile Include="dllmain.cpp" />
@@ -159,6 +161,7 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>$(ProjectDir)..\TygerMemory2\TygerMemory2;$(ProjectDir)..\wswrap\include;$(ProjectDir)..\websocketpp;$(ProjectDir)..\apclientpp;$(ProjectDir)..\imgui\backends;$(ProjectDir)..\imgui;$(ProjectDir)..\imgui\misc\cpp</AdditionalIncludeDirectories>
       <ShowIncludes>true</ShowIncludes>
+      <AdditionalOptions>/Zc:__cplusplus %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

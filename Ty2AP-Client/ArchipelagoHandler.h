@@ -4,8 +4,6 @@
 
 class LoginWindow;
 #define GAME_NAME "Ty the Tasmanian Tiger 2"
-#define AP_OFFSET 8850000
-
 class ArchipelagoHandler
 {
 public:
