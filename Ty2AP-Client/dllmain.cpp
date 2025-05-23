@@ -4,6 +4,7 @@
 
 void TickBeforeGame(float deltaSeconds) {
     GUI::DrawUI();
+    API::LogPluginMessage(std::to_string(SaveData::GetData()->TotalItems));
 }
 
 void OnTyInit() {

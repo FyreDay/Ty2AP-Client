@@ -9,6 +9,7 @@ public:
     
     static void HandleRang(int id);
     static void HandleParkingPad(int id);
+    static void CollectItem(int offsetfromfirstitem);
     //static void HandleProgressiveParkingPad();
     static std::queue<APClient::NetworkItem> storedItems;
 private:
@@ -18,6 +19,8 @@ private:
         uintptr_t thisPtr = (uintptr_t)API::Get()->param()->TyHModule + 0x4EB580;
 
         addopals(thisPtr, amount);
+        int* uiPtr = (int*)(Core::moduleBase + 0x4EB588);
+        *uiPtr += amount;
         return;
     }
 

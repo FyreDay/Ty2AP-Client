@@ -89,7 +89,7 @@ void CheckHandler::SetupHooks() {
 	auto cmaddr = (char*)(Core::moduleBase + 0x0029734f);
 	MH_CreateHook((LPVOID)cmaddr, &CompleteMissionHook, reinterpret_cast<LPVOID*>(&CompleteMissionOrigin));
 
-	PurchaseItemOriginReturnAddr = Core::moduleBase + 0x001b145c + 5;
+	PurchaseItemOriginReturnAddr = Core::moduleBase + 0x001b1468;
 	auto piaddr = (char*)(Core::moduleBase + 0x001b145c);
 	MH_CreateHook((LPVOID)piaddr, &PurchaseItemHook, reinterpret_cast<LPVOID*>(&PurchaseItemOrigin));
 }
@@ -126,6 +126,7 @@ void CheckHandler::OnBuyItem(void* item) {
 
 	short value = *reinterpret_cast<short*>(base + 0x4); // read short
 	char letter = *reinterpret_cast<char*>(base + 0x7);  // read char
+	APSaveData::updateBoughtItem(value, false);
 	std::string id = std::string(1, letter) + std::to_string(value);
 	for (auto& window : GUI::windows) {
 		if (auto infowindow = dynamic_cast<InfoWindow*>(window.get())) {

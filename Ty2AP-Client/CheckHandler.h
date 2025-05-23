@@ -2,6 +2,7 @@
 #include "gui.h"
 #include "InfoWindow.h"
 #include "MinHook.h"
+#include "APSaveData.h"
 
 
 
