@@ -212,15 +212,12 @@ void GameHandler::SetupHooks() {
 
 	auto titleaddr = (char*)(Core::moduleBase + 0x32E5F0);
 	MH_CreateHook((LPVOID)titleaddr, &HookedGetString, reinterpret_cast<void**>(&originalGetString));
-
-	//hook 00699990 at 699a1e to change how items are required
 }
 
 bool GameHandler::OnItemAvailable(void* itemPtr) {
 	uint8_t* base = static_cast<uint8_t*>(itemPtr);
 	short id = *reinterpret_cast<short*>(base + 0x4);
 	return APSaveData::hasBoughtItem(id);
-	//API::LogPluginMessage("has Infra");
 }
 
 static std::string myCustomTitle = "AP Item Name";
