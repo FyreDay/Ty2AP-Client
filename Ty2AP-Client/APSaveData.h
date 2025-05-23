@@ -11,7 +11,8 @@ public:
 	static void updateBoughtItem(int id, bool bought) {
 		ItemMap[id] = bought;
 	}
-
+	static inline std::list<int> UnlockedParkingPads = { 3736 };
+	static inline const std::list<int> AllParkingPads = { 3736,3689 };
 	static inline std::map<int, bool> ItemMap = {
 	{8, true}, //True is can purchuse
 	{9, true},

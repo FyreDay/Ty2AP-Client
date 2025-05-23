@@ -4,7 +4,9 @@
 
 void TickBeforeGame(float deltaSeconds) {
     GUI::DrawUI();
-    API::LogPluginMessage(std::to_string(SaveData::GetData()->TotalItems));
+    //API::LogPluginMessage(std::to_string(SaveData::GetData()->TotalItems));\
+    const char* GetTriggerNameSafely() {
+    // Base address + offset
 }
 
 void OnTyInit() {

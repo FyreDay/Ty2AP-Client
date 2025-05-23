@@ -16,7 +16,13 @@ public:
 	static void __stdcall ItemAvailableClickHook();
 	static void __stdcall ItemAvailableClick2Hook();
 
+	static void __stdcall ChunkLoadedHook();
+	static void __stdcall TriggerHitHook();
+
 	static int __cdecl HookedGetString(int param_1);
 
 	static bool OnItemAvailable(void* itemPtr);
+	static void OnChunkLoaded();
+	static void TryDisableFourbieTrigger();
+	static void TryEditFourbieTrigger(bool enable);
 };
