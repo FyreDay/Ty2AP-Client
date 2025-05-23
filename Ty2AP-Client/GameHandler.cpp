@@ -225,7 +225,7 @@ bool GameHandler::OnItemAvailable(void* itemPtr) {
 
 static std::string myCustomTitle = "AP Item Name";
 static std::string PadDisabled = "Pad Disabled By AP";
-static std::string copyright = "Krome Studios Inc.  All rights reserved.  TY the Tasmanian Tiger, Bush Rescue and characters and the Krome Studios logo are trademarks of Krome Studios Inc.\nAP Mod Created By\nFyreDay\n xMcacutt Dashieswag92";
+static std::string copyright = "Krome Studios Inc.  All rights reserved.  TY the Tasmanian Tiger, Bush Rescue and characters and the Krome Studios logo are trademarks of Krome Studios Inc.\n\nAP Mod Created By\nFyreDay\n xMcacutt Dashieswag92";
 
 int __cdecl GameHandler::HookedGetString(int param_1) {
 	API::LogPluginMessage(std::to_string(param_1));
