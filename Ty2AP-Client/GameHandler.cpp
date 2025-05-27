@@ -173,11 +173,15 @@ __declspec(naked) void __stdcall GameHandler::TriggerHitHook() {
 	}
 }
 
+char* saveFileBuffer = nullptr;
+int saveFileLength = 0;
+
 FunctionType LoadSaveFileOrigin = nullptr;
 uintptr_t LoadSaveFileOriginReturnAddr;
 __declspec(naked) void __stdcall GameHandler::LoadSaveFileHook() {
 	_asm {
 		call GameHandler::LoadAPSaveFile
+		add esp, 0xC
 		mov eax, offset saveFileBuffer
 		mov edx, saveFileLength
 		jmp dword ptr[LoadSaveFileOriginReturnAddr]
@@ -352,8 +356,7 @@ void createDirectoriesIfNeeded(const std::string& filepath) {
 	std::filesystem::create_directories(path.parent_path());
 }
 
-char* saveFileBuffer = nullptr;
-int saveFileLength= 0;
+
 void GameHandler::LoadAPSaveFile() {
 	auto filePath = "./Saves/" + std::to_string(5) + "_" + "fyre";
 	createDirectoriesIfNeeded(filePath);
@@ -374,13 +377,12 @@ void GameHandler::LoadAPSaveFile() {
 		}
 
 		file.close();
-
+		//this doesnt work
+		using CallbackFn = int(__thiscall*)(void* thisptr, void* arg1, int arg2);
 		CallbackFn fn = (CallbackFn)(Core::moduleBase + 0x377AE0);
 
-		// Prepare arguments
 		void* thisptr = (void*)(Core::moduleBase + 0x4CBD78);
 
-		// Your buffer (example bytes you gave)
 		uint8_t dataBuffer[] = {
 			0x46, 0xC1, 0xF7, 0xCD, 
 			0x18, 0x74, 0xD7, 0x09,
@@ -392,7 +394,7 @@ void GameHandler::LoadAPSaveFile() {
 		dataBuffer[0x10] = (uint8_t)(saveFileLength & 0xFF);
 		dataBuffer[0x11] = (uint8_t)((saveFileLength >> 8) & 0xFF);
 		dataBuffer[0x12] = (uint8_t)((saveFileLength >> 16) & 0xFF);
-		dataBuffer[0x13] = (uint8_t)((saveFileLength >> 24) & 0xFF);
+		dataBuffer[0x13] = (uint8_t)((saveFileLength >> 24) & 0xFF); 
 
 		int arg2 = 2;
 
@@ -407,7 +409,7 @@ void GameHandler::LoadAPSaveFile() {
 	}
 }
 
-using CallbackFn = int(__fastcall*)(void* thisptr, void* arg1, int arg2);
+
 
 int GameHandler::SaveFile(const char* filename, void* data, int size) {
 	std::string filePath = "./Saves/" + std::to_string(5) + "_" + "fyre";

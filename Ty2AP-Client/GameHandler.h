@@ -25,6 +25,7 @@ public:
 
 	static void __stdcall ChunkLoadedHook();
 	static void __stdcall TriggerHitHook();
+
 	static void __stdcall LoadSaveFileHook();
 	static void __stdcall SaveFileHook();
 
