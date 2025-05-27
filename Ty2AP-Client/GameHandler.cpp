@@ -173,6 +173,26 @@ __declspec(naked) void __stdcall GameHandler::TriggerHitHook() {
 	}
 }
 
+FunctionType LoadSaveFileOrigin = nullptr;
+uintptr_t LoadSaveFileOriginReturnAddr;
+__declspec(naked) void __stdcall GameHandler::LoadSaveFileHook() {
+	_asm {
+		call GameHandler::LoadAPSaveFile
+		mov eax, offset saveFileBuffer
+		mov edx, saveFileLength
+		jmp dword ptr[LoadSaveFileOriginReturnAddr]
+	}
+}
+
+FunctionType SaveFileOrigin = nullptr;
+uintptr_t SaveFileOriginReturnAddr;
+__declspec(naked) void __stdcall GameHandler::SaveFileHook() {
+	_asm {
+		call GameHandler::SaveFile
+		add esp, 0xC
+		jmp dword ptr[SaveFileOriginReturnAddr]
+	}
+}
 
 typedef int(__cdecl* TGetStringFunc)(int param_1);
 TGetStringFunc originalGetString = nullptr;
@@ -212,6 +232,16 @@ void GameHandler::SetupHooks() {
 
 	auto titleaddr = (char*)(Core::moduleBase + 0x32E5F0);
 	MH_CreateHook((LPVOID)titleaddr, &HookedGetString, reinterpret_cast<void**>(&originalGetString));
+
+	//load
+	LoadSaveFileOriginReturnAddr = Core::moduleBase + 0x376e84+5;
+	auto loadaddr = (char*)(Core::moduleBase + 0x376e84);
+	MH_CreateHook((LPVOID)loadaddr, &LoadSaveFileHook, reinterpret_cast<LPVOID*>(&LoadSaveFileOrigin));
+
+	SaveFileOriginReturnAddr = Core::moduleBase + 0x376d6f+5;
+	auto saveaddr = (char*)(Core::moduleBase + 0x376d6f);
+	MH_CreateHook((LPVOID)saveaddr, &SaveFileHook, reinterpret_cast<LPVOID*>(&SaveFileOrigin));
+
 }
 
 bool GameHandler::OnItemAvailable(void* itemPtr) {
@@ -225,7 +255,7 @@ static std::string PadDisabled = "Pad Disabled By AP";
 static std::string copyright = "Krome Studios Inc.  All rights reserved.  TY the Tasmanian Tiger, Bush Rescue and characters and the Krome Studios logo are trademarks of Krome Studios Inc.\n\nAP Mod Created By\nFyreDay\n xMcacutt Dashieswag92";
 
 int __cdecl GameHandler::HookedGetString(int param_1) {
-	API::LogPluginMessage(std::to_string(param_1));
+	//API::LogPluginMessage(std::to_string(param_1));
 	if (param_1 == 564) {
 		return (int)myCustomTitle.c_str(); // Make sure string stays alive
 	}
@@ -308,9 +338,99 @@ void GameHandler::TryEditFourbieTrigger(bool enable) {
 	}
 	else {
 		API::LogPluginMessage("Trigger name does not match.");
+
 	}
 }
 
+bool fileExists(const std::string& filePath) {
+	std::ifstream file(filePath);
+	return file.good();
+}
+
+void createDirectoriesIfNeeded(const std::string& filepath) {
+	std::filesystem::path path(filepath);
+	std::filesystem::create_directories(path.parent_path());
+}
+
+char* saveFileBuffer = nullptr;
+int saveFileLength= 0;
+void GameHandler::LoadAPSaveFile() {
+	auto filePath = "./Saves/" + std::to_string(5) + "_" + "fyre";
+	createDirectoriesIfNeeded(filePath);
+	std::ifstream file(filePath, std::ios::binary);
+	if (file.is_open()) {
+		// Read first 4 bytes to get the file size
+		file.read(reinterpret_cast<char*>(&saveFileLength), sizeof(int));
+
+		if (saveFileLength > 0) {
+			// Allocate buffer and read the rest of the file
+			saveFileBuffer = new char[saveFileLength];
+			if (!file.read(saveFileBuffer, saveFileLength)) {
+				delete[] saveFileBuffer;
+				saveFileBuffer = nullptr;
+				saveFileLength = 0;
+				API::LogPluginMessage("Failed to read save file.");
+			}
+		}
+
+		file.close();
+
+		CallbackFn fn = (CallbackFn)(Core::moduleBase + 0x377AE0);
+
+		// Prepare arguments
+		void* thisptr = (void*)(Core::moduleBase + 0x4CBD78);
+
+		// Your buffer (example bytes you gave)
+		uint8_t dataBuffer[] = {
+			0x46, 0xC1, 0xF7, 0xCD, 
+			0x18, 0x74, 0xD7, 0x09,
+			0x01, 0x00, 0x00, 0x00, 
+			0x00, 0x00, 0x00, 0x00,
+			0x00, 0x00, 0x00, 0x00
+		};
+
+		dataBuffer[0x10] = (uint8_t)(saveFileLength & 0xFF);
+		dataBuffer[0x11] = (uint8_t)((saveFileLength >> 8) & 0xFF);
+		dataBuffer[0x12] = (uint8_t)((saveFileLength >> 16) & 0xFF);
+		dataBuffer[0x13] = (uint8_t)((saveFileLength >> 24) & 0xFF);
+
+		int arg2 = 2;
+
+		// Call the function
+		int result = fn(thisptr, dataBuffer, arg2);
+		API::LogPluginMessage("result: " + std::to_string(result));
+	}
+	else {
+		API::LogPluginMessage("Save file not found.");
+		saveFileLength = 0;
+		saveFileBuffer = nullptr;
+	}
+}
+
+using CallbackFn = int(__fastcall*)(void* thisptr, void* arg1, int arg2);
+
+int GameHandler::SaveFile(const char* filename, void* data, int size) {
+	std::string filePath = "./Saves/" + std::to_string(5) + "_" + "fyre";
+	createDirectoriesIfNeeded(filePath);
+	FILE* f = nullptr;
+	if (fopen_s(&f, filePath.c_str(), "wb") == 0 && f) {
+		fwrite(data, 1, size, f);
+		fclose(f);
+		API::LogPluginMessage("Save file Saved.");
+	}
+
+
+	g_SaveCallback.esi = Core::moduleBase + 0x4CBD78;
+	g_SaveCallback.framesRemaining = 5; // delay ~5 frames
+	g_SaveCallback.active = true;
+	// Define callback type, assuming __thiscall (ECX = this)
+	//typedef void(__thiscall* SteamCallbackType)(void* thisptr, void* param1, int param2);
+	//SteamCallbackType steamCallback = (SteamCallbackType)FUN_00777a10;
+
+	// Otherwise, return success manually
+	return 1;  // pretend success
+}
 /*
 0057da30 load chunk
+269200 handles game state
 */

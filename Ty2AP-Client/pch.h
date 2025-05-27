@@ -2,6 +2,7 @@
 #include "apclient.hpp"
 #include <map>
 #include <iostream>
+#include <filesystem>
 #include <vector>
 #include <string>
 #include <array>

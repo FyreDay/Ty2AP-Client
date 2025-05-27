@@ -4,6 +4,14 @@
 
 void TickBeforeGame(float deltaSeconds) {
     GUI::DrawUI();
+    if (GameHandler::g_SaveCallback.active) {
+        if (--GameHandler::g_SaveCallback.framesRemaining <= 0) {
+            *(DWORD*)(GameHandler::g_SaveCallback.esi + 0x238) = 0;  // Mark save complete
+            GameHandler::g_SaveCallback.active = false;
+            API::LogPluginMessage("Set to 0.");
+        }
+    }
+    
     //API::LogPluginMessage(std::to_string(SaveData::GetData()->TotalItems));\
     const char* GetTriggerNameSafely() {
     // Base address + offset

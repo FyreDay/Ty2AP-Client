@@ -8,6 +8,12 @@ extern GetStringFunc originalGetString;
 class GameHandler
 {
 public:
+	struct SaveCallbackInfo {
+		DWORD esi;
+		int framesRemaining;
+		bool active;
+	};
+	static inline SaveCallbackInfo g_SaveCallback = { 0, 0, false };
 	static void Initialize();
 	static void SetupHooks();
 
@@ -15,9 +21,12 @@ public:
 	static void __stdcall ItemAvailableLogicHook();
 	static void __stdcall ItemAvailableClickHook();
 	static void __stdcall ItemAvailableClick2Hook();
+	
 
 	static void __stdcall ChunkLoadedHook();
 	static void __stdcall TriggerHitHook();
+	static void __stdcall LoadSaveFileHook();
+	static void __stdcall SaveFileHook();
 
 	static int __cdecl HookedGetString(int param_1);
 
@@ -25,4 +34,6 @@ public:
 	static void OnChunkLoaded();
 	static void TryDisableFourbieTrigger();
 	static void TryEditFourbieTrigger(bool enable);
+	static void LoadAPSaveFile();
+	static int SaveFile(const char* filename, void* data, int size);
 };
