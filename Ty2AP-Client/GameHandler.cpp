@@ -182,8 +182,17 @@ __declspec(naked) void __stdcall GameHandler::LoadSaveFileHook() {
 	_asm {
 		call GameHandler::LoadAPSaveFile
 		add esp, 0xC
-		mov eax, offset saveFileBuffer
-		mov edx, saveFileLength
+
+		mov eax, saveFileLength
+		mov[edi + 0x68], eax
+
+		sub eax, 0xc
+		mov[edi + 0x70], eax
+
+		mov esi, saveFileBuffer       // Source (loaded file)
+		mov edi, [edi + 0x6C]         // Destination (preallocated buffer)
+		mov ecx, saveFileLength
+		rep movsb
 		jmp dword ptr[LoadSaveFileOriginReturnAddr]
 	}
 }
@@ -237,15 +246,41 @@ void GameHandler::SetupHooks() {
 	auto titleaddr = (char*)(Core::moduleBase + 0x32E5F0);
 	MH_CreateHook((LPVOID)titleaddr, &HookedGetString, reinterpret_cast<void**>(&originalGetString));
 
-	//load
-	LoadSaveFileOriginReturnAddr = Core::moduleBase + 0x376e84+5;
+	//////load
+	/*LoadSaveFileOriginReturnAddr = Core::moduleBase + 0x376e84+5;
 	auto loadaddr = (char*)(Core::moduleBase + 0x376e84);
-	MH_CreateHook((LPVOID)loadaddr, &LoadSaveFileHook, reinterpret_cast<LPVOID*>(&LoadSaveFileOrigin));
+	MH_CreateHook((LPVOID)loadaddr, &LoadSaveFileHook, reinterpret_cast<LPVOID*>(&LoadSaveFileOrigin));*/
 
 	SaveFileOriginReturnAddr = Core::moduleBase + 0x376d6f+5;
 	auto saveaddr = (char*)(Core::moduleBase + 0x376d6f);
 	MH_CreateHook((LPVOID)saveaddr, &SaveFileHook, reinterpret_cast<LPVOID*>(&SaveFileOrigin));
 
+	//PatchStartingLevel();
+}
+
+void GameHandler::PatchStartingLevel() {
+	// Address of the instruction to patch (PUSH 0x00851738)
+	uintptr_t address = Core::moduleBase + 0x234504;
+
+	// New bytes: PUSH 0x00454D74 -> 68 74 4D 45 00
+	uintptr_t stringAddr = Core::moduleBase + 0x454D74;
+
+	BYTE patch[5];
+	patch[0] = 0x68; // PUSH opcode
+	*reinterpret_cast<uint32_t*>(&patch[1]) = static_cast<uint32_t>(stringAddr);
+	// Unprotect memory region
+	DWORD oldProtect;
+	if (VirtualProtect(reinterpret_cast<LPVOID>(address), sizeof(patch), PAGE_EXECUTE_READWRITE, &oldProtect)) {
+		// Apply patch
+		memcpy(reinterpret_cast<void*>(address), patch, sizeof(patch));
+
+		// Restore old protection
+		VirtualProtect(reinterpret_cast<LPVOID>(address), sizeof(patch), oldProtect, &oldProtect);
+		std::cout << "Patch applied successfully." << std::endl;
+	}
+	else {
+		std::cerr << "Failed to change memory protection." << std::endl;
+	}
 }
 
 bool GameHandler::OnItemAvailable(void* itemPtr) {
@@ -362,9 +397,9 @@ void GameHandler::LoadAPSaveFile() {
 	createDirectoriesIfNeeded(filePath);
 	std::ifstream file(filePath, std::ios::binary);
 	if (file.is_open()) {
-		// Read first 4 bytes to get the file size
-		file.read(reinterpret_cast<char*>(&saveFileLength), sizeof(int));
-
+		file.seekg(0, std::ios::end);
+		saveFileLength = file.tellg();
+		file.seekg(0, std::ios::beg);
 		if (saveFileLength > 0) {
 			// Allocate buffer and read the rest of the file
 			saveFileBuffer = new char[saveFileLength];
@@ -377,30 +412,38 @@ void GameHandler::LoadAPSaveFile() {
 		}
 
 		file.close();
+		//set state to loading
+		*(DWORD*)(Core::moduleBase + 0x4CBD78 + 0x238) = 1;
 		//this doesnt work
-		using CallbackFn = int(__thiscall*)(void* thisptr, void* arg1, int arg2);
-		CallbackFn fn = (CallbackFn)(Core::moduleBase + 0x377AE0);
+		g_SaveCallback.active = true;
+		g_SaveCallback.esi = Core::moduleBase + 0x4CBD78;
+		g_SaveCallback.framesRemaining = 5;
+		g_SaveCallback.callback = []() {
+			using CallbackFn = int(__thiscall*)(void* thisptr, void* arg1, int arg2);
+			CallbackFn fn = (CallbackFn)(Core::moduleBase + 0x377AE0);
 
-		void* thisptr = (void*)(Core::moduleBase + 0x4CBD78);
+			void* thisptr = (void*)(Core::moduleBase + 0x4CBD78);
 
-		uint8_t dataBuffer[] = {
-			0x46, 0xC1, 0xF7, 0xCD, 
-			0x18, 0x74, 0xD7, 0x09,
-			0x01, 0x00, 0x00, 0x00, 
-			0x00, 0x00, 0x00, 0x00,
-			0x00, 0x00, 0x00, 0x00
+			uint8_t dataBuffer[] = {
+				0x46, 0xC1, 0xF7, 0xCD,
+				0x18, 0x74, 0xD7, 0x09,
+				0x01, 0x00, 0x00, 0x00,
+				0x00, 0x00, 0x00, 0x00,
+				0x00, 0x00, 0x00, 0x00
+			};
+
+			dataBuffer[0x10] = (uint8_t)(saveFileLength & 0xFF);
+			dataBuffer[0x11] = (uint8_t)((saveFileLength >> 8) & 0xFF);
+			dataBuffer[0x12] = (uint8_t)((saveFileLength >> 16) & 0xFF);
+			dataBuffer[0x13] = (uint8_t)((saveFileLength >> 24) & 0xFF);
+
+			int arg2 = 0;
+
+			// Call the function
+			int result = fn(thisptr, dataBuffer, arg2);
+			API::LogPluginMessage("result: " + std::to_string(result));
 		};
 
-		dataBuffer[0x10] = (uint8_t)(saveFileLength & 0xFF);
-		dataBuffer[0x11] = (uint8_t)((saveFileLength >> 8) & 0xFF);
-		dataBuffer[0x12] = (uint8_t)((saveFileLength >> 16) & 0xFF);
-		dataBuffer[0x13] = (uint8_t)((saveFileLength >> 24) & 0xFF); 
-
-		int arg2 = 2;
-
-		// Call the function
-		int result = fn(thisptr, dataBuffer, arg2);
-		API::LogPluginMessage("result: " + std::to_string(result));
 	}
 	else {
 		API::LogPluginMessage("Save file not found.");
@@ -409,7 +452,17 @@ void GameHandler::LoadAPSaveFile() {
 	}
 }
 
+//using CallbackFn = int(__stdcall*)(void* dest, void* src, int size);
+//CallbackFn fn = (CallbackFn)(Core::moduleBase + 0x3b7e10);
 
+//void** destPtrLocation = reinterpret_cast<void**>(Core::moduleBase + 0x4CBD78 + 0x74);
+//void* dest = *destPtrLocation;
+//// Call the function
+//int result = fn(dest, saveFileBuffer, saveFileLength);
+//API::LogPluginMessage("result: " + std::to_string(result));
+//g_SaveCallback.active = true;
+//g_SaveCallback.esi = Core::moduleBase + 0x4CBD78;
+//g_SaveCallback.framesRemaining = 5; // delay ~5 frames
 
 int GameHandler::SaveFile(const char* filename, void* data, int size) {
 	std::string filePath = "./Saves/" + std::to_string(5) + "_" + "fyre";
@@ -435,4 +488,5 @@ int GameHandler::SaveFile(const char* filename, void* data, int size) {
 /*
 0057da30 load chunk
 269200 handles game state
+0854d74 is z2 hq chunck
 */

@@ -7,6 +7,7 @@
 #include <string>
 #include <array>
 #include "imgui.h"
+#include <cstdint>
 #include "imgui_impl_opengl3.h"
 #include "imgui_internal.h"
 #include "imgui_stdlib.h"

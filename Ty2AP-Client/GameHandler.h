@@ -1,6 +1,7 @@
 #pragma once
 #include "CheckHandler.h"
 #include "APSaveData.h"
+#include <windows.h>
 
 typedef int(__cdecl* GetStringFunc)(int id);
 extern GetStringFunc originalGetString;
@@ -9,11 +10,12 @@ class GameHandler
 {
 public:
 	struct SaveCallbackInfo {
+		std::function<void()> callback;
 		DWORD esi;
 		int framesRemaining;
 		bool active;
 	};
-	static inline SaveCallbackInfo g_SaveCallback = { 0, 0, false };
+	static inline SaveCallbackInfo g_SaveCallback = { nullptr,0, 0, false };
 	static void Initialize();
 	static void SetupHooks();
 
@@ -33,6 +35,7 @@ public:
 
 	static bool OnItemAvailable(void* itemPtr);
 	static void OnChunkLoaded();
+	static void PatchStartingLevel();
 	static void TryDisableFourbieTrigger();
 	static void TryEditFourbieTrigger(bool enable);
 	static void LoadAPSaveFile();
