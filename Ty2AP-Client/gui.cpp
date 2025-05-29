@@ -10,18 +10,28 @@ extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam
 bool GUI::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
     if (msg == WM_KEYDOWN && wParam == VK_F3) {
         for (auto& window : windows) {
-            if (auto MKObject = dynamic_cast<InfoWindow*>(window.get())) {
-                MKObject->ToggleVisibility();
-                API::LogPluginMessage("Toggle GetObject window.");
+            if (auto Iwindow = dynamic_cast<InfoWindow*>(window.get())) {
+                Iwindow->ToggleVisibility();
+                API::LogPluginMessage("Toggle InfoWindow window.");
                 break;
             }
         }
     }
     if (msg == WM_KEYDOWN && wParam == VK_F4) {
         for (auto& window : windows) {
-            if (auto MKObject = dynamic_cast<LoginWindow*>(window.get())) {
-                MKObject->ToggleVisibility();
+            if (auto Lwindow = dynamic_cast<LoginWindow*>(window.get())) {
+                Lwindow->ToggleVisibility();
                 API::LogPluginMessage("Toggle LoginWindow window.");
+                break;
+            }
+        }
+    }
+
+    if (msg == WM_KEYDOWN && wParam == VK_F5) {
+        for (auto& window : windows) {
+            if (auto Cwindow = dynamic_cast<LoggerWindow*>(window.get())) {
+                Cwindow->ToggleVisibility();
+                API::LogPluginMessage("Toggle LoggerWindow window.");
                 break;
             }
         }
@@ -53,6 +63,7 @@ void GUI::Initialize() {
 
     windows.push_back(std::make_unique<InfoWindow>());
     windows.push_back(std::make_unique<LoginWindow>());
+    windows.push_back(std::make_unique<LoggerWindow>());
 
     API::LogPluginMessage("Initialized ImGui successfully.");
     GUI::init = true;

@@ -29,6 +29,8 @@ public:
 	static void __stdcall TriggerHitHook();
 
 	static void __stdcall LoadSaveFileHook();
+	static void __stdcall GetSaveDataSize1Hook();
+	static void __stdcall GetSaveDataSize2Hook();
 	static void __stdcall SaveFileHook();
 
 	static int __cdecl HookedGetString(int param_1);
@@ -36,8 +38,10 @@ public:
 	static bool OnItemAvailable(void* itemPtr);
 	static void OnChunkLoaded();
 	static void PatchStartingLevel();
+	static void NopInstructions(void* address, size_t size);
 	static void TryDisableFourbieTrigger();
 	static void TryEditFourbieTrigger(bool enable);
 	static void LoadAPSaveFile();
+	static int GetSaveDataSize();
 	static int SaveFile(const char* filename, void* data, int size);
 };

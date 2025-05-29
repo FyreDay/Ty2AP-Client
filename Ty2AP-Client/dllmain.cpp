@@ -3,6 +3,7 @@
 #include "gui.h"
 
 void TickBeforeGame(float deltaSeconds) {
+    ArchipelagoHandler::Poll();
     GUI::DrawUI();
     if (GameHandler::g_SaveCallback.active) {
         if (--GameHandler::g_SaveCallback.framesRemaining <= 0) {
@@ -12,9 +13,10 @@ void TickBeforeGame(float deltaSeconds) {
             }
             else {
                 *(DWORD*)(GameHandler::g_SaveCallback.esi + 0x238) = 0;  // Mark save complete
+                API::LogPluginMessage("Set to 0.");
             }
             GameHandler::g_SaveCallback.active = false;
-            API::LogPluginMessage("Set to 0.");
+            
             
         }
     }

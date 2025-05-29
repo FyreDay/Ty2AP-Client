@@ -11,6 +11,7 @@ public:
 	static void updateBoughtItem(int id, bool bought) {
 		ItemMap[id] = bought;
 	}
+	static inline int pLastReceivedIndex = -1;
 	static inline std::list<int> UnlockedParkingPads = { 3736 };
 	static inline const std::list<int> AllParkingPads = { 3736,3689 };
 	static inline std::map<int, bool> ItemMap = {

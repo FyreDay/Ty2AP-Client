@@ -180,8 +180,8 @@ FunctionType LoadSaveFileOrigin = nullptr;
 uintptr_t LoadSaveFileOriginReturnAddr;
 __declspec(naked) void __stdcall GameHandler::LoadSaveFileHook() {
 	_asm {
+		add esp, 0x8
 		call GameHandler::LoadAPSaveFile
-		add esp, 0xC
 
 		mov eax, saveFileLength
 		mov[edi + 0x68], eax
@@ -194,6 +194,26 @@ __declspec(naked) void __stdcall GameHandler::LoadSaveFileHook() {
 		mov ecx, saveFileLength
 		rep movsb
 		jmp dword ptr[LoadSaveFileOriginReturnAddr]
+	}
+}
+
+FunctionType GetSaveDataSize1Origin = nullptr;
+uintptr_t GetSaveDataSize1OriginReturnAddr;
+__declspec(naked) void __stdcall GameHandler::GetSaveDataSize1Hook() {
+	_asm {
+		call GameHandler::GetSaveDataSize
+
+		jmp dword ptr[GetSaveDataSize1OriginReturnAddr]
+	}
+}
+
+FunctionType GetSaveDataSize2Origin = nullptr;
+uintptr_t GetSaveDataSize2OriginReturnAddr;
+__declspec(naked) void __stdcall GameHandler::GetSaveDataSize2Hook() {
+	_asm {
+		call GameHandler::GetSaveDataSize
+
+		jmp dword ptr[GetSaveDataSize2OriginReturnAddr]
 	}
 }
 
@@ -246,11 +266,29 @@ void GameHandler::SetupHooks() {
 	auto titleaddr = (char*)(Core::moduleBase + 0x32E5F0);
 	MH_CreateHook((LPVOID)titleaddr, &HookedGetString, reinterpret_cast<void**>(&originalGetString));
 
-	//////load
-	/*LoadSaveFileOriginReturnAddr = Core::moduleBase + 0x376e84+5;
+	//load
+	LoadSaveFileOriginReturnAddr = Core::moduleBase + 0x376e84+5;
 	auto loadaddr = (char*)(Core::moduleBase + 0x376e84);
-	MH_CreateHook((LPVOID)loadaddr, &LoadSaveFileHook, reinterpret_cast<LPVOID*>(&LoadSaveFileOrigin));*/
+	MH_CreateHook((LPVOID)loadaddr, &LoadSaveFileHook, reinterpret_cast<LPVOID*>(&LoadSaveFileOrigin));
+	
+	//modify size of slot buffer
+	GetSaveDataSize1OriginReturnAddr = Core::moduleBase + 0x2697af +7;
+	auto size1addr = (char*)(Core::moduleBase + 0x2697af);
+	MH_CreateHook((LPVOID)size1addr, &GetSaveDataSize1Hook, reinterpret_cast<LPVOID*>(&GetSaveDataSize1Origin));
 
+	GetSaveDataSize2OriginReturnAddr = Core::moduleBase + 0x234492 +7;
+	auto size2addr = (char*)(Core::moduleBase + 0x234492);
+	MH_CreateHook((LPVOID)size2addr, &GetSaveDataSize2Hook, reinterpret_cast<LPVOID*>(&GetSaveDataSize2Origin));
+
+	NopInstructions((void*)(Core::moduleBase + 0x376e67), 29);
+	//remove the steam callbackandload setup
+	NopInstructions((void*)(Core::moduleBase + 0x376eaf), 12);
+	NopInstructions((void*)(Core::moduleBase + 0x376ece), 6);
+
+	//remove the steam finish saveload code
+	NopInstructions((void*)(Core::moduleBase + 0x377b34), 20);
+	NopInstructions((void*)(Core::moduleBase + 0x377b4b), 8);
+	//save
 	SaveFileOriginReturnAddr = Core::moduleBase + 0x376d6f+5;
 	auto saveaddr = (char*)(Core::moduleBase + 0x376d6f);
 	MH_CreateHook((LPVOID)saveaddr, &SaveFileHook, reinterpret_cast<LPVOID*>(&SaveFileOrigin));
@@ -281,6 +319,14 @@ void GameHandler::PatchStartingLevel() {
 	else {
 		std::cerr << "Failed to change memory protection." << std::endl;
 	}
+}
+
+void GameHandler::NopInstructions(void* address, size_t size) {
+	DWORD oldProtect;
+	VirtualProtect(address, size, PAGE_EXECUTE_READWRITE, &oldProtect);
+	memset(address, 0x90, size); // 0x90 = NOP
+	VirtualProtect(address, size, oldProtect, &oldProtect);
+	FlushInstructionCache(GetCurrentProcess(), address, size);
 }
 
 bool GameHandler::OnItemAvailable(void* itemPtr) {
@@ -392,6 +438,18 @@ void createDirectoriesIfNeeded(const std::string& filepath) {
 }
 
 
+int GameHandler::GetSaveDataSize() {
+	int size = 0;
+	auto filePath = "./Saves/" + std::to_string(5) + "_" + "fyre";
+	createDirectoriesIfNeeded(filePath);
+	std::ifstream file(filePath, std::ios::binary);
+	if (file.is_open()) {
+		
+		file.read(reinterpret_cast<char*>(&size), sizeof(int));
+		file.close();
+	}
+	return size;
+}
 void GameHandler::LoadAPSaveFile() {
 	auto filePath = "./Saves/" + std::to_string(5) + "_" + "fyre";
 	createDirectoriesIfNeeded(filePath);
