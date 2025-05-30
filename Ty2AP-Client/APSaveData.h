@@ -12,8 +12,47 @@ public:
 		ItemMap[id] = bought;
 	}
 	static inline int pLastReceivedIndex = -1;
-	static inline std::list<int> UnlockedParkingPads = { 3736 };
-	static inline const std::list<int> AllParkingPads = { 3736,3689 };
+	static inline std::list<int> UnlockedParkingPads = {};
+	static inline const std::list<int> AllParkingPads = 
+	{ 
+		3736,
+		3689,
+		3688,
+		4092,
+		3692,
+		30001,
+		3306,
+		3285,
+		3287,
+		3712,
+		3735,
+		3694,
+		3693,
+		3292,
+		4130,
+		3685,
+		3687,
+		3983,
+		3244,
+		3714,
+		3708,
+		3702,
+		3713,
+		3284,
+		3709,
+		3710,
+		3711,
+		4035,
+		3300,
+		3951,
+		3686,
+		3733,
+		3967,
+		3690,
+		3691,
+		3277,
+		3954 
+	};
 	static inline std::map<int, bool> ItemMap = {
 	{8, true}, //True is can purchuse
 	{9, true},

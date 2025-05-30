@@ -1,5 +1,5 @@
 #pragma once
-#include "ArchipelagoHandler.h"
+#include "GameHandler.h"
 #include "SaveData.h"
 
 class ItemHandler
@@ -10,6 +10,8 @@ public:
     static void HandleRang(int id);
     static void HandleParkingPad(int id);
     static void CollectItem(int offsetfromfirstitem);
+    static const char* GetShopItemName(int strId);
+    static void FillShopItemNames(const std::list<APClient::NetworkItem>& items);
     //static void HandleProgressiveParkingPad();
     static std::queue<APClient::NetworkItem> storedItems;
 private:

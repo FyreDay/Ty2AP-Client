@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "GameHandler.h"
-
+using nlohmann::json;
 void GameHandler::Initialize()
 {
 	MH_Uninitialize();
@@ -266,12 +266,12 @@ void GameHandler::SetupHooks() {
 	auto titleaddr = (char*)(Core::moduleBase + 0x32E5F0);
 	MH_CreateHook((LPVOID)titleaddr, &HookedGetString, reinterpret_cast<void**>(&originalGetString));
 
-	//load
+	//load custom save
 	LoadSaveFileOriginReturnAddr = Core::moduleBase + 0x376e84+5;
 	auto loadaddr = (char*)(Core::moduleBase + 0x376e84);
 	MH_CreateHook((LPVOID)loadaddr, &LoadSaveFileHook, reinterpret_cast<LPVOID*>(&LoadSaveFileOrigin));
 	
-	//modify size of slot buffer
+	//modify size of slot buffer in both places
 	GetSaveDataSize1OriginReturnAddr = Core::moduleBase + 0x2697af +7;
 	auto size1addr = (char*)(Core::moduleBase + 0x2697af);
 	MH_CreateHook((LPVOID)size1addr, &GetSaveDataSize1Hook, reinterpret_cast<LPVOID*>(&GetSaveDataSize1Origin));
@@ -335,15 +335,11 @@ bool GameHandler::OnItemAvailable(void* itemPtr) {
 	return APSaveData::hasBoughtItem(id);
 }
 
-static std::string myCustomTitle = "AP Item Name";
 static std::string PadDisabled = "Pad Disabled By AP";
 static std::string copyright = "Krome Studios Inc.  All rights reserved.  TY the Tasmanian Tiger, Bush Rescue and characters and the Krome Studios logo are trademarks of Krome Studios Inc.\n\nAP Mod Created By\nFyreDay\n xMcacutt Dashieswag92";
 
 int __cdecl GameHandler::HookedGetString(int param_1) {
-	//API::LogPluginMessage(std::to_string(param_1));
-	if (param_1 == 564) {
-		return (int)myCustomTitle.c_str(); // Make sure string stays alive
-	}
+	API::LogPluginMessage(std::to_string(param_1));
 	if (param_1 == 1) {
 		return (int)copyright.c_str();
 	}
@@ -354,6 +350,11 @@ int __cdecl GameHandler::HookedGetString(int param_1) {
 		if (!*canLeave) {
 			return (int)PadDisabled.c_str();
 		}
+	}
+
+	const char* itemname = ItemHandler::GetShopItemName(param_1);
+	if (itemname) {
+		return (int)itemname; 
 	}
 
 	return originalGetString(param_1);
@@ -440,9 +441,9 @@ void createDirectoriesIfNeeded(const std::string& filepath) {
 
 int GameHandler::GetSaveDataSize() {
 	int size = 0;
-	auto filePath = "./Saves/" + std::to_string(5) + "_" + "fyre";
+	std::string filePath = "./Saves/" + ArchipelagoHandler::GetSaveIdentifier();
 	createDirectoriesIfNeeded(filePath);
-	std::ifstream file(filePath, std::ios::binary);
+	std::ifstream file(filePath + ".bin", std::ios::binary);
 	if (file.is_open()) {
 		
 		file.read(reinterpret_cast<char*>(&size), sizeof(int));
@@ -451,12 +452,14 @@ int GameHandler::GetSaveDataSize() {
 	return size;
 }
 void GameHandler::LoadAPSaveFile() {
-	auto filePath = "./Saves/" + std::to_string(5) + "_" + "fyre";
+	std::string filePath = "./Saves/" + ArchipelagoHandler::GetSaveIdentifier();
+	API::LogPluginMessage(filePath);
 	createDirectoriesIfNeeded(filePath);
-	std::ifstream file(filePath, std::ios::binary);
+	std::ifstream file(filePath + ".bin", std::ios::binary);
 	if (file.is_open()) {
 		file.seekg(0, std::ios::end);
 		saveFileLength = file.tellg();
+		API::LogPluginMessage("length: " + std::to_string(saveFileLength));
 		file.seekg(0, std::ios::beg);
 		if (saveFileLength > 0) {
 			// Allocate buffer and read the rest of the file
@@ -470,9 +473,11 @@ void GameHandler::LoadAPSaveFile() {
 		}
 
 		file.close();
-		//set state to loading
+
+		read_json_file(filePath + ".json");
+
 		*(DWORD*)(Core::moduleBase + 0x4CBD78 + 0x238) = 1;
-		//this doesnt work
+		
 		g_SaveCallback.active = true;
 		g_SaveCallback.esi = Core::moduleBase + 0x4CBD78;
 		g_SaveCallback.framesRemaining = 5;
@@ -508,40 +513,66 @@ void GameHandler::LoadAPSaveFile() {
 		saveFileLength = 0;
 		saveFileBuffer = nullptr;
 	}
+
+
 }
 
-//using CallbackFn = int(__stdcall*)(void* dest, void* src, int size);
-//CallbackFn fn = (CallbackFn)(Core::moduleBase + 0x3b7e10);
-
-//void** destPtrLocation = reinterpret_cast<void**>(Core::moduleBase + 0x4CBD78 + 0x74);
-//void* dest = *destPtrLocation;
-//// Call the function
-//int result = fn(dest, saveFileBuffer, saveFileLength);
-//API::LogPluginMessage("result: " + std::to_string(result));
-//g_SaveCallback.active = true;
-//g_SaveCallback.esi = Core::moduleBase + 0x4CBD78;
-//g_SaveCallback.framesRemaining = 5; // delay ~5 frames
-
 int GameHandler::SaveFile(const char* filename, void* data, int size) {
-	std::string filePath = "./Saves/" + std::to_string(5) + "_" + "fyre";
+	std::string filePath = "./Saves/" +  ArchipelagoHandler::GetSaveIdentifier();
 	createDirectoriesIfNeeded(filePath);
 	FILE* f = nullptr;
-	if (fopen_s(&f, filePath.c_str(), "wb") == 0 && f) {
+	if (fopen_s(&f, (filePath + ".bin").c_str(), "wb") == 0 && f) {
 		fwrite(data, 1, size, f);
 		fclose(f);
 		API::LogPluginMessage("Save file Saved.");
 	}
 
+	//write_json_file(filePath + ".json");
 
 	g_SaveCallback.esi = Core::moduleBase + 0x4CBD78;
 	g_SaveCallback.framesRemaining = 5; // delay ~5 frames
 	g_SaveCallback.active = true;
-	// Define callback type, assuming __thiscall (ECX = this)
-	//typedef void(__thiscall* SteamCallbackType)(void* thisptr, void* param1, int param2);
-	//SteamCallbackType steamCallback = (SteamCallbackType)FUN_00777a10;
 
-	// Otherwise, return success manually
-	return 1;  // pretend success
+	return 1; 
+}
+
+void GameHandler::write_json_file(const std::string& filename) {
+	json j;
+
+	// Populate the JSON object
+	j["LastRecievedIndex"] = APSaveData::pLastReceivedIndex;
+	j["ShopData"] = APSaveData::ItemMap;
+	j["UnlockedParkingBays"] = APSaveData::UnlockedParkingPads;
+
+	// Write to file
+	std::ofstream file(filename);
+	if (file.is_open()) {
+		file << j.dump(4);  // pretty print with indent of 4
+		file.close();
+	}
+	else {
+		std::cerr << "Could not open file for writing: " << filename << std::endl;
+	}
+}
+
+void GameHandler::read_json_file(const std::string& filename) {
+	std::ifstream file(filename);
+	if (!file.is_open()) {
+		return;
+	}
+
+	json j;
+	file >> j;
+
+	// Access data
+	APSaveData::pLastReceivedIndex = j["LastRecievedIndex"];
+	APSaveData::ItemMap = j["ShopData"].get<std::map<int, bool>>();
+	APSaveData::UnlockedParkingPads = j["UnlockedParkingBays"].get<std::list<int>>();
+}
+
+bool GameHandler::IsInGame() {
+	uintptr_t addr = Core::moduleBase + 0x4EB510;
+	return *reinterpret_cast<uint8_t*>(addr) != 0;
 }
 /*
 0057da30 load chunk

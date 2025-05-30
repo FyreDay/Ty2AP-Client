@@ -6,7 +6,7 @@
 #define UUID_FILE "uuid" // TODO: place in %appdata%
 #define GAME_NAME "Ty the Tasmanian Tiger 2"
 
-#define VERSION_TUPLE {0,5,1}
+#define VERSION_STRING "0.0.1"
 
 using nlohmann::json;
 bool ap_connect_sent = false;
@@ -40,15 +40,18 @@ void ArchipelagoHandler::ConnectAP(LoginWindow* login)
 	ap = new APClient(uuid, GAME_NAME, login->server);
 	ap_sync_queued = false;
 
-	ap->set_slot_connected_handler([](const json& data) {
-		LoggerWindow::Log("connected");
+	ap->set_slot_connected_handler([login](const json& data) {
+		LoggerWindow::Log("Connected");
+		login->SetMessage("Connected");
 	});
-	ap->set_slot_disconnected_handler([]() {
+	ap->set_slot_disconnected_handler([login]() {
 		LoggerWindow::Log("Slot disconnected");
+		login->SetMessage("Disconnected");
 	});
-	ap->set_slot_refused_handler([](const std::list<std::string>& errors) {
+	ap->set_slot_refused_handler([login](const std::list<std::string>& errors) {
 		for (const auto& error : errors) {
 			LoggerWindow::Log("Connection refused : " + error);
+			login->SetMessage("Connection refused");
 		}
 	});
 	ap->set_room_info_handler([login]() {
@@ -69,7 +72,11 @@ void ArchipelagoHandler::ConnectAP(LoginWindow* login)
 			}
 			LoggerWindow::Log("item recieved: " + itemname);
 			APSaveData::pLastReceivedIndex++;
+			ItemHandler::HandleItem(item);
 		}
+	});
+	ap->set_location_info_handler([](const std::list<APClient::NetworkItem>& items) {
+		ItemHandler::FillShopItemNames(items);
 	});
 }
 
@@ -85,4 +92,34 @@ void ArchipelagoHandler::gameFinished() {
 
 void ArchipelagoHandler::Poll() {
 	if (ap) ap->poll();
+}
+
+
+std::string ArchipelagoHandler::GetItemName(int64_t id, int player) {
+	if (ap) {
+		return ap->get_item_name(id, ap->get_player_game(player));
+	}
+	return "";
+}
+
+std::string ArchipelagoHandler::GetItemDesc(int player) {
+	if (ap) {
+		return "Item for "+ ap->get_player_alias(player) + " playing " + ap->get_player_game(player);
+	}
+	return "";
+}
+
+std::string ArchipelagoHandler::GetSaveIdentifier() {
+	if (ap) {
+		return ap->get_slot() + "_" + ap->get_seed();
+	}
+	return "";
+}
+
+
+bool ArchipelagoHandler::ScoutLocations(std::list<int64_t> locations, int create_as_hint) {
+	if (ap) {
+		return ap->LocationScouts(locations, create_as_hint);
+	}
+	return false;
 }

@@ -1,4 +1,5 @@
 #pragma once
+#include "ArchipelagoHandler.h"
 #include "CheckHandler.h"
 #include "APSaveData.h"
 #include <windows.h>
@@ -44,4 +45,7 @@ public:
 	static void LoadAPSaveFile();
 	static int GetSaveDataSize();
 	static int SaveFile(const char* filename, void* data, int size);
+	static void write_json_file(const std::string& filename);
+	static void read_json_file(const std::string& filename);
+	static bool IsInGame();
 };

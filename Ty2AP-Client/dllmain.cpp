@@ -20,6 +20,10 @@ void TickBeforeGame(float deltaSeconds) {
             
         }
     }
+    bool* gotBoomerangPtr = &SaveData::GetData()->BoomerangData.GotBoomerang;
+    std::ostringstream oss;
+    oss << "addr: " << static_cast<void*>(gotBoomerangPtr);
+    API::LogPluginMessage(oss.str());
     
     //API::LogPluginMessage(std::to_string(SaveData::GetData()->TotalItems));\
     const char* GetTriggerNameSafely() {
