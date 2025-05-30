@@ -43,6 +43,12 @@ void ArchipelagoHandler::ConnectAP(LoginWindow* login)
 	ap->set_slot_connected_handler([login](const json& data) {
 		LoggerWindow::Log("Connected");
 		login->SetMessage("Connected");
+		bool deathlink = false;
+		std::list<std::string> tags = {};
+		if (deathlink)
+			tags.push_back("DeathLink");
+		ap->ConnectUpdate(false, 0b111, true, tags);
+		ap->StatusUpdate(APClient::ClientStatus::PLAYING);
 	});
 	ap->set_slot_disconnected_handler([login]() {
 		LoggerWindow::Log("Slot disconnected");
@@ -56,8 +62,7 @@ void ArchipelagoHandler::ConnectAP(LoginWindow* login)
 	});
 	ap->set_room_info_handler([login]() {
 		std::list<std::string> tags;
-		//if (GameHook->dIsDeathLink) { tags.push_back("DeathLink"); }
-		ap->ConnectSlot(login->slot, login->password, 5, tags, { 0,6,0 });
+		ap->ConnectSlot(login->slot, login->password, 0b111, tags, { 0,6,0 });
 	});
 
 	ap->set_items_received_handler([](const std::list<APClient::NetworkItem>& items) {
@@ -65,7 +70,7 @@ void ArchipelagoHandler::ConnectAP(LoginWindow* login)
 			std::string itemname = ap->get_item_name(item.item, GAME_NAME);
 			std::string sender = ap->get_player_alias(item.player);
 			//std::string location = ap->get_location_name(item.location, );
-
+			API::LogPluginMessage("recieved: " + itemname);
 			//Check if we should ignore this item
 			if (item.index < APSaveData::pLastReceivedIndex) {
 				continue;
@@ -91,7 +96,9 @@ void ArchipelagoHandler::gameFinished() {
 }
 
 void ArchipelagoHandler::Poll() {
-	if (ap) ap->poll();
+	if (ap) {
+		ap->poll();
+	}
 }
 
 

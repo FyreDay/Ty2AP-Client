@@ -5,6 +5,11 @@ std::queue<APClient::NetworkItem> ItemHandler::storedItems;
 
 void ItemHandler::HandleItem(APClient::NetworkItem item)
 {
+	if (!GameHandler::IsInGame()) {
+		storedItems.push(item);
+		return;
+	}
+
 	if (item.item < 0x16) {
 		HandleRang(item.item);
 	}
@@ -55,10 +60,10 @@ void ItemHandler::HandleItem(APClient::NetworkItem item)
 	}
 
 	if (item.item == 0x20) {
-		SaveData::GetData()->CollectableData.Cogs.Collected++;
+		SaveData::GetData()->CogCollected++;
 	}
 	if (item.item == 0x21) {
-		SaveData::GetData()->CollectableData.Orbs.Collected++;
+		SaveData::GetData()->OrbCollected++;
 	}
 	if (item.item == 0x22) {
 		AddOpals(1);
@@ -93,7 +98,7 @@ void ItemHandler::HandleRang(int id)
 	if (id == 0x13) {
 		id = 0;
 	}
-	bool* base = &SaveData::GetData()->BoomerangData.GotBoomerang;
+	bool* base = &SaveData::GetData()->GotBoomerang;
 	base[id] = true;
 	//if infrarang or x rang update that ty has them
 	if (id == 0x0a) {
@@ -108,10 +113,10 @@ void ItemHandler::HandleRang(int id)
 void ItemHandler::HandleParkingPad(int id)
 {
 	APSaveData::UnlockedParkingPads.push_back(id);
-	//updates parkingpads if its loaded
-	if (GameHandler::IsInGame()) {
+	//updates parkingpads if its loaded nned to queue for next frame
+	/*if (GameHandler::IsInGame()) {
 		GameHandler::OnChunkLoaded();
-	}
+	}*/
 }
 
 void ItemHandler::CollectItem(int offsetfromfirstitem)
@@ -120,6 +125,14 @@ void ItemHandler::CollectItem(int offsetfromfirstitem)
 	uintptr_t newAddress = rawAddress + offsetfromfirstitem + 0x10;
 	bool* boolPtr = reinterpret_cast<bool*>(newAddress);
 	*boolPtr = true;
+}
+
+void ItemHandler::HandleStoredItems()
+{
+	while (!storedItems.empty() && GameHandler::IsInGame()) {
+		HandleItem(storedItems.front());
+		storedItems.pop();
+	}
 }
 
 static std::map<int, std::string> strIDtoTitleText = {};

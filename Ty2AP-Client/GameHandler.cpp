@@ -339,7 +339,7 @@ static std::string PadDisabled = "Pad Disabled By AP";
 static std::string copyright = "Krome Studios Inc.  All rights reserved.  TY the Tasmanian Tiger, Bush Rescue and characters and the Krome Studios logo are trademarks of Krome Studios Inc.\n\nAP Mod Created By\nFyreDay\n xMcacutt Dashieswag92";
 
 int __cdecl GameHandler::HookedGetString(int param_1) {
-	API::LogPluginMessage(std::to_string(param_1));
+	//API::LogPluginMessage(std::to_string(param_1));
 	if (param_1 == 1) {
 		return (int)copyright.c_str();
 	}
@@ -351,16 +351,19 @@ int __cdecl GameHandler::HookedGetString(int param_1) {
 			return (int)PadDisabled.c_str();
 		}
 	}
-
-	const char* itemname = ItemHandler::GetShopItemName(param_1);
-	if (itemname) {
-		return (int)itemname; 
+	int* state = reinterpret_cast<int*>(Core::moduleBase + 0x4EB508);
+	if (*state == 2) {
+		const char* itemname = ItemHandler::GetShopItemName(param_1);
+		if (itemname) {
+			return (int)itemname;
+		}
 	}
 
 	return originalGetString(param_1);
 }
 
 void GameHandler::OnChunkLoaded() {
+	ItemHandler::HandleStoredItems();
 	for (int pad : APSaveData::AllParkingPads) {
 		
 		if (std::find(APSaveData::UnlockedParkingPads.begin(), APSaveData::UnlockedParkingPads.end(), pad) != APSaveData::UnlockedParkingPads.end()){
@@ -392,7 +395,6 @@ void GameHandler::TryDisableFourbieTrigger() {
 	}
 	uintptr_t objptr = MKObject::GetMKObject(100);
 	if (objptr != 0) {
-		API::LogPluginMessage("Found Car");
 		*(bool*)(objptr + 0x3f0) = canExit;
 	}
 }
@@ -403,7 +405,6 @@ void GameHandler::TryEditFourbieTrigger(bool enable) {
 	// Follow the pointer chain: ty2.exe+4ED1C8 -> [ +0x8 ] -> [ +0x8 ] -> string
 	uintptr_t* p1 = *reinterpret_cast<uintptr_t**>(Core::moduleBase + 0x4ED1C8);
 	if (!p1) {
-		API::LogPluginMessage("No Trigger");
 		return;
 	}
 
@@ -417,10 +418,6 @@ void GameHandler::TryEditFourbieTrigger(bool enable) {
 		// Now set *(bool*)(p1 + 0x24) = false;
 		bool* flagPtr = reinterpret_cast<bool*>(reinterpret_cast<uintptr_t>(p1) + 0x24);
 		*flagPtr = enable;
-		API::LogPluginMessage("Successfully eddited trigger flag at 0x24.");
-		if (!enable) {
-
-		}
 	}
 	else {
 		API::LogPluginMessage("Trigger name does not match.");
@@ -459,7 +456,6 @@ void GameHandler::LoadAPSaveFile() {
 	if (file.is_open()) {
 		file.seekg(0, std::ios::end);
 		saveFileLength = file.tellg();
-		API::LogPluginMessage("length: " + std::to_string(saveFileLength));
 		file.seekg(0, std::ios::beg);
 		if (saveFileLength > 0) {
 			// Allocate buffer and read the rest of the file
@@ -504,7 +500,6 @@ void GameHandler::LoadAPSaveFile() {
 
 			// Call the function
 			int result = fn(thisptr, dataBuffer, arg2);
-			API::LogPluginMessage("result: " + std::to_string(result));
 		};
 
 	}
@@ -527,10 +522,10 @@ int GameHandler::SaveFile(const char* filename, void* data, int size) {
 		API::LogPluginMessage("Save file Saved.");
 	}
 
-	//write_json_file(filePath + ".json");
+	write_json_file(filePath + ".json");
 
 	g_SaveCallback.esi = Core::moduleBase + 0x4CBD78;
-	g_SaveCallback.framesRemaining = 5; // delay ~5 frames
+	g_SaveCallback.framesRemaining = 5; // delay 5 frames
 	g_SaveCallback.active = true;
 
 	return 1; 
@@ -571,8 +566,12 @@ void GameHandler::read_json_file(const std::string& filename) {
 }
 
 bool GameHandler::IsInGame() {
-	uintptr_t addr = Core::moduleBase + 0x4EB510;
-	return *reinterpret_cast<uint8_t*>(addr) != 0;
+	//uintptr_t addr = Core::moduleBase + 0x4EB510;
+	uintptr_t addr = Core::moduleBase + 0x4F3888;
+	char buffer[9] = { 0 }; // Ensure null-terminated
+	memcpy(buffer, reinterpret_cast<const void*>(addr), 8);
+
+	return strncmp(buffer, "mainmenu", 8) != 0;
 }
 /*
 0057da30 load chunk
