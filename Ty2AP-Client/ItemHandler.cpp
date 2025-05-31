@@ -61,6 +61,7 @@ void ItemHandler::HandleItem(APClient::NetworkItem item)
 
 	if (item.item == 0x20) {
 		SaveData::GetData()->CogCollected++;
+		GameHandler::KillTy();
 	}
 	if (item.item == 0x21) {
 		SaveData::GetData()->OrbCollected++;
@@ -81,10 +82,10 @@ void ItemHandler::HandleItem(APClient::NetworkItem item)
 		AddOpals(200);
 	}
 	if (item.item == 0x27) {
-		//heal
-	}
-	if (item.item == 51) {
-
+		int* health = reinterpret_cast<int*>(Core::moduleBase + 0x4BC304);
+		int* healthPer = reinterpret_cast<int*>(Core::moduleBase + 0x4BC2FC);
+		int* numPaws = reinterpret_cast<int*>(Core::moduleBase + 0x4BC300);
+		*health = *healthPer * *numPaws;
 	}
 
 	if (item.item >= 3000 && item.item < 5000) {

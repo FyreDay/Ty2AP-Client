@@ -293,8 +293,9 @@ void GameHandler::SetupHooks() {
 	auto saveaddr = (char*)(Core::moduleBase + 0x376d6f);
 	MH_CreateHook((LPVOID)saveaddr, &SaveFileHook, reinterpret_cast<LPVOID*>(&SaveFileOrigin));
 
-	//PatchStartingLevel();
-}
+	//remove write to cog
+	NopInstructions((void*)(Core::moduleBase + 0x11b2e1), 6);
+	}
 
 void GameHandler::PatchStartingLevel() {
 	// Address of the instruction to patch (PUSH 0x00851738)
@@ -423,6 +424,12 @@ void GameHandler::TryEditFourbieTrigger(bool enable) {
 		API::LogPluginMessage("Trigger name does not match.");
 
 	}
+}
+
+void GameHandler::KillTy() {
+	int* health = reinterpret_cast<int*>(Core::moduleBase + 0x4BC304);
+	*health = 0;
+
 }
 
 bool fileExists(const std::string& filePath) {

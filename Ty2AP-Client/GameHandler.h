@@ -48,4 +48,5 @@ public:
 	static void write_json_file(const std::string& filename);
 	static void read_json_file(const std::string& filename);
 	static bool IsInGame();
+	static void KillTy();
 };

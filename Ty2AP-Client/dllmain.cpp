@@ -21,13 +21,13 @@ void TickBeforeGame(float deltaSeconds) {
         }
     }
 
-    int* mptr = &SaveData::GetData()->TotalMissions;
-    std::ostringstream oss;
-    oss << "addr: " << static_cast<void*>(mptr) << " is: " << *mptr;
-    int* mptr2 = &SaveData::GetData()->NumStartingMissions;
-    std::ostringstream oss2;
-    oss2 << "addr: " << static_cast<void*>(mptr2) << " is: " << *mptr2;
-    API::LogPluginMessage(oss.str()+ " " + oss2.str());
+    //int* mptr = &SaveData::GetData()->TotalMissions;
+    //std::ostringstream oss;
+    //oss << "addr: " << static_cast<void*>(mptr) << " is: " << *mptr;
+    //int* mptr2 = &SaveData::GetData()->NumStartingMissions;
+    //std::ostringstream oss2;
+    //oss2 << "addr: " << static_cast<void*>(mptr2) << " is: " << *mptr2;
+    //API::LogPluginMessage(oss.str()+ " " + oss2.str());
 }
 
 void OnTyInit() {
