@@ -16,5 +16,6 @@
 #include <../TygerMemory2/MKObject.h>
 #include <../TygerMemory2/Missions.h>
 #include <../TygerMemory2/SaveData.h>
+#include <../TygerMemory2/MemoryLinkedList.h>
 #include "../TygerFramework/TygerFrameworkAPI.h"
 #include "../TygerFramework/TygerFrameworkAPI.hpp"

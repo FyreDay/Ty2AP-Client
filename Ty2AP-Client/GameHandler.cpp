@@ -429,7 +429,7 @@ void GameHandler::TryEditFourbieTrigger(bool enable) {
 void GameHandler::KillTy() {
 	int* health = reinterpret_cast<int*>(Core::moduleBase + 0x4BC304);
 	*health = 0;
-
+	//doesnt actually kill ty. just sets health to 0
 }
 
 bool fileExists(const std::string& filePath) {

@@ -33,35 +33,34 @@ void ItemHandler::HandleItem(APClient::NetworkItem item)
 	}
 
 	if (item.item == 51) {
-		CollectItem(0);
+		CollectItem(1, 1);
 	}
 	if (item.item == 52) {
-		CollectItem(0x50);
+		CollectItem(1, 2);
 	}
 	
 	if (item.item == 59) {
-		CollectItem(0x7D0);
+		CollectItem(1, 59);
 	}
 	if (item.item == 55) {
-		CollectItem(0xa0);
+		CollectItem(4, 55);
 	}
 	if (item.item == 56) {
-		CollectItem(0xf0);
+		CollectItem(4, 56);
 	}
 	if (item.item == 57) {
-		CollectItem(0x14);
+		CollectItem(4, 57);
 	}
 
 	if (item.item == 77) {
-		CollectItem(0xD25);
+		CollectItem(1,77);
 	}
 	if (item.item == 78) {
-		CollectItem(0xd2a);
+		CollectItem(1,78);
 	}
 
 	if (item.item == 0x20) {
 		SaveData::GetData()->CogCollected++;
-		GameHandler::KillTy();
 	}
 	if (item.item == 0x21) {
 		SaveData::GetData()->OrbCollected++;
@@ -104,10 +103,10 @@ void ItemHandler::HandleRang(int id)
 	//if infrarang or x rang update that ty has them
 	if (id == 0x0a) {
 		
-		CollectItem(0x2D0);
+		CollectItem(2,12);
 	}
 	if (id == 0x0b) {
-		CollectItem(0x2D0 + 0x280);
+		CollectItem(3,20);
 	}
 }
 
@@ -120,12 +119,17 @@ void ItemHandler::HandleParkingPad(int id)
 	}*/
 }
 
-void ItemHandler::CollectItem(int offsetfromfirstitem)
+void ItemHandler::CollectItem(int shopId, int itemId)
 {
-	uintptr_t rawAddress = reinterpret_cast<uintptr_t>(&SaveData::GetData()->FirstItem);
-	uintptr_t newAddress = rawAddress + offsetfromfirstitem + 0x10;
-	bool* boolPtr = reinterpret_cast<bool*>(newAddress);
-	*boolPtr = true;
+	LinkedList<ItemWrapper> items = SaveData::ItemList(shopId);
+	std::optional<ItemWrapper> item = SaveData::findItemByID(items, itemId);
+	if (item.has_value()) {
+		API::LogPluginMessage("item has value: " + std::to_string(itemId) + "  " + std::to_string(item.value().address));
+		item.value().setPuchusedStatus(true);
+	}
+	else {
+		API::LogPluginMessage("No Item with id " + std::to_string(itemId));
+	}
 }
 
 void ItemHandler::HandleStoredItems()
@@ -231,18 +235,3 @@ void ItemHandler::FillShopItemNames(const std::list<APClient::NetworkItem>& item
 		}
 	}
 }
-
-//x = 10;
-//y = 7;
-//z = y;
-//y = x;
-//x = z
-//
-//cout << x << y
-//
-//
-//r=2
-//u=r
-//
-//
-//cout << 2+2+2

@@ -37,6 +37,30 @@ bool GUI::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
         }
     }
 
+    if (msg == WM_KEYDOWN && wParam == VK_F6) {
+        LinkedList<ItemWrapper> items = SaveData::ItemList(2);
+        std::optional<ItemWrapper> item = SaveData::findItemByID(items, 12);
+        if (items.getLength()>0) {
+            API::LogPluginMessage(std::to_string(items.getHead().getNext().isValid()));
+            if (item.has_value()) {
+                API::LogPluginMessage("item has value: " + std::to_string(12) + "  " + std::to_string(item.value().address));
+                item.value().setPuchusedStatus(true);
+            }
+        }
+        else {
+            API::LogPluginMessage("No Items.");
+        }
+    }
+
+    if(msg == WM_KEYDOWN && wParam == VK_F7) {
+        LinkedList<MissionWrapper> m0 = SaveData::MissionList(2);
+        
+        if (m0.getLength() > 0) {
+            MissionStruct* m84 = (MissionStruct*)m0.getHead().address;
+            Missions::UpdateMissionState(m84, 5, 0);
+        }
+    }
+
     if (API::DrawingGUI())
         if (ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam))
             return true;

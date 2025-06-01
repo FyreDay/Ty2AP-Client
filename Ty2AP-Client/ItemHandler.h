@@ -9,7 +9,7 @@ public:
     
     static void HandleRang(int id);
     static void HandleParkingPad(int id);
-    static void CollectItem(int offsetfromfirstitem);
+    static void CollectItem(int shopId, int itemId);
     static void HandleStoredItems();
     static const char* GetShopItemName(int strId);
     static void FillShopItemNames(const std::list<APClient::NetworkItem>& items);
