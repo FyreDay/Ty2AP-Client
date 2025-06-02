@@ -36,6 +36,59 @@ void LoginWindow::Draw(int outerWidth, int outerHeight, float uiScale) {
 
 
     ImGui::TextWrapped("%s", message.c_str());
+    //remove later
+    ImGui::InputText("Mission Id", id, IM_ARRAYSIZE(id));
+
+    if (ImGui::Button("Find Mission")) {
+        int oID = 0;
+        try {
+            // Try converting the char array to an int using std::stoi
+            oID = std::stoi(id);
+
+            std::optional<MissionWrapper> foundmission = std::optional<MissionWrapper>();
+            
+            for (int i = 0; i < 7; i++) {
+                LinkedList<MissionWrapper> list = SaveData::MissionList(i);
+                std::optional<MissionWrapper> mission = SaveData::findMissionByID(list, oID);
+                if (mission.has_value()) {
+                    foundmission = mission;
+                    break;
+                }
+            }
+            if (foundmission.has_value()) {
+                char hexStr[20];
+
+                sprintf_s(hexStr, "0x%p", (void*)foundmission.value().address);
+                mPointer = hexStr;
+            }
+            else {
+                mPointer = "failed";
+            }
+
+            
+        }
+        catch (const std::invalid_argument& e) {
+            SetMessage("ID Not an int");
+            API::LogPluginMessage(e.what());
+        }
+    }
+    ImGui::InputText("Pointer", mPointer.data(), mPointer.size(), ImGuiInputTextFlags_ReadOnly);
+    ImGui::InputText("Mission Pointer", mptr, IM_ARRAYSIZE(mptr));
+    ImGui::InputText("Mission State", mstate, IM_ARRAYSIZE(mstate));
+    if (ImGui::Button("Set Mission State")) {
+        int MPTR = 0;
+        int MSTATE = 0;
+        try {
+            // Try converting the char array to an int using std::stoi
+            MPTR = static_cast<int>(std::stoul(mptr, nullptr, 0));
+            MSTATE = std::stoi(mstate);
+
+            Missions::UpdateMissionState((MissionStruct*)MPTR, MSTATE, 0);
+        }
+        catch (const std::invalid_argument& e) {
+            API::LogPluginMessage(e.what());
+        }
+    }
     ImGui::End();
 }
 

@@ -10,6 +10,12 @@ void ItemHandler::HandleItem(APClient::NetworkItem item)
 		return;
 	}
 
+	if (item.index < ArchipelagoHandler::customSaveData->pLastReceivedIndex) {
+		return;
+	}
+	LoggerWindow::Log("item recieved: " + ArchipelagoHandler::GetItemName(item.item, item.player));
+	ArchipelagoHandler::customSaveData->pLastReceivedIndex++;
+
 	if (item.item < 0x16) {
 		HandleRang(item.item);
 	}
@@ -112,11 +118,9 @@ void ItemHandler::HandleRang(int id)
 
 void ItemHandler::HandleParkingPad(int id)
 {
-	APSaveData::UnlockedParkingPads.push_back(id);
+	ArchipelagoHandler::customSaveData->UnlockedParkingPads.push_back(id);
 	//updates parkingpads if its loaded nned to queue for next frame
-	/*if (GameHandler::IsInGame()) {
-		GameHandler::OnChunkLoaded();
-	}*/
+	GameHandler::OnChunkLoaded();
 }
 
 void ItemHandler::CollectItem(int shopId, int itemId)

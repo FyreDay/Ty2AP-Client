@@ -5,15 +5,17 @@
 class APSaveData
 {
 public:
-	static bool hasBoughtItem(int id) {
+	APSaveData();
+	bool hasBoughtItem(int id) {
 		return ItemMap[id];
 	}
-	static void updateBoughtItem(int id, bool bought) {
+	void updateBoughtItem(int id, bool bought) {
 		ItemMap[id] = bought;
 	}
-	static inline int pLastReceivedIndex = -1;
-	static inline std::list<int> UnlockedParkingPads = {};
-	static inline const std::list<int> AllParkingPads = 
+	int pLastReceivedIndex = -1;
+	int completedMissionChecks = 0;
+	std::list<int> UnlockedParkingPads = {}; //patchy, oilrig, 
+	const std::list<int> AllParkingPads = 
 	{ 
 		3736,
 		3689,
@@ -53,7 +55,7 @@ public:
 		3277,
 		3954 
 	};
-	static inline std::map<int, bool> ItemMap = {
+	std::map<int, bool> ItemMap = {
 	{8, true}, //True is can purchuse
 	{9, true},
 	{10, true},

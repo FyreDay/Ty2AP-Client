@@ -18,6 +18,7 @@ bool ArchipelagoHandler::ap_connected = false;
 std::string ArchipelagoHandler::seed;
 bool ArchipelagoHandler::ap_sync_queued = false;
 
+APSaveData* ArchipelagoHandler::customSaveData = new APSaveData();
 APClient* ArchipelagoHandler::ap = nullptr;
 
 void ArchipelagoHandler::DisconnectAP() {
@@ -49,6 +50,8 @@ void ArchipelagoHandler::ConnectAP(LoginWindow* login)
 			tags.push_back("DeathLink");
 		ap->ConnectUpdate(false, 0b111, true, tags);
 		ap->StatusUpdate(APClient::ClientStatus::PLAYING);
+
+
 	});
 	ap->set_slot_disconnected_handler([login]() {
 		LoggerWindow::Log("Slot disconnected");
@@ -67,16 +70,9 @@ void ArchipelagoHandler::ConnectAP(LoginWindow* login)
 
 	ap->set_items_received_handler([](const std::list<APClient::NetworkItem>& items) {
 		for (const auto& item : items) {
-			std::string itemname = ap->get_item_name(item.item, GAME_NAME);
+			
 			std::string sender = ap->get_player_alias(item.player);
 			//std::string location = ap->get_location_name(item.location, );
-			API::LogPluginMessage("recieved: " + itemname);
-			//Check if we should ignore this item
-			if (item.index < APSaveData::pLastReceivedIndex) {
-				continue;
-			}
-			LoggerWindow::Log("item recieved: " + itemname);
-			APSaveData::pLastReceivedIndex++;
 			ItemHandler::HandleItem(item);
 		}
 	});
@@ -98,6 +94,14 @@ void ArchipelagoHandler::gameFinished() {
 void ArchipelagoHandler::Poll() {
 	if (ap) {
 		ap->poll();
+		if (GameHandler::IsInGame()) {
+			if (!GameHandler::hasRunSetup) {
+				GameHandler::RunLoadSetup();
+			}
+		}
+		else {
+			GameHandler::hasRunSetup = false;
+		}
 	}
 }
 

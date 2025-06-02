@@ -22,7 +22,11 @@ public:
     char server[128] = "archipelago.gg:";
     char password[128] = "";
     char slot[128] = "";
+    char id[128] = "";
+    char mptr[128] = "";
+    char mstate[128] = "";
 private:
     std::string message;
+    std::string mPointer;
 };
 

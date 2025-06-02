@@ -25,6 +25,7 @@ public:
 	static std::string uuid;
 	static bool ap_connected;
 	static std::string seed;
+	static APSaveData* customSaveData;
 private:
 	static bool ap_sync_queued;
 	static APClient* ap;

@@ -134,6 +134,36 @@ void CheckHandler::OnCompleteMission(void* mission, int status) {
 			infowindow->AddLogMessage(Sid + " -> " + std::to_string(status));
 		}
 	}
+	ArchipelagoHandler::customSaveData->completedMissionChecks++;
+
+	if (ArchipelagoHandler::customSaveData->completedMissionChecks >= 5) {
+		std::optional<MissionWrapper> mission = SaveData::findMissionByID(80);
+		if (mission.has_value() && mission.value().getStatus() == 0) {
+			API::LogPluginMessage("Patchy available");
+			Missions::UpdateMissionState((MissionStruct*)mission.value().address, 1, 0);
+		}
+	}
+
+	if (ArchipelagoHandler::customSaveData->completedMissionChecks >= 10) {
+		std::optional<MissionWrapper> mission = SaveData::findMissionByID(81);
+		if (mission.has_value() && mission.value().getStatus() == 0) {
+			Missions::UpdateMissionState((MissionStruct*)mission.value().address, 1, 0);
+		}
+	}
+
+	if (ArchipelagoHandler::customSaveData->completedMissionChecks >= 15) {
+		std::optional<MissionWrapper> mission = SaveData::findMissionByID(82);
+		if (mission.has_value() && mission.value().getStatus() == 0) {
+			Missions::UpdateMissionState((MissionStruct*)mission.value().address, 1, 0);
+		}
+	}
+
+	if (ArchipelagoHandler::customSaveData->completedMissionChecks >= 20) {
+		std::optional<MissionWrapper> mission = SaveData::findMissionByID(99);
+		if (mission.has_value() && mission.value().getStatus() == 0) {
+			Missions::UpdateMissionState((MissionStruct*)mission.value().address, 1, 0);
+		}
+	}
 }
 
 void CheckHandler::OnBuyItem(void* item) {
@@ -142,7 +172,7 @@ void CheckHandler::OnBuyItem(void* item) {
 
 	short value = *reinterpret_cast<short*>(base + 0x4); // read short
 	char letter = *reinterpret_cast<char*>(base + 0x7);  // read char
-	APSaveData::updateBoughtItem(value, false);
+	ArchipelagoHandler::customSaveData->updateBoughtItem(value, false);
 	
 	ArchipelagoHandler::SendLocation(value);
 

@@ -292,8 +292,10 @@ void GameHandler::SetupHooks() {
 	SaveFileOriginReturnAddr = Core::moduleBase + 0x376d6f+5;
 	auto saveaddr = (char*)(Core::moduleBase + 0x376d6f);
 	MH_CreateHook((LPVOID)saveaddr, &SaveFileHook, reinterpret_cast<LPVOID*>(&SaveFileOrigin));
+	
 
-	//remove write to cog
+
+	//remove write to collectablecount
 	NopInstructions((void*)(Core::moduleBase + 0x11b2e1), 6);
 	}
 
@@ -333,7 +335,7 @@ void GameHandler::NopInstructions(void* address, size_t size) {
 bool GameHandler::OnItemAvailable(void* itemPtr) {
 	uint8_t* base = static_cast<uint8_t*>(itemPtr);
 	short id = *reinterpret_cast<short*>(base + 0x4);
-	return APSaveData::hasBoughtItem(id);
+	return ArchipelagoHandler::customSaveData->hasBoughtItem(id);
 }
 
 static std::string PadDisabled = "Pad Disabled By AP";
@@ -364,10 +366,10 @@ int __cdecl GameHandler::HookedGetString(int param_1) {
 }
 
 void GameHandler::OnChunkLoaded() {
-	ItemHandler::HandleStoredItems();
-	for (int pad : APSaveData::AllParkingPads) {
+	
+	for (int pad : ArchipelagoHandler::customSaveData->AllParkingPads) {
 		
-		if (std::find(APSaveData::UnlockedParkingPads.begin(), APSaveData::UnlockedParkingPads.end(), pad) != APSaveData::UnlockedParkingPads.end()){
+		if (std::find(ArchipelagoHandler::customSaveData->UnlockedParkingPads.begin(), ArchipelagoHandler::customSaveData->UnlockedParkingPads.end(), pad) != ArchipelagoHandler::customSaveData->UnlockedParkingPads.end()){
 			uintptr_t objptr = MKObject::GetMKObject(pad);
 			if (objptr != 0) {
 				*(short*)(objptr + 0x1a) = 0x0016;
@@ -391,7 +393,7 @@ void GameHandler::OnChunkLoaded() {
 void GameHandler::TryDisableFourbieTrigger() {
 	int* closestID = reinterpret_cast<int*>(Core::moduleBase + 0x4BDD00);
 	bool canExit = false;
-	if (std::find(APSaveData::UnlockedParkingPads.begin(), APSaveData::UnlockedParkingPads.end(), *closestID) != APSaveData::UnlockedParkingPads.end()) {
+	if (std::find(ArchipelagoHandler::customSaveData->UnlockedParkingPads.begin(), ArchipelagoHandler::customSaveData->UnlockedParkingPads.end(), *closestID) != ArchipelagoHandler::customSaveData->UnlockedParkingPads.end()) {
 		canExit = true;
 	}
 	uintptr_t objptr = MKObject::GetMKObject(100);
@@ -542,9 +544,9 @@ void GameHandler::write_json_file(const std::string& filename) {
 	json j;
 
 	// Populate the JSON object
-	j["LastRecievedIndex"] = APSaveData::pLastReceivedIndex;
-	j["ShopData"] = APSaveData::ItemMap;
-	j["UnlockedParkingBays"] = APSaveData::UnlockedParkingPads;
+	j["LastRecievedIndex"] = ArchipelagoHandler::customSaveData->pLastReceivedIndex;
+	j["ShopData"] = ArchipelagoHandler::customSaveData->ItemMap;
+	j["UnlockedParkingBays"] = ArchipelagoHandler::customSaveData->UnlockedParkingPads;
 
 	// Write to file
 	std::ofstream file(filename);
@@ -567,9 +569,9 @@ void GameHandler::read_json_file(const std::string& filename) {
 	file >> j;
 
 	// Access data
-	APSaveData::pLastReceivedIndex = j["LastRecievedIndex"];
-	APSaveData::ItemMap = j["ShopData"].get<std::map<int, bool>>();
-	APSaveData::UnlockedParkingPads = j["UnlockedParkingBays"].get<std::list<int>>();
+	ArchipelagoHandler::customSaveData->pLastReceivedIndex = j["LastRecievedIndex"];
+	ArchipelagoHandler::customSaveData->ItemMap = j["ShopData"].get<std::map<int, bool>>();
+	ArchipelagoHandler::customSaveData->UnlockedParkingPads = j["UnlockedParkingBays"].get<std::list<int>>();
 }
 
 bool GameHandler::IsInGame() {
@@ -579,6 +581,28 @@ bool GameHandler::IsInGame() {
 	memcpy(buffer, reinterpret_cast<const void*>(addr), 8);
 
 	return strncmp(buffer, "mainmenu", 8) != 0;
+}
+
+bool GameHandler::hasRunSetup = false;
+void GameHandler::RunLoadSetup() {
+	ItemHandler::HandleStoredItems();
+	std::optional<MissionWrapper> mission980 = SaveData::findMissionByID(980);
+	if (mission980.has_value()) {
+		Missions::UpdateMissionState((MissionStruct*)mission980.value().address, 5, 0);
+	}
+	std::optional<MissionWrapper> mission981 = SaveData::findMissionByID(981);
+	if (mission981.has_value()) {
+		Missions::UpdateMissionState((MissionStruct*)mission981.value().address, 5, 0);
+	}
+	std::optional<MissionWrapper> mission982 = SaveData::findMissionByID(982);
+	if (mission982.has_value()) {
+		Missions::UpdateMissionState((MissionStruct*)mission982.value().address, 5, 0);
+	}
+	hasRunSetup = true;
+}
+
+void SetMissionRequirements() {
+
 }
 /*
 0057da30 load chunk

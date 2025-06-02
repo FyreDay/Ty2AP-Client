@@ -49,4 +49,8 @@ public:
 	static void read_json_file(const std::string& filename);
 	static bool IsInGame();
 	static void KillTy();
+
+	static bool hasRunSetup;
+
+	static void RunLoadSetup();
 };
