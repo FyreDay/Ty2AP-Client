@@ -53,4 +53,5 @@ public:
 	static bool hasRunSetup;
 
 	static void RunLoadSetup();
+	static void SetMissionRequirements();
 };

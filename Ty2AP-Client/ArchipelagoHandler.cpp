@@ -51,7 +51,7 @@ void ArchipelagoHandler::ConnectAP(LoginWindow* login)
 		ap->ConnectUpdate(false, 0b111, true, tags);
 		ap->StatusUpdate(APClient::ClientStatus::PLAYING);
 
-
+		GameHandler::SetMissionRequirements();
 	});
 	ap->set_slot_disconnected_handler([login]() {
 		LoggerWindow::Log("Slot disconnected");

@@ -598,11 +598,14 @@ void GameHandler::RunLoadSetup() {
 	if (mission982.has_value()) {
 		Missions::UpdateMissionState((MissionStruct*)mission982.value().address, 5, 0);
 	}
+	
 	hasRunSetup = true;
 }
 
-void SetMissionRequirements() {
-
+void GameHandler::SetMissionRequirements() {
+	SaveData::MissionList(0).forEach([](MissionWrapper mission) {
+		mission.setNumberOfMissionsRequired(0);
+	});
 }
 /*
 0057da30 load chunk
