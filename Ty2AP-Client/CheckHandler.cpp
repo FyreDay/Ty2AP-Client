@@ -140,6 +140,7 @@ void CheckHandler::OnCompleteMission(void* mission, int status) {
 		std::optional<MissionWrapper> mission = SaveData::findMissionByID(80);
 		if (mission.has_value() && mission.value().getStatus() == 0) {
 			API::LogPluginMessage("Patchy available");
+			mission.value().setNumberOfMissionsRequired(0);
 			Missions::UpdateMissionState((MissionStruct*)mission.value().address, 1, 0);
 		}
 	}
@@ -147,6 +148,7 @@ void CheckHandler::OnCompleteMission(void* mission, int status) {
 	if (ArchipelagoHandler::customSaveData->completedMissionChecks >= 10) {
 		std::optional<MissionWrapper> mission = SaveData::findMissionByID(81);
 		if (mission.has_value() && mission.value().getStatus() == 0) {
+			mission.value().setNumberOfMissionsRequired(0);
 			Missions::UpdateMissionState((MissionStruct*)mission.value().address, 1, 0);
 		}
 	}
@@ -154,6 +156,7 @@ void CheckHandler::OnCompleteMission(void* mission, int status) {
 	if (ArchipelagoHandler::customSaveData->completedMissionChecks >= 15) {
 		std::optional<MissionWrapper> mission = SaveData::findMissionByID(82);
 		if (mission.has_value() && mission.value().getStatus() == 0) {
+			mission.value().setNumberOfMissionsRequired(0);
 			Missions::UpdateMissionState((MissionStruct*)mission.value().address, 1, 0);
 		}
 	}
@@ -161,6 +164,7 @@ void CheckHandler::OnCompleteMission(void* mission, int status) {
 	if (ArchipelagoHandler::customSaveData->completedMissionChecks >= 20) {
 		std::optional<MissionWrapper> mission = SaveData::findMissionByID(99);
 		if (mission.has_value() && mission.value().getStatus() == 0) {
+			mission.value().setNumberOfMissionsRequired(0);
 			Missions::UpdateMissionState((MissionStruct*)mission.value().address, 1, 0);
 		}
 	}

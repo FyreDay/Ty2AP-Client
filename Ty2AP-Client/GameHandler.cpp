@@ -604,7 +604,15 @@ void GameHandler::RunLoadSetup() {
 
 void GameHandler::SetMissionRequirements() {
 	SaveData::MissionList(0).forEach([](MissionWrapper mission) {
-		mission.setNumberOfMissionsRequired(0);
+		if (mission.getID() == 80 || mission.getID() == 81 || mission.getID() == 82 || mission.getID() == 99) {
+			mission.setNumberOfMissionsRequired(10);
+		}
+		else if (mission.getID() == 83) {
+
+		}
+		else {
+			mission.setNumberOfMissionsRequired(0);
+		}
 	});
 }
 /*

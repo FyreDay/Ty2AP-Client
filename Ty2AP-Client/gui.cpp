@@ -8,7 +8,7 @@ std::vector<std::unique_ptr<Window>> GUI::windows;
 
 extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 bool GUI::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
-    if (msg == WM_KEYDOWN && wParam == VK_F3) {
+    if (msg == WM_KEYDOWN && wParam == VK_F5) {
         for (auto& window : windows) {
             if (auto Iwindow = dynamic_cast<InfoWindow*>(window.get())) {
                 Iwindow->ToggleVisibility();
@@ -17,7 +17,7 @@ bool GUI::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
             }
         }
     }
-    if (msg == WM_KEYDOWN && wParam == VK_F4) {
+    if (msg == WM_KEYDOWN && wParam == VK_F2) {
         for (auto& window : windows) {
             if (auto Lwindow = dynamic_cast<LoginWindow*>(window.get())) {
                 Lwindow->ToggleVisibility();
@@ -27,7 +27,7 @@ bool GUI::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
         }
     }
 
-    if (msg == WM_KEYDOWN && wParam == VK_F5) {
+    if (msg == WM_KEYDOWN && wParam == VK_F6) {
         for (auto& window : windows) {
             if (auto Cwindow = dynamic_cast<LoggerWindow*>(window.get())) {
                 Cwindow->ToggleVisibility();
@@ -37,8 +37,9 @@ bool GUI::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
         }
     }
 
-    if (msg == WM_KEYDOWN && wParam == VK_F6) {
-        LinkedList<ItemWrapper> items = SaveData::ItemList(2);
+    if (msg == WM_KEYDOWN && wParam == VK_F8) {
+        ArchipelagoHandler::customSaveData->completedMissionChecks += 5;
+       /* LinkedList<ItemWrapper> items = SaveData::ItemList(2);
         std::optional<ItemWrapper> item = SaveData::findItemByID(items, 12);
         if (items.getLength()>0) {
             API::LogPluginMessage(std::to_string(items.getHead().getNext().isValid()));
@@ -49,16 +50,16 @@ bool GUI::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
         }
         else {
             API::LogPluginMessage("No Items.");
-        }
+        }*/
     }
 
     if(msg == WM_KEYDOWN && wParam == VK_F7) {
-        LinkedList<MissionWrapper> m0 = SaveData::MissionList(2);
-        
-        if (m0.getLength() > 0) {
-            MissionStruct* m84 = (MissionStruct*)m0.getHead().address;
-            Missions::UpdateMissionState(m84, 5, 0);
-        }
+        //LinkedList<MissionWrapper> m0 = SaveData::MissionList(2);
+        //
+        //if (m0.getLength() > 0) {
+        //    MissionStruct* m84 = (MissionStruct*)m0.getHead().address;
+        //    Missions::UpdateMissionState(m84, 5, 0);
+        //}
     }
 
     if (API::DrawingGUI())
