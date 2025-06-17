@@ -5,6 +5,7 @@
 class APSaveData
 {
 public:
+
 	APSaveData();
 	bool hasBoughtItem(int id) {
 		return ItemMap[id];
@@ -14,6 +15,7 @@ public:
 	}
 	int pLastReceivedIndex = -1;
 	int completedMissionChecks = 0;
+	int bossesdefeated = 0;
 	std::list<int> UnlockedParkingPads = {}; //patchy, oilrig, 
 	const std::list<int> AllParkingPads = 
 	{ 

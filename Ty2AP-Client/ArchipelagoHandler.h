@@ -3,6 +3,7 @@
 #include "LoginWindow.h"
 #include "LoggerWindow.h"
 #include "APSaveData.h"
+#include "SlotData.h"
 #include "ItemHandler.h"
 
 #define UUID_FILE "uuid"
@@ -25,6 +26,8 @@ public:
 	static std::string uuid;
 	static bool ap_connected;
 	static std::string seed;
+
+	static SlotData* slotdata;
 	static APSaveData* customSaveData;
 private:
 	static bool ap_sync_queued;

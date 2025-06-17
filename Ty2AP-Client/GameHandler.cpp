@@ -584,21 +584,22 @@ bool GameHandler::IsInGame() {
 }
 
 bool GameHandler::hasRunSetup = false;
-void GameHandler::RunLoadSetup() {
+void GameHandler::RunLoadSetup(bool openworld) {
 	ItemHandler::HandleStoredItems();
-	std::optional<MissionWrapper> mission980 = SaveData::findMissionByID(980);
-	if (mission980.has_value()) {
-		Missions::UpdateMissionState((MissionStruct*)mission980.value().address, 5, 0);
+	if (openworld) {
+		std::optional<MissionWrapper> mission980 = SaveData::findMissionByID(980);
+		if (mission980.has_value()) {
+			Missions::UpdateMissionState((MissionStruct*)mission980.value().address, 5, 0);
+		}
+		std::optional<MissionWrapper> mission981 = SaveData::findMissionByID(981);
+		if (mission981.has_value()) {
+			Missions::UpdateMissionState((MissionStruct*)mission981.value().address, 5, 0);
+		}
+		std::optional<MissionWrapper> mission982 = SaveData::findMissionByID(982);
+		if (mission982.has_value()) {
+			Missions::UpdateMissionState((MissionStruct*)mission982.value().address, 5, 0);
+		}
 	}
-	std::optional<MissionWrapper> mission981 = SaveData::findMissionByID(981);
-	if (mission981.has_value()) {
-		Missions::UpdateMissionState((MissionStruct*)mission981.value().address, 5, 0);
-	}
-	std::optional<MissionWrapper> mission982 = SaveData::findMissionByID(982);
-	if (mission982.has_value()) {
-		Missions::UpdateMissionState((MissionStruct*)mission982.value().address, 5, 0);
-	}
-	
 	hasRunSetup = true;
 }
 

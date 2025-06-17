@@ -18,6 +18,7 @@ bool ArchipelagoHandler::ap_connected = false;
 std::string ArchipelagoHandler::seed;
 bool ArchipelagoHandler::ap_sync_queued = false;
 
+SlotData* ArchipelagoHandler::slotdata = new SlotData();
 APSaveData* ArchipelagoHandler::customSaveData = new APSaveData();
 APClient* ArchipelagoHandler::ap = nullptr;
 
@@ -51,9 +52,29 @@ void ArchipelagoHandler::ConnectAP(LoginWindow* login)
 		ap->ConnectUpdate(false, 0b111, true, tags);
 		ap->StatusUpdate(APClient::ClientStatus::PLAYING);
 
+		if (data.find("ModVersion") != data.end() || data["ModVersion"] != VERSION_STRING)
+			LoggerWindow::Log("Your client and apworld versions do not match.");
+
+		if (data.find("ReqBosses") != data.end()) {
+			slotdata->requireBosses = data["ReqBosses"].get<int>() == 1;
+		}
+
+		if (data.find("BarrierUnlock") != data.end()) {
+			slotdata->barrierUnlockStyle = static_cast<BarrierUnlock>(data["BarrierUnlock"].get<int>());
+		}
+
+		if (data.find("CogPrices") != data.end() && data["CogPrices"].is_array()) {
+			auto cogprices = data["CogPrices"].get<std::vector<int>>();
+			slotdata->cogPrices = cogprices;
+		}
+		if (data.find("OrbPrices") != data.end() && data["OrbPrices"].is_array()) {
+			auto orbprices = data["OrbPrices"].get<std::vector<int>>();
+			slotdata->orbPrices = orbprices;
+		}
+
 		GameHandler::SetMissionRequirements();
 	});
-	ap->set_slot_disconnected_handler([login]() {
+	ap->set_slot_disconnected_handler([login]() { 
 		LoggerWindow::Log("Slot disconnected");
 		login->SetMessage("Disconnected");
 	});
@@ -96,7 +117,7 @@ void ArchipelagoHandler::Poll() {
 		ap->poll();
 		if (GameHandler::IsInGame()) {
 			if (!GameHandler::hasRunSetup) {
-				GameHandler::RunLoadSetup();
+				GameHandler::RunLoadSetup(slotdata->barrierUnlockStyle == BarrierUnlock::OpenWorld);
 			}
 		}
 		else {

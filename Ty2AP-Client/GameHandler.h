@@ -52,6 +52,6 @@ public:
 
 	static bool hasRunSetup;
 
-	static void RunLoadSetup();
+	static void RunLoadSetup(bool openworld);
 	static void SetMissionRequirements();
 };
