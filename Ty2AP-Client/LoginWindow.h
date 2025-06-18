@@ -1,5 +1,7 @@
 #pragma once
 #include "ArchipelagoHandler.h"
+#include <sstream>
+#include <iomanip>
 #include "Window.h"
 
 class LoginWindow : public Window {

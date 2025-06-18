@@ -11,6 +11,7 @@ class SlotData
 public:
 	SlotData();
 	bool requireBosses;
+	int missionsToGoal;
 	BarrierUnlock barrierUnlockStyle;
 	std::vector<int> cogPrices;
 	std::vector<int> orbPrices;

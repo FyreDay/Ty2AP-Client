@@ -53,5 +53,5 @@ public:
 	static bool hasRunSetup;
 
 	static void RunLoadSetup(bool openworld);
-	static void SetMissionRequirements();
+	static void SetMissionRequirements(BarrierUnlock unlockType, int mission_goal);
 };

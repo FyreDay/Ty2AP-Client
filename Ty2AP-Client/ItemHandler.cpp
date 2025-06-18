@@ -95,6 +95,28 @@ void ItemHandler::HandleItem(APClient::NetworkItem item)
 
 	if (item.item >= 3000 && item.item < 5000) {
 		HandleParkingPad(item.item);
+		if (item.item == 3732) {
+			HandleParkingPad(3708);
+		}
+	}
+
+	if (item.item == 980) {
+		std::optional<MissionWrapper> mission980 = SaveData::findMissionByID(980);
+		if (mission980.has_value()) {
+			Missions::UpdateMissionState((MissionStruct*)mission980.value().address, 5, 0);
+		}
+	}
+	if (item.item == 981) {
+		std::optional<MissionWrapper> mission981 = SaveData::findMissionByID(981);
+		if (mission981.has_value()) {
+			Missions::UpdateMissionState((MissionStruct*)mission981.value().address, 5, 0);
+		}
+	}
+	if (item.item == 982) {
+		std::optional<MissionWrapper> mission982 = SaveData::findMissionByID(982);
+		if (mission982.has_value()) {
+			Missions::UpdateMissionState((MissionStruct*)mission982.value().address, 5, 0);
+		}
 	}
 }
 

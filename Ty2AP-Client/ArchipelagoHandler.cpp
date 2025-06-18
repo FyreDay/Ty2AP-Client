@@ -59,6 +59,10 @@ void ArchipelagoHandler::ConnectAP(LoginWindow* login)
 			slotdata->requireBosses = data["ReqBosses"].get<int>() == 1;
 		}
 
+		if (data.find("MissionsToGoal") != data.end()) {
+			slotdata->missionsToGoal = data["MissionsToGoal"].get<int>() == 1;
+		}
+
 		if (data.find("BarrierUnlock") != data.end()) {
 			slotdata->barrierUnlockStyle = static_cast<BarrierUnlock>(data["BarrierUnlock"].get<int>());
 		}
@@ -72,7 +76,7 @@ void ArchipelagoHandler::ConnectAP(LoginWindow* login)
 			slotdata->orbPrices = orbprices;
 		}
 
-		GameHandler::SetMissionRequirements();
+		GameHandler::SetMissionRequirements(slotdata->barrierUnlockStyle, slotdata->missionsToGoal);
 	});
 	ap->set_slot_disconnected_handler([login]() { 
 		LoggerWindow::Log("Slot disconnected");

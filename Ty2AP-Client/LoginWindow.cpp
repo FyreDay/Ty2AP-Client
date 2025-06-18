@@ -5,6 +5,49 @@ void LoginWindow::ToggleVisibility() {
     isVisible = !isVisible;
 }
 
+static struct MKTObject {
+    uintptr_t padding0[2];   // 0x00 to 0x07
+    uintptr_t typeInfoPtr;   // 0x08
+    uintptr_t padding1[11];  // 0x0C to 0x37
+    MKTObject* prev;            // 0x38
+    MKTObject* next;            // 0x3C
+};
+
+static struct TypeInfo {
+    uintptr_t padding0[2];   // 0x00 to 0x07
+    const char* typeNamePtr; // 0x08
+    uintptr_t padding1[11];  // 0x0C to 0x3B
+    MKTObject* owningObject;    // 0x3C
+};
+
+static std::vector<MKTObject*> FindObjectsByType(MKTObject* startObject, const char* targetTypeName) {
+    std::vector<MKTObject*> result;
+
+    // 1. Walk backwards to the head
+    MKTObject* current = startObject;
+    while (current->prev != nullptr) {
+        current = current->prev;
+    }
+
+    // 2. Walk forwards and search
+    while (current != nullptr) {
+        TypeInfo* typeInfo = reinterpret_cast<TypeInfo*>(current->typeInfoPtr);
+        const char* typeName = typeInfo->typeNamePtr;
+
+        if (strcmp(typeName, targetTypeName) == 0) {
+            uintptr_t addr = (uintptr_t)current;
+            std::stringstream ss;
+            ss << std::hex << std::showbase << addr;
+            API::LogPluginMessage(ss.str());
+            result.push_back(current);
+        }
+
+        current = current->next;
+    }
+
+    return result;
+}
+
 void LoginWindow::Draw(int outerWidth, int outerHeight, float uiScale) {
     if (!isVisible)
         return;
@@ -36,61 +79,26 @@ void LoginWindow::Draw(int outerWidth, int outerHeight, float uiScale) {
 
 
     ImGui::TextWrapped("%s", message.c_str());
-    ////remove later
-    //ImGui::InputText("Mission Id", id, IM_ARRAYSIZE(id));
 
-    //if (ImGui::Button("Find Mission")) {
-    //    int oID = 0;
-    //    try {
-    //        // Try converting the char array to an int using std::stoi
-    //        oID = std::stoi(id);
+    if (ImGui::Button("Search For mission lights")) {
+        FindObjectsByType((MKTObject*)(MKObject::GetMKObject(100)), "P1066_MissionLight");
+    }
+    if (ImGui::Button("Try kill Ty")) {
+        typedef void(__thiscall* StateTransitionFunc)(void* thisPtr, int firstArg, int secondArg);
+        StateTransitionFunc transitionFunc = (StateTransitionFunc)(Core::moduleBase + 0x0022c7d0);
+        void* tyStateHandler = (void*)(MKObject::GetMKObject(204) + 0x470);
+        int stateid = 0xe;
+        int source = 0x0;
+        transitionFunc(tyStateHandler, stateid, source);
+    }
 
-    //        std::optional<MissionWrapper> foundmission = std::optional<MissionWrapper>();
-    //        
-    //        for (int i = 0; i < 7; i++) {
-    //            LinkedList<MissionWrapper> list = SaveData::MissionList(i);
-    //            std::optional<MissionWrapper> mission = SaveData::findMissionByID(list, oID);
-    //            if (mission.has_value()) {
-    //                foundmission = mission;
-    //                break;
-    //            }
-    //        }
-    //        if (foundmission.has_value()) {
-    //            char hexStr[20];
-
-    //            sprintf_s(hexStr, "0x%p", (void*)foundmission.value().address);
-    //            mPointer = hexStr;
-    //        }
-    //        else {
-    //            mPointer = "failed";
-    //        }
-
-    //        
-    //    }
-    //    catch (const std::invalid_argument& e) {
-    //        SetMessage("ID Not an int");
-    //        API::LogPluginMessage(e.what());
-    //    }
-    //}
-    //ImGui::InputText("Pointer", mPointer.data(), mPointer.size(), ImGuiInputTextFlags_ReadOnly);
-    //ImGui::InputText("Mission Pointer", mptr, IM_ARRAYSIZE(mptr));
-    //ImGui::InputText("Mission State", mstate, IM_ARRAYSIZE(mstate));
-    //if (ImGui::Button("Set Mission State")) {
-    //    int MPTR = 0;
-    //    int MSTATE = 0;
-    //    try {
-    //        // Try converting the char array to an int using std::stoi
-    //        MPTR = static_cast<int>(std::stoul(mptr, nullptr, 0));
-    //        MSTATE = std::stoi(mstate);
-
-    //        Missions::UpdateMissionState((MissionStruct*)MPTR, MSTATE, 0);
-    //    }
-    //    catch (const std::invalid_argument& e) {
-    //        API::LogPluginMessage(e.what());
-    //    }
-    //}
     ImGui::End();
 }
+
+
+
+
+
 
 void LoginWindow::SetMessage(std::string newMessage) {
     message = newMessage;

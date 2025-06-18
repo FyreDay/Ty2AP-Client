@@ -16,7 +16,8 @@ public:
 	int pLastReceivedIndex = -1;
 	int completedMissionChecks = 0;
 	int bossesdefeated = 0;
-	std::list<int> UnlockedParkingPads = {}; //patchy, oilrig, 
+	std::list<int> UnlockedParkingPads = {
+	};
 	const std::list<int> AllParkingPads = 
 	{ 
 		3736,
@@ -24,7 +25,6 @@ public:
 		3688,
 		4092,
 		3692,
-		30001,
 		3306,
 		3285,
 		3287,
@@ -39,8 +39,8 @@ public:
 		3983,
 		3244,
 		3714,
-		3708,
 		3702,
+		3732,
 		3713,
 		3284,
 		3709,
@@ -54,8 +54,10 @@ public:
 		3967,
 		3690,
 		3691,
+		3954,
 		3277,
-		3954 
+		4046,
+		3972
 	};
 	std::map<int, bool> ItemMap = {
 	{8, true}, //True is can purchuse

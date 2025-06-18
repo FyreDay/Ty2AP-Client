@@ -584,34 +584,23 @@ bool GameHandler::IsInGame() {
 }
 
 bool GameHandler::hasRunSetup = false;
-void GameHandler::RunLoadSetup(bool openworld) {
+void GameHandler::RunLoadSetup(std::vector<int> cogPrices, std::vector<int> orbPrices) {
 	ItemHandler::HandleStoredItems();
-	if (openworld) {
-		std::optional<MissionWrapper> mission980 = SaveData::findMissionByID(980);
-		if (mission980.has_value()) {
-			Missions::UpdateMissionState((MissionStruct*)mission980.value().address, 5, 0);
-		}
-		std::optional<MissionWrapper> mission981 = SaveData::findMissionByID(981);
-		if (mission981.has_value()) {
-			Missions::UpdateMissionState((MissionStruct*)mission981.value().address, 5, 0);
-		}
-		std::optional<MissionWrapper> mission982 = SaveData::findMissionByID(982);
-		if (mission982.has_value()) {
-			Missions::UpdateMissionState((MissionStruct*)mission982.value().address, 5, 0);
-		}
-	}
+	int index = 0;
+	SaveData::ItemList(1).forEach([index](ItemWrapper item) {
+		if(item.)
+		item.setPrice(cogPrices[index]);
+		index = index +1;
+	});
 	hasRunSetup = true;
 }
 
-void GameHandler::SetMissionRequirements() {
-	SaveData::MissionList(0).forEach([](MissionWrapper mission) {
-		if (mission.getID() == 80 || mission.getID() == 81 || mission.getID() == 82 || mission.getID() == 99) {
-			mission.setNumberOfMissionsRequired(10);
+void GameHandler::SetMissionRequirements(BarrierUnlock unlockType, int mission_goal) {
+	SaveData::MissionList(0).forEach([](MissionWrapper mission) { //52 is oil rig
+		if (mission.getID() == 99) {
+			mission.setNumberOfMissionsRequired(100);
 		}
-		else if (mission.getID() == 83) {
-
-		}
-		else {
+		else  if (mission.getID() != 83 and mission.getID() != 82) { //82 and 83 have only 1 precondition that I dont want to mess with
 			mission.setNumberOfMissionsRequired(0);
 		}
 	});
