@@ -15,7 +15,6 @@ public:
 	}
 	int pLastReceivedIndex = -1;
 	int completedMissionChecks = 0;
-	int bossesdefeated = 0;
 	std::list<int> UnlockedParkingPads = {
 	};
 	const std::list<int> AllParkingPads = 

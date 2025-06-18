@@ -67,6 +67,21 @@ void ArchipelagoHandler::ConnectAP(LoginWindow* login)
 			slotdata->barrierUnlockStyle = static_cast<BarrierUnlock>(data["BarrierUnlock"].get<int>());
 		}
 
+		if (data.find("RangPrices") != data.end() && data["RangPrices"].is_array()) {
+			auto rangprices = data["RangPrices"].get<std::vector<int>>();
+			slotdata->rangPrices = rangprices;
+		}
+
+		if (data.find("SlyPrices") != data.end() && data["SlyPrices"].is_array()) {
+			auto slyprices = data["SlyPrices"].get<std::vector<int>>();
+			slotdata->slyPrices = slyprices;
+		}
+
+		if (data.find("CopPrices") != data.end() && data["CopPrices"].is_array()) {
+			auto copprices = data["CopPrices"].get<std::vector<int>>();
+			slotdata->copPrices = copprices;
+		}
+
 		if (data.find("CogPrices") != data.end() && data["CogPrices"].is_array()) {
 			auto cogprices = data["CogPrices"].get<std::vector<int>>();
 			slotdata->cogPrices = cogprices;
@@ -121,7 +136,7 @@ void ArchipelagoHandler::Poll() {
 		ap->poll();
 		if (GameHandler::IsInGame()) {
 			if (!GameHandler::hasRunSetup) {
-				GameHandler::RunLoadSetup(slotdata->barrierUnlockStyle == BarrierUnlock::OpenWorld);
+				GameHandler::RunLoadSetup(slotdata);
 			}
 		}
 		else {

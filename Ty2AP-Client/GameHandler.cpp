@@ -339,7 +339,7 @@ bool GameHandler::OnItemAvailable(void* itemPtr) {
 }
 
 static std::string PadDisabled = "Pad Disabled By AP";
-static std::string copyright = "Krome Studios Inc.  All rights reserved.  TY the Tasmanian Tiger, Bush Rescue and characters and the Krome Studios logo are trademarks of Krome Studios Inc.\n\nAP Mod Created By\nFyreDay\n xMcacutt Dashieswag92";
+static std::string copyright = "Krome Studios Inc.  All rights reserved.  TY the Tasmanian Tiger, Bush Rescue and characters and the Krome Studios logo are trademarks of Krome Studios Inc.\n\nAP Mod Created By\nFyreDay\n\nSpecial Thanks\nxMcacutt Dashieswag92";
 
 int __cdecl GameHandler::HookedGetString(int param_1) {
 	//API::LogPluginMessage(std::to_string(param_1));
@@ -584,14 +584,50 @@ bool GameHandler::IsInGame() {
 }
 
 bool GameHandler::hasRunSetup = false;
-void GameHandler::RunLoadSetup(std::vector<int> cogPrices, std::vector<int> orbPrices) {
+void GameHandler::RunLoadSetup(SlotData* slotdata) {
 	ItemHandler::HandleStoredItems();
+
 	int index = 0;
-	SaveData::ItemList(1).forEach([index](ItemWrapper item) {
-		if(item.)
-		item.setPrice(cogPrices[index]);
-		index = index +1;
+	SaveData::ItemList(1).forEach([&index, slotdata](ItemWrapper item) {
+		if (item.getCurrencyType() == 0) {
+			item.setPrice(slotdata->copPrices[index]);
+			index++;
+		}
 	});
+
+	index = 0;
+	SaveData::ItemList(1).forEach([&index, slotdata](ItemWrapper item) {
+		if (item.getCurrencyType() == 2) {
+			item.setPrice(slotdata->cogPrices[index]);
+			index++;
+		}
+	});
+
+	index = 0;
+	SaveData::ItemList(2).forEach([&index, slotdata](ItemWrapper item) {
+		if (item.getCurrencyType() == 0) {
+			item.setPrice(slotdata->rangPrices[index]);
+			index++;
+		}
+	});
+
+	index = 0;
+	SaveData::ItemList(3).forEach([&index, slotdata](ItemWrapper item) {
+		if (item.getCurrencyType() == 0) {
+			item.setPrice(slotdata->slyPrices[index]);
+			index++;
+		}
+	});
+
+	index = 0;
+	SaveData::ItemList(4).forEach([&index, slotdata](ItemWrapper item) {
+		if (item.getCurrencyType() == 1) {
+			item.setPrice(slotdata->orbPrices[index]);
+			index++;
+		}
+	});
+
+
 	hasRunSetup = true;
 }
 

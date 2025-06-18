@@ -13,6 +13,9 @@ public:
 	bool requireBosses;
 	int missionsToGoal;
 	BarrierUnlock barrierUnlockStyle;
+	std::vector<int> rangPrices;
+	std::vector<int> slyPrices;
+	std::vector<int> copPrices;
 	std::vector<int> cogPrices;
 	std::vector<int> orbPrices;
 };
