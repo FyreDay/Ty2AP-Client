@@ -6,7 +6,7 @@ For the AP world see [Ty 2 AP World](https://github.com/FyreDay/Archipelago-TyTh
 
 **To install MANUALLY** information setup can be found at the respective pages below
 
-- [TygerFramework](https://github.com/ElusiveFluffy/TygerFramework/releases/tag/latest)
+- [TygerFramework](https://github.com/ElusiveFluffy/TygerFramework/releases/latest)
 
 - [TygerMemory 2](https://github.com/FyreDay/TygerMemory2) VERSION 1.0.0+
 
