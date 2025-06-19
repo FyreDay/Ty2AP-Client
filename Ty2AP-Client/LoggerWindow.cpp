@@ -5,9 +5,10 @@ void LoggerWindow::ToggleVisibility() {
     isVisible = !isVisible;
 }
 
-void LoggerWindow::Draw(int outerWidth, int outerHeight, float uiScale) {
+void LoggerWindow::Draw(int outerWidth, int outerHeight, float uiScale, ImFont* font) {
     if (!isVisible)
         return;
+
 
     UpdateVisibleMessages();
 
@@ -15,6 +16,10 @@ void LoggerWindow::Draw(int outerWidth, int outerHeight, float uiScale) {
     ImGui::SetNextWindowPos(ImVec2(10, outerHeight - 500 - 10), ImGuiCond_Always);
     ImGui::SetNextWindowSize(ImVec2(500, 500), ImGuiCond_Always);
     ImGui::Begin(name.c_str(), nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoTitleBar);
+    
+    if (font) {
+        ImGui::PushFont(font);
+    }
 
     // Get the window draw list for custom drawing
     ImDrawList* draw_list = ImGui::GetWindowDrawList();
@@ -90,7 +95,9 @@ void LoggerWindow::Draw(int outerWidth, int outerHeight, float uiScale) {
         // Add space between messages for separation
         y_pos -= 5.0f;  // Adjust this space for gap between messages
     }
-
+    if (font) {
+        ImGui::PopFont();
+    }
     ImGui::End();
 }
 

@@ -11,14 +11,22 @@ void InfoWindow::AddLogMessage(const std::string& message) {
     logMessages.push_back(message); // add newest at the end
 }
 
-void InfoWindow::Draw(int outerWidth, int outerHeight, float uiScale) {
+void InfoWindow::Draw(int outerWidth, int outerHeight, float uiScale, ImFont* font) {
     if (!isVisible)
         return;
 
     ImGui::Begin("Log");
 
+    if (font) {
+        ImGui::PushFont(font);
+    }
+
     for (const auto& msg : logMessages) {
         ImGui::TextUnformatted(msg.c_str());
+    }
+
+    if (font) {
+        ImGui::PopFont();
     }
 
     ImGui::End();

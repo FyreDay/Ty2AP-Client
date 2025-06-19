@@ -141,8 +141,8 @@ void CheckHandler::OnCompleteMission(void* mission, int status) {
 			missioncount++;
 		}
 	});
-
-	if (missioncount >= ArchipelagoHandler::slotdata->missionsToGoal) {
+	API::LogPluginMessage("misionsdone: " + std::to_string(missioncount) + " Need: " + std::to_string(ArchipelagoHandler::slotdata->missionsToGoal));
+	if (missioncount >= ArchipelagoHandler::slotdata->missionsToGoal - 1) {
 		std::optional<MissionWrapper> mission = SaveData::findMissionByID(99);
 		if (mission.has_value() && mission.value().getStatus() == 0) {
 			mission.value().setNumberOfMissionsRequired(0);

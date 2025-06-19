@@ -2,9 +2,15 @@
 #include "GameHandler.h"
 #include "gui.h"
 
+bool disabledButtons = false;
+
 void TickBeforeGame(float deltaSeconds) {
     ArchipelagoHandler::Poll();
     GUI::DrawUI();
+    if (!disabledButtons && MKUI::GetMainMenu() != nullptr) {
+        GameHandler::DisableLoadButtons();
+        disabledButtons = true;
+    }
 
     if (GameHandler::g_SaveCallback.active) {
         if (--GameHandler::g_SaveCallback.framesRemaining <= 0) {

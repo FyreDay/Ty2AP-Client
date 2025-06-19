@@ -8,7 +8,7 @@ std::vector<std::unique_ptr<Window>> GUI::windows;
 
 extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 bool GUI::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
-    if (msg == WM_KEYDOWN && wParam == VK_F5) {
+    if (msg == WM_KEYDOWN && wParam == VK_F3) {
         for (auto& window : windows) {
             if (auto Iwindow = dynamic_cast<InfoWindow*>(window.get())) {
                 Iwindow->ToggleVisibility();
@@ -27,15 +27,15 @@ bool GUI::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
         }
     }
 
-    if (msg == WM_KEYDOWN && wParam == VK_F6) {
-        for (auto& window : windows) {
-            if (auto Cwindow = dynamic_cast<LoggerWindow*>(window.get())) {
-                Cwindow->ToggleVisibility();
-                API::LogPluginMessage("Toggle LoggerWindow window.");
-                break;
-            }
-        }
-    }
+    //if (msg == WM_KEYDOWN && wParam == VK_F3) {
+    //    for (auto& window : windows) {
+    //        if (auto Cwindow = dynamic_cast<LoggerWindow*>(window.get())) {
+    //            Cwindow->ToggleVisibility();
+    //            API::LogPluginMessage("Toggle LoggerWindow window.");
+    //            break;
+    //        }
+    //    }
+    //}
 
     if (API::DrawingGUI())
         if (ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam))
@@ -43,28 +43,43 @@ bool GUI::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
     return false;
 }
 
+ImFont* GUI::tyFont = nullptr;
 
 void GUI::Initialize() {
     ImGui::CreateContext();
 
     ImGuiIO& io = ImGui::GetIO();
     //load font
+    //HMODULE hModule = nullptr;
+    //if (!GetModuleHandleEx(
+    //    GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS |
+    //    GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
+    //    (LPCWSTR)&GUI::Initialize,  // or any function in your DLL
+    //    &hModule))
+    //{
+    //    API::LogPluginMessage("Failed to get module handle");
+    //    return;
+    //}
+    //HRSRC hRes = FindResource(hModule, MAKEINTRESOURCE(IDR_RCDATA1), RT_RCDATA);
+    //if (hRes) {
+    //    API::LogPluginMessage("hres success");
+    //    HGLOBAL hData = LoadResource(NULL, hRes);
+    //    if (hData) {
+    //        API::LogPluginMessage("hdata success");
+    //        void* pFontData = LockResource(hData);
+    //        DWORD size = SizeofResource(NULL, hRes);
 
-    HRSRC hRes = FindResource(NULL, MAKEINTRESOURCE(IDR_FONT1), RT_FONT);
-    if (hRes) {
-        HGLOBAL hData = LoadResource(NULL, hRes);
-        if (hData) {
-            void* pFontData = LockResource(hData);
-            DWORD size = SizeofResource(NULL, hRes);
-
-            auto font = io.Fonts->AddFontFromMemoryTTF(pFontData, size, 16.0f);
-            if (!font) {
-                API::LogPluginMessage("Failed to load embedded font.");
-            }
-            io.Fonts->Build();
-        }
-    }
-
+    //        tyFont = io.Fonts->AddFontFromMemoryTTF(pFontData, size, 16.0f);
+    //        if (!tyFont) {
+    //            API::LogPluginMessage("Failed to load embedded font.");
+    //        }
+    //        else {
+    //            API::LogPluginMessage("Found Font.");
+    //        }
+    //        io.Fonts->Build();
+    //    }
+    //}
+    API::LogPluginMessage("hres done");
 
     io.FontGlobalScale = 1.3f;
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
@@ -81,7 +96,7 @@ void GUI::Initialize() {
 
     windows.push_back(std::make_unique<InfoWindow>());
     windows.push_back(std::make_unique<LoginWindow>());
-    windows.push_back(std::make_unique<LoggerWindow>());
+    //windows.push_back(std::make_unique<LoggerWindow>());
 
     API::LogPluginMessage("Initialized ImGui successfully.");
     GUI::init = true;
@@ -112,7 +127,7 @@ void GUI::DrawUI() {
 
 
 
-    for (auto& window : windows) { window.get()->Draw(windowWidth, windowHeight, uiScale); }
+    for (auto& window : windows) { window.get()->Draw(windowWidth, windowHeight, uiScale, tyFont); }
 
 
     ImGui::Render();

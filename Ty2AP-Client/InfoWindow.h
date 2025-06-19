@@ -10,7 +10,7 @@ public:
 		isVisible = false;
 	};
 	void ToggleVisibility() override;
-	void Draw(int outerWidth, int outerHeight, float uiScale) override;
+	void Draw(int outerWidth, int outerHeight, float uiScale, ImFont* font) override;
 	void AddLogMessage(const std::string& message);
 private:
 	std::deque<std::string> logMessages;

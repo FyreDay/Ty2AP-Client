@@ -8,7 +8,7 @@ class LoginWindow : public Window {
 public:
     LoginWindow() : Window("Login") {
         std::string savedServer, savedSlot, savedPassword;
-        isVisible = false;
+        isVisible = true;
         if (LoadLoginData(savedServer, savedSlot, savedPassword)) {
             // If data was loaded successfully, pre-fill the fields
             strncpy_s(server, savedServer.c_str(), sizeof(server));
@@ -17,7 +17,7 @@ public:
         }
     };
     void ToggleVisibility() override;
-    void Draw(int outerWidth, int outerHeight, float uiScale) override;
+    void Draw(int outerWidth, int outerHeight, float uiScale, ImFont* font) override;
     void SetMessage(std::string);
     bool LoadLoginData(std::string& server, std::string& slot, std::string& password);
     void SaveLoginData(const std::string& server, const std::string& slot, const std::string& password);

@@ -44,15 +44,20 @@ public:
 	static void TryEditFourbieTrigger(bool enable);
 	static void LoadAPSaveFile();
 	static int GetSaveDataSize();
+	
 	static int SaveFile(const char* filename, void* data, int size);
 	static void write_json_file(const std::string& filename);
 	static void read_json_file(const std::string& filename);
 	static bool IsInGame();
 	static void KillTy();
+	static void EnableLoadButtons();
+	static void DisableLoadButtons();
 	static void __fastcall DeathHook(void* thisptr, int edx, int state, int source);
 
 	static bool hasRunSetup;
 
 	static void RunLoadSetup(SlotData* slotdata);
 	static void SetMissionRequirements(BarrierUnlock unlockType, int mission_goal);
+private:
+	static bool doesSaveExist();
 };

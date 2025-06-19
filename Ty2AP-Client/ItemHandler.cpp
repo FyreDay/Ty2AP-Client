@@ -9,8 +9,8 @@ void ItemHandler::HandleItem(APClient::NetworkItem item)
 		storedItems.push(item);
 		return;
 	}
-
-	if (item.index < ArchipelagoHandler::customSaveData->pLastReceivedIndex) {
+	API::LogPluginMessage("lastindex: " + std::to_string(ArchipelagoHandler::customSaveData->pLastReceivedIndex) + " index: " + std::to_string(item.index));
+	if (item.index <= ArchipelagoHandler::customSaveData->pLastReceivedIndex) {
 		return;
 	}
 	LoggerWindow::Log("item recieved: " + ArchipelagoHandler::GetItemName(item.item, item.player));
@@ -29,12 +29,15 @@ void ItemHandler::HandleItem(APClient::NetworkItem item)
 		HandleRang(progressiveFrostyrang());
 	}
 	if (item.item == 0x19) {
-		HandleRang(progressiveLasharang());
+		HandleRang(progressiveZappyrang());
 	}
 	if (item.item == 0x1a) {
-		HandleRang(progressiveInfrarang());
+		HandleRang(progressiveLasharang());
 	}
 	if (item.item == 0x1b) {
+		HandleRang(progressiveInfrarang());
+	}
+	if (item.item == 0x1c) {
 		HandleRang(progressiveSmasharang());
 	}
 

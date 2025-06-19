@@ -67,7 +67,10 @@ void ArchipelagoHandler::ConnectAP(LoginWindow* login)
 		}
 
 		if (data.find("MissionsToGoal") != data.end()) {
-			slotdata->missionsToGoal = data["MissionsToGoal"].get<int>() == 1;
+			slotdata->missionsToGoal = data["MissionsToGoal"].get<int>();
+		}
+		if (data.find("ProgressiveRangs") != data.end()) {
+			slotdata->progressiveRangs = data["ProgressiveRangs"].get<int>() == 1;
 		}
 
 		if (data.find("BarrierUnlock") != data.end()) {
@@ -99,6 +102,7 @@ void ArchipelagoHandler::ConnectAP(LoginWindow* login)
 		}
 
 		GameHandler::SetMissionRequirements(slotdata->barrierUnlockStyle, slotdata->missionsToGoal);
+		GameHandler::EnableLoadButtons();
 	});
 	ap->set_slot_disconnected_handler([login]() { 
 		LoggerWindow::Log("Slot disconnected");

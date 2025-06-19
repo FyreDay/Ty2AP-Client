@@ -20,12 +20,17 @@ static struct TypeInfo {
     MKTObject* owningObject;    // 0x3C
 };
 
-void LoginWindow::Draw(int outerWidth, int outerHeight, float uiScale) {
+void LoginWindow::Draw(int outerWidth, int outerHeight, float uiScale, ImFont* font) {
     if (!isVisible)
         return;
 
     // Draw login window
     ImGui::Begin(name.c_str(), &isVisible, ImGuiWindowFlags_AlwaysAutoResize);
+
+    if (font) {
+        ImGui::PushFont(font);
+    }
+
     ImGui::InputText("Server", server, IM_ARRAYSIZE(server));
     ImGui::InputText("Password", password, IM_ARRAYSIZE(password), ImGuiInputTextFlags_Password);
     ImGui::InputText("Slot Name", slot, IM_ARRAYSIZE(slot));
@@ -51,8 +56,11 @@ void LoginWindow::Draw(int outerWidth, int outerHeight, float uiScale) {
 
 
     ImGui::TextWrapped("%s", message.c_str());
-    if (ImGui::Button("Kill Ty")) {
-        GameHandler::KillTy();
+    //if (ImGui::Button("Kill Ty")) {
+    //    GameHandler::KillTy();
+    //}
+    if (font) {
+        ImGui::PopFont();
     }
     ImGui::End();
 }

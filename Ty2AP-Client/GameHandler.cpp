@@ -346,8 +346,8 @@ bool GameHandler::OnItemAvailable(void* itemPtr) {
 
 static std::string PadDisabled = "Pad Disabled By AP";
 static std::string copyright = "Krome Studios Inc.  All rights reserved.  TY the Tasmanian Tiger, Bush Rescue and characters and the Krome Studios logo are trademarks of Krome Studios Inc.\n\nAP Mod Created By\nFyreDay\n\nSpecial Thanks\nxMcacutt Dashieswag92";
-static std::string selectsave = "Select any save game. AP Save data for your Slot will be loaded/Created instead";
-static std::string overwrite = "Any AP Save data for this slot will be overwritten.";
+static std::string selectsave = "Select any save game. Instead of Loading Vanilla, custom AP Save data will be loaded/Created instead";
+static std::string overwrite = "Creating new custom save data. Ok?";
 
 int __cdecl GameHandler::HookedGetString(int param_1) {
 	//API::LogPluginMessage(std::to_string(param_1));
@@ -465,6 +465,13 @@ int GameHandler::GetSaveDataSize() {
 	}
 	return size;
 }
+
+bool GameHandler::doesSaveExist() {
+	std::string filePath = "./Saves/" + ArchipelagoHandler::GetSaveIdentifier() + ".json";
+	std::ifstream file(filePath);
+	return file.good();
+}
+
 void GameHandler::LoadAPSaveFile() {
 	std::string filePath = "./Saves/" + ArchipelagoHandler::GetSaveIdentifier();
 	API::LogPluginMessage(filePath);
@@ -635,6 +642,7 @@ void GameHandler::RunLoadSetup(SlotData* slotdata) {
 		}
 	});
 
+	SetMissionRequirements(ArchipelagoHandler::slotdata->barrierUnlockStyle, ArchipelagoHandler::slotdata->missionsToGoal);
 
 	hasRunSetup = true;
 }
@@ -642,7 +650,7 @@ void GameHandler::RunLoadSetup(SlotData* slotdata) {
 void GameHandler::SetMissionRequirements(BarrierUnlock unlockType, int mission_goal) {
 	SaveData::MissionList(0).forEach([](MissionWrapper mission) { //52 is oil rig
 		if (mission.getID() == 99) {
-			mission.setNumberOfMissionsRequired(100);
+			mission.setNumberOfMissionsRequired(44);
 		}
 		else  if (mission.getID() != 83 and mission.getID() != 82) { //82 and 83 have only 1 precondition that I dont want to mess with
 			mission.setNumberOfMissionsRequired(0);
@@ -665,6 +673,66 @@ void GameHandler::KillTy() {
 	int stateid = 0xe;
 	int source = 9000;
 	transitionFunc(tyStateHandler, stateid, source);
+}
+
+void GameHandler::EnableLoadButtons()
+{
+	if (IsInGame()) {
+		return;
+	}
+	auto buttongroup = MKUI::FindChildElementByName(MKUI::GetMainMenu(), "MainMenuButtons");
+	if (buttongroup == nullptr) {
+		API::LogPluginMessage("Button group does not exist here");
+		return;
+	}
+	if (doesSaveExist()) {
+		UIElementStruct* loadgame = MKUI::FindChildElementByName(buttongroup, "LoadGame");
+		if (loadgame != nullptr) {
+			loadgame->interactable = true;
+			loadgame->enabled = true;
+			loadgame->Red = 0.63f;
+			loadgame->Blue = 0.63f;
+			loadgame->Green = 0.63f;
+		}
+	}
+	else {
+		UIElementStruct* newgame = MKUI::FindChildElementByName(buttongroup, "NewGame");
+		if (newgame != nullptr) {
+			newgame->interactable = true;
+			newgame->enabled = true;
+			newgame->Red = 0.63f;
+			newgame->Blue = 0.63f;
+			newgame->Green = 0.63f;
+		}
+	}
+}
+
+
+void GameHandler::DisableLoadButtons()
+{
+	auto buttongroup = MKUI::FindChildElementByName(MKUI::GetMainMenu(), "MainMenuButtons");
+	if (buttongroup == nullptr) {
+		return;
+	}
+	UIElementStruct* loadgame = MKUI::FindChildElementByName(buttongroup, "LoadGame");
+	if (loadgame != nullptr) {
+		loadgame->interactable = false;
+		loadgame->enabled = false;
+		loadgame->currentlySelected = false;
+		loadgame->Red = 0.4f;
+		loadgame->Blue = 0.4f;
+		loadgame->Green = 0.4f;
+		API::LogPluginMessage("Disable load game");
+	}
+	UIElementStruct* newgame = MKUI::FindChildElementByName(buttongroup, "NewGame");
+	if (newgame != nullptr) {
+		newgame->interactable = false;
+		newgame->enabled = false;
+		newgame->currentlySelected = false;
+		newgame->Red = 0.4f;
+		newgame->Blue = 0.4f;
+		newgame->Green = 0.4f;
+	}
 }
 
 /*

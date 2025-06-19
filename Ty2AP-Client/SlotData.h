@@ -12,6 +12,7 @@ public:
 	SlotData();
 	bool deathlink;
 	bool requireBosses;
+	bool progressiveRangs;
 	int missionsToGoal;
 	BarrierUnlock barrierUnlockStyle;
 	std::vector<int> rangPrices;
