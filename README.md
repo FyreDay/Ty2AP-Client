@@ -4,15 +4,13 @@ For the AP world see [Ty 2 AP World](https://github.com/FyreDay/Archipelago-TyTh
 
 #### Manual Installation
 
-**To install MANUALLY** information setup can be found at the respective pages below
-
 - [TygerFramework](https://github.com/ElusiveFluffy/TygerFramework/releases/latest)
 
 - [TygerMemory 2](https://github.com/FyreDay/TygerMemory2) VERSION 1.0.0+
 
-1. Follow the Tyger Framework Setup guide
+1. Follow the Tyger Framework Setup guide linked above
 2. Add the Ty2 AP Client dll to your plugins directory that should have been created when installing TygerFramework.
-3. Put Tyger Memory 2 dll in the Dependencies folder inside the Plugins folder
+3. Put Tyger Memory 2.dll linked above in the Dependencies folder inside the Plugins folder
 
 Once you launch the game, the client should be up and running.
 
