@@ -1,0 +1,25 @@
+# Ty The Tasmanian Tiger 2 - Archipelago Client Plugin
+
+For the AP world see [Ty 2 AP World](https://github.com/FyreDay/Archipelago-TyTheTasmanianTiger2/releases/latest)
+
+#### Manual Installation
+
+**To install MANUALLY** information setup can be found at the respective pages below
+
+- [TygerFramework](https://github.com/ElusiveFluffy/TygerFramework)
+
+- [TygerMemory 2](https://github.com/FyreDay/TygerMemory2) VERSION 1.0.0+
+
+1. Follow the Tyger Framework Setup guide
+2. Add the Ty2 AP Client dll to your plugins directory that should have been created when installing TygerFramework.
+3. Put Tyger Memory 2 dll in the Dependencies folder inside the Plugins folder
+
+Once you launch the game, the client should be up and running.
+
+## Connecting
+
+To open and close the AP client windows press F2
+
+Interacting with any window in TygerFramework requires the TygerFramework window to be open. You can toggle the TygerFramework window with F1.
+
+To Login, Enter the server with the port, the password, and the slot and press connect
