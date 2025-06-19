@@ -230,6 +230,9 @@ __declspec(naked) void __stdcall GameHandler::SaveFileHook() {
 typedef int(__cdecl* TGetStringFunc)(int param_1);
 TGetStringFunc originalGetString = nullptr;
 
+typedef void(__thiscall* StateTransitionFunc)(void* thisPtr, int firstArg, int secondArg);
+StateTransitionFunc origionalStateTransition = nullptr;
+
 void GameHandler::SetupHooks() {
 	ItemAvailableUIBranchReturnAddr = Core::moduleBase + 0x1b2cba;
 	ItemAvailableUIOriginReturnAddr = Core::moduleBase + 0x1b2cb0;
@@ -265,6 +268,9 @@ void GameHandler::SetupHooks() {
 
 	auto titleaddr = (char*)(Core::moduleBase + 0x32E5F0);
 	MH_CreateHook((LPVOID)titleaddr, &HookedGetString, reinterpret_cast<void**>(&originalGetString));
+
+	auto deathaddr = (char*)(Core::moduleBase + 0x22c7d0);
+	MH_CreateHook((LPVOID)deathaddr, &DeathHook, reinterpret_cast<void**>(&origionalStateTransition));
 
 	//load custom save
 	LoadSaveFileOriginReturnAddr = Core::moduleBase + 0x376e84+5;
@@ -340,6 +346,8 @@ bool GameHandler::OnItemAvailable(void* itemPtr) {
 
 static std::string PadDisabled = "Pad Disabled By AP";
 static std::string copyright = "Krome Studios Inc.  All rights reserved.  TY the Tasmanian Tiger, Bush Rescue and characters and the Krome Studios logo are trademarks of Krome Studios Inc.\n\nAP Mod Created By\nFyreDay\n\nSpecial Thanks\nxMcacutt Dashieswag92";
+static std::string selectsave = "Select any save game. AP Save data for your Slot will be loaded/Created instead";
+static std::string overwrite = "Any AP Save data for this slot will be overwritten.";
 
 int __cdecl GameHandler::HookedGetString(int param_1) {
 	//API::LogPluginMessage(std::to_string(param_1));
@@ -361,7 +369,13 @@ int __cdecl GameHandler::HookedGetString(int param_1) {
 			return (int)itemname;
 		}
 	}
-
+	if (param_1 == 78) {
+		return (int)selectsave.c_str();
+	}
+	if (param_1 == 93) {
+		return (int)overwrite.c_str();
+	}
+	//API::LogPluginMessage(std::to_string(param_1));
 	return originalGetString(param_1);
 }
 
@@ -426,12 +440,6 @@ void GameHandler::TryEditFourbieTrigger(bool enable) {
 		API::LogPluginMessage("Trigger name does not match.");
 
 	}
-}
-
-void GameHandler::KillTy() {
-	int* health = reinterpret_cast<int*>(Core::moduleBase + 0x4BC304);
-	*health = 0;
-	//doesnt actually kill ty. just sets health to 0
 }
 
 bool fileExists(const std::string& filePath) {
@@ -641,6 +649,24 @@ void GameHandler::SetMissionRequirements(BarrierUnlock unlockType, int mission_g
 		}
 	});
 }
+
+void __fastcall GameHandler::DeathHook(void* thisptr, int edx, int state, int source) {
+	API::LogPluginMessage("State: " + std::to_string(state) + " Source: " + std::to_string(source));
+	if (source != 9000 && state == 0xe) {
+		ArchipelagoHandler::SendDeath();
+	}
+
+	origionalStateTransition(thisptr, state, source);
+}
+
+void GameHandler::KillTy() {
+	auto transitionFunc = (StateTransitionFunc)(Core::moduleBase + 0x0022c7d0);
+	void* tyStateHandler = (void*)(MKObject::GetMKObject(204) + 0x470);
+	int stateid = 0xe;
+	int source = 9000;
+	transitionFunc(tyStateHandler, stateid, source);
+}
+
 /*
 0057da30 load chunk
 269200 handles game state

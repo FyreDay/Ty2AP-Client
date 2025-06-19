@@ -10,6 +10,7 @@ class SlotData
 {
 public:
 	SlotData();
+	bool deathlink;
 	bool requireBosses;
 	int missionsToGoal;
 	BarrierUnlock barrierUnlockStyle;

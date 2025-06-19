@@ -30,6 +30,7 @@
     <ClInclude Include="LoggerWindow.h" />
     <ClInclude Include="LoginWindow.h" />
     <ClInclude Include="pch.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="SlotData.h" />
     <ClInclude Include="Window.h" />
   </ItemGroup>
@@ -76,6 +77,12 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="info.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Resource.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Font Include="Resources\SF_Slapstick_Comic.ttf" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

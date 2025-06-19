@@ -18,6 +18,7 @@ public:
 	static void DisconnectAP();
 	static void gameFinished();
 	static void Poll();
+	static void SendDeath();
 	static std::string GetSaveIdentifier();
 	static std::string GetItemDesc(int player);
 	static std::string GetItemName(int64_t id, int player);
@@ -26,6 +27,7 @@ public:
 	static std::string uuid;
 	static bool ap_connected;
 	static std::string seed;
+	static std::string slotname;
 
 	static SlotData* slotdata;
 	static APSaveData* customSaveData;

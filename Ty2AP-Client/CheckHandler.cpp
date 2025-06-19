@@ -95,6 +95,7 @@ void CheckHandler::SetupHooks() {
 }
 
 void CheckHandler::OnCollectCollectible(int type, int id) {
+	//dont send on sanity
 	switch (type) {
 	case 0: ArchipelagoHandler::SendLocation(('C' << 8) | id); break;
 	case 1: ArchipelagoHandler::SendLocation(('B' << 8) | id); break;
@@ -134,34 +135,14 @@ void CheckHandler::OnCompleteMission(void* mission, int status) {
 			infowindow->AddLogMessage(Sid + " -> " + std::to_string(status));
 		}
 	}
-	ArchipelagoHandler::customSaveData->completedMissionChecks++;
-
-	if (ArchipelagoHandler::customSaveData->completedMissionChecks >= 5) {
-		std::optional<MissionWrapper> mission = SaveData::findMissionByID(80);
-		if (mission.has_value() && mission.value().getStatus() == 0) {
-			API::LogPluginMessage("Patchy available");
-			mission.value().setNumberOfMissionsRequired(0);
-			Missions::UpdateMissionState((MissionStruct*)mission.value().address, 1, 0);
+	int missioncount = 0;
+	SaveData::MissionList(5).forEach([&missioncount](MissionWrapper m) {
+		if (m.getID() < 100 && m.getID() != 86) {
+			missioncount++;
 		}
-	}
+	});
 
-	if (ArchipelagoHandler::customSaveData->completedMissionChecks >= 10) {
-		std::optional<MissionWrapper> mission = SaveData::findMissionByID(81);
-		if (mission.has_value() && mission.value().getStatus() == 0) {
-			mission.value().setNumberOfMissionsRequired(0);
-			Missions::UpdateMissionState((MissionStruct*)mission.value().address, 1, 0);
-		}
-	}
-
-	if (ArchipelagoHandler::customSaveData->completedMissionChecks >= 15) {
-		std::optional<MissionWrapper> mission = SaveData::findMissionByID(82);
-		if (mission.has_value() && mission.value().getStatus() == 0) {
-			mission.value().setNumberOfMissionsRequired(0);
-			Missions::UpdateMissionState((MissionStruct*)mission.value().address, 1, 0);
-		}
-	}
-
-	if (ArchipelagoHandler::customSaveData->completedMissionChecks >= 20) {
+	if (missioncount >= ArchipelagoHandler::slotdata->missionsToGoal) {
 		std::optional<MissionWrapper> mission = SaveData::findMissionByID(99);
 		if (mission.has_value() && mission.value().getStatus() == 0) {
 			mission.value().setNumberOfMissionsRequired(0);

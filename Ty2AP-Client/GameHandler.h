@@ -49,6 +49,7 @@ public:
 	static void read_json_file(const std::string& filename);
 	static bool IsInGame();
 	static void KillTy();
+	static void __fastcall DeathHook(void* thisptr, int edx, int state, int source);
 
 	static bool hasRunSetup;
 

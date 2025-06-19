@@ -14,7 +14,6 @@ public:
 		ItemMap[id] = bought;
 	}
 	int pLastReceivedIndex = -1;
-	int completedMissionChecks = 0;
 	std::list<int> UnlockedParkingPads = {
 	};
 	const std::list<int> AllParkingPads = 

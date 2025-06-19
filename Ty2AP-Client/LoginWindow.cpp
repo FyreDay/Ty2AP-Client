@@ -20,34 +20,6 @@ static struct TypeInfo {
     MKTObject* owningObject;    // 0x3C
 };
 
-static std::vector<MKTObject*> FindObjectsByType(MKTObject* startObject, const char* targetTypeName) {
-    std::vector<MKTObject*> result;
-
-    // 1. Walk backwards to the head
-    MKTObject* current = startObject;
-    while (current->prev != nullptr) {
-        current = current->prev;
-    }
-
-    // 2. Walk forwards and search
-    while (current != nullptr) {
-        TypeInfo* typeInfo = reinterpret_cast<TypeInfo*>(current->typeInfoPtr);
-        const char* typeName = typeInfo->typeNamePtr;
-
-        if (strcmp(typeName, targetTypeName) == 0) {
-            uintptr_t addr = (uintptr_t)current;
-            std::stringstream ss;
-            ss << std::hex << std::showbase << addr;
-            API::LogPluginMessage(ss.str());
-            result.push_back(current);
-        }
-
-        current = current->next;
-    }
-
-    return result;
-}
-
 void LoginWindow::Draw(int outerWidth, int outerHeight, float uiScale) {
     if (!isVisible)
         return;
@@ -79,19 +51,9 @@ void LoginWindow::Draw(int outerWidth, int outerHeight, float uiScale) {
 
 
     ImGui::TextWrapped("%s", message.c_str());
-
-    if (ImGui::Button("Search For mission lights")) {
-        FindObjectsByType((MKTObject*)(MKObject::GetMKObject(100)), "P1066_MissionLight");
+    if (ImGui::Button("Kill Ty")) {
+        GameHandler::KillTy();
     }
-    if (ImGui::Button("Try kill Ty")) {
-        typedef void(__thiscall* StateTransitionFunc)(void* thisPtr, int firstArg, int secondArg);
-        StateTransitionFunc transitionFunc = (StateTransitionFunc)(Core::moduleBase + 0x0022c7d0);
-        void* tyStateHandler = (void*)(MKObject::GetMKObject(204) + 0x470);
-        int stateid = 0xe;
-        int source = 0x0;
-        transitionFunc(tyStateHandler, stateid, source);
-    }
-
     ImGui::End();
 }
 
