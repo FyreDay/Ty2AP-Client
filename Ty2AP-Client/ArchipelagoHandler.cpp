@@ -18,17 +18,21 @@ bool ArchipelagoHandler::ap_connected = false;
 std::string ArchipelagoHandler::seed;
 std::string ArchipelagoHandler::slotname = "";
 bool ArchipelagoHandler::ap_sync_queued = false;
+bool ArchipelagoHandler::polling = false;
 
 SlotData* ArchipelagoHandler::slotdata = new SlotData();
 APSaveData* ArchipelagoHandler::customSaveData = new APSaveData();
 APClient* ArchipelagoHandler::ap = nullptr;
 
 void ArchipelagoHandler::DisconnectAP() {
+	polling = false;
+	GameHandler::hasRunSetup = false;
 	LoggerWindow::Log("Try Disconnecting");
 }
 
 void ArchipelagoHandler::ConnectAP(LoginWindow* login)
 {
+	polling = true;
 	std::string uri = login->server;
 	std::string uuid = ap_get_uuid(UUID_FILE,
 		uri.empty() ? APClient::DEFAULT_URI :
@@ -44,6 +48,7 @@ void ArchipelagoHandler::ConnectAP(LoginWindow* login)
 	ap_sync_queued = false;
 
 	ap->set_slot_connected_handler([login](const json& data) {
+		
 		slotname = login->slot;
 		LoggerWindow::Log("Connected");
 		login->SetMessage("Connected");
@@ -165,15 +170,17 @@ void ArchipelagoHandler::gameFinished() {
 }
 
 void ArchipelagoHandler::Poll() {
-	if (ap) {
-		ap->poll();
-		if (GameHandler::IsInGame()) {
-			if (!GameHandler::hasRunSetup) {
-				GameHandler::RunLoadSetup(slotdata);
+	while (true) {
+		if (ap && polling) {
+			ap->poll();
+			if (GameHandler::IsInGame()) {
+				if (!GameHandler::hasRunSetup) {
+					GameHandler::RunLoadSetup(slotdata);
+				}
 			}
-		}
-		else {
-			GameHandler::hasRunSetup = false;
+			else {
+				GameHandler::hasRunSetup = false;
+			}
 		}
 	}
 }

@@ -26,6 +26,7 @@ public:
 	static void SendLocation(int64_t locationId);
 	static std::string uuid;
 	static bool ap_connected;
+	static bool polling;
 	static std::string seed;
 	static std::string slotname;
 

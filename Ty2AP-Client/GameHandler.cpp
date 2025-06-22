@@ -606,6 +606,7 @@ void GameHandler::RunLoadSetup(SlotData* slotdata) {
 	SaveData::ItemList(1).forEach([&index, slotdata](ItemWrapper item) {
 		if (item.getCurrencyType() == 0) {
 			item.setPrice(slotdata->copPrices[index]);
+			item.setPuchusedStatus(!ArchipelagoHandler::customSaveData->hasBoughtItem(item.getID()));
 			index++;
 		}
 	});
@@ -614,6 +615,11 @@ void GameHandler::RunLoadSetup(SlotData* slotdata) {
 	SaveData::ItemList(1).forEach([&index, slotdata](ItemWrapper item) {
 		if (item.getCurrencyType() == 2) {
 			item.setPrice(slotdata->cogPrices[index]);
+			item.setPuchusedStatus(!ArchipelagoHandler::customSaveData->hasBoughtItem(item.getID()));
+			if (item.getID() > 79) {
+				item.setLocked(ArchipelagoHandler::customSaveData->hasBoughtItem(item.getID() - 1));
+			}
+
 			index++;
 		}
 	});
@@ -622,6 +628,7 @@ void GameHandler::RunLoadSetup(SlotData* slotdata) {
 	SaveData::ItemList(2).forEach([&index, slotdata](ItemWrapper item) {
 		if (item.getCurrencyType() == 0) {
 			item.setPrice(slotdata->rangPrices[index]);
+			item.setPuchusedStatus(!ArchipelagoHandler::customSaveData->hasBoughtItem(item.getID()));
 			index++;
 		}
 	});
@@ -630,6 +637,7 @@ void GameHandler::RunLoadSetup(SlotData* slotdata) {
 	SaveData::ItemList(3).forEach([&index, slotdata](ItemWrapper item) {
 		if (item.getCurrencyType() == 0) {
 			item.setPrice(slotdata->slyPrices[index]);
+			item.setPuchusedStatus(!ArchipelagoHandler::customSaveData->hasBoughtItem(item.getID()));
 			index++;
 		}
 	});
@@ -638,6 +646,11 @@ void GameHandler::RunLoadSetup(SlotData* slotdata) {
 	SaveData::ItemList(4).forEach([&index, slotdata](ItemWrapper item) {
 		if (item.getCurrencyType() == 1) {
 			item.setPrice(slotdata->orbPrices[index]);
+			item.setPuchusedStatus(!ArchipelagoHandler::customSaveData->hasBoughtItem(item.getID()));
+			if (item.getID() > 5) {
+				item.setLocked(ArchipelagoHandler::customSaveData->hasBoughtItem(item.getID() - 1));
+			}
+			
 			index++;
 		}
 	});

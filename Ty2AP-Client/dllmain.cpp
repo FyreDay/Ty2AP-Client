@@ -5,7 +5,7 @@
 bool disabledButtons = false;
 
 void TickBeforeGame(float deltaSeconds) {
-    ArchipelagoHandler::Poll();
+    
     GUI::DrawUI();
     if (!disabledButtons && MKUI::GetMainMenu() != nullptr) {
         GameHandler::DisableLoadButtons();
@@ -33,6 +33,12 @@ void TickBeforeGame(float deltaSeconds) {
 
 void OnTyInit() {
     GameHandler::Initialize();
+    std::thread t(ArchipelagoHandler::Poll);
+    t.detach();
+}
+
+void OnTyBeginShutdown() {
+    ArchipelagoHandler::DisconnectAP();
 }
 
 extern "C" __declspec(dllexport) bool TygerFrameworkPluginInitialize(TygerFrameworkPluginInitializeParam* param) {
