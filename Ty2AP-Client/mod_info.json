@@ -16,5 +16,5 @@
   "icon_url": "https://raw.githubusercontent.com/xMcacutt/Ty1AP-Client/refs/heads/master/favico.ico",
   "last_updated": "2025-10-15",
   "website": "https://github.com/FyreDay/Ty2AP-Client?tab=readme-ov-file#ty-the-tasmanian-tiger-2---archipelago-client-plugin",
-  "games": "Ty 2"
+  "games": [ "Ty 2" ]
 }
