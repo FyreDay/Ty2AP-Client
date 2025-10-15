@@ -104,7 +104,7 @@ void CheckHandler::OnCollectCollectible(int type, int id) {
 	case 4: ArchipelagoHandler::SendLocation(('S' << 8) | id); break;
 	case 5: ArchipelagoHandler::SendLocation(('F' << 8) | id); break;
 	default:
-		API::LogPluginMessage("Failure on collectable Type");
+		Logging::log("Failure on collectable Type");
 	}
 	
 
@@ -141,13 +141,17 @@ void CheckHandler::OnCompleteMission(void* mission, int status) {
 			missioncount++;
 		}
 	});
-	API::LogPluginMessage("misionsdone: " + std::to_string(missioncount) + " Need: " + std::to_string(ArchipelagoHandler::slotdata->missionsToGoal));
+	Logging::log("misionsdone: " + std::to_string(missioncount) + " Need: " + std::to_string(ArchipelagoHandler::slotdata->missionsToGoal));
 	if (missioncount >= ArchipelagoHandler::slotdata->missionsToGoal - 1) {
 		std::optional<MissionWrapper> mission = SaveData::findMissionByID(99);
 		if (mission.has_value() && mission.value().getStatus() == 0) {
 			mission.value().setNumberOfMissionsRequired(0);
 			Missions::UpdateMissionState((MissionStruct*)mission.value().address, 1, 0);
 		}
+	}
+
+	if (id == 99) {
+		ArchipelagoHandler::gameFinished();
 	}
 }
 

@@ -127,38 +127,6 @@ void LoggerWindow::RenderFormattedText(ImDrawList* draw_list, const char* text, 
     // Define keywords and associated colors
     static const std::unordered_map<std::string, ImU32> keywordColors = {
         //{"Golden Cog", IM_COL32(252, 210, 16, 255)},
-        //{"Fire Thunder Egg", IM_COL32(235, 106, 106, 255)},
-        //{"Air Thunder Egg", IM_COL32(32, 216, 25, 255)},
-        //{"Ice Thunder Egg", IM_COL32(108, 137, 244, 255)},
-        //{"Portal", IM_COL32(255, 198, 252, 255)},
-        //{"Stopwatch", IM_COL32(233, 106, 126, 255)},
-        //{"Progressive Level", IM_COL32(228, 103, 103, 255)},
-        //{"Progressive Rang", IM_COL32(238, 173, 92, 255)},
-        //{"Bilby", IM_COL32(137, 176, 210, 255)},
-        //{"Acid Trap", IM_COL32(0, 255, 255, 255)},
-        //{"Slow Trap", IM_COL32(0, 255, 255, 255)},
-        //{"Gravity Trap", IM_COL32(0, 255, 255, 255)},
-        //{"Exit Trap", IM_COL32(0, 255, 255, 255)},
-        //{"Knocked Down Trap", IM_COL32(0, 255, 255, 255)},
-        //{"Second Rang", IM_COL32(219, 165, 101, 255)},
-        //{"Swim", IM_COL32(101, 161, 219, 255)},
-        //{"Dive", IM_COL32(101, 161, 219, 255)},
-        //{"Multirang", IM_COL32(242, 180, 68, 255)},
-        //{"Zoomerang", IM_COL32(244, 146, 146, 255)},
-        //{"Megarang", IM_COL32(148, 186, 216, 255)},
-        //{"Infrarang", IM_COL32(238, 62, 62, 255)},
-        //{"Kaboomerang", IM_COL32(244, 146, 146, 255)},
-        //{"Chronorang", IM_COL32(299, 143, 226, 225)},
-        //{"Flamerang", IM_COL32(243, 111, 29, 255)},
-        //{"Frostyrang", IM_COL32(184, 234, 245, 255)},
-        //{"Zappyrang", IM_COL32(186, 238, 214, 255)},
-        //{"Aquarang", IM_COL32(101, 161, 219, 255)},
-        //{"Doomerang", IM_COL32(255, 255, 0, 255)},
-        //{"Signpost", IM_COL32(213, 171, 108, 255)},
-        //{"Extra Life", IM_COL32(243, 175, 35, 255)},
-        //{"Extra Health", IM_COL32(243, 175, 35, 255)},
-        //{"Picture Frame", IM_COL32(255, 230, 68, 255)},
-        //{"Rainbow Scale", IM_COL32(255, 68, 249, 255)},
     };
 
     ImU32 current_color = IM_COL32(255, 255, 255, 255); // Default white
@@ -245,4 +213,37 @@ void LoggerWindow::Log(const std::string& message)
             break;
         }
     }
+}
+
+void LoggerWindow::LogNodes(APClient::PrintJSONArgs printdata)
+{
+    for (auto& window : GUI::windows) {
+        if (auto logger = dynamic_cast<LoggerWindow*>(window.get())) {
+            std::string message;
+            for (const auto& text : printdata.data) {
+                API::LogPluginMessage(text.text + " " + text.type);
+                if (text.type == "") {
+                    auto it = logger->apKeywordColors.find(text.color);
+                    std::string colorHex = (it != logger->apKeywordColors.end()) ? it->second : "FFFFFF";
+                    message += text.text;
+                }
+                if (text.type == "player_id") {
+                    int value = std::atoi(text.text.c_str());
+                    message += ArchipelagoHandler::GetPlayerName(value);
+                }
+                if (text.type == "item_id") {
+                    message += ArchipelagoHandler::GetItemName(printdata.item->item, printdata.item->player);
+                }
+                if (text.type == "location_id") {
+                    int value = std::atoi(text.text.c_str());
+                    message += ArchipelagoHandler::GetLocationName(value, printdata.item->player);
+                }
+            }
+            logger->AddLogMessage(message);
+            API::LogPluginMessage(message);
+
+            break;
+        }
+    }
+    
 }

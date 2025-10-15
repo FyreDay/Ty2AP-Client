@@ -1,0 +1,20 @@
+{
+  "name": "Ty2 AP Client",
+  "description": "This is a mod to connect to the multi world randomizer archipelago.",
+  "dll_name": "Ty2AP-Client",
+  "version": "0.0.1",
+  "dependencies": [
+    {
+      "dep_name": "Tyger Memory 2",
+      "dep_ver": "0.0.1",
+      "dep_url": "download@github"
+    }
+  ],
+  "conflicts": "",
+  "author": "FyreDay",
+  "download_url": "github",
+  "icon_url": "github",
+  "last_updated": "2025-06-10",
+  "website": "readme@github",
+  "games":  "Ty 2"
+}

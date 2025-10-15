@@ -15,7 +15,7 @@ public:
 	}
 	int pLastReceivedIndex = -1;
 	int cogCount = 0;
-	int OrbCount = 0;
+	int orbCount = 0;
 	std::list<int> UnlockedParkingPads = {
 	};
 	const std::list<int> AllParkingPads = 

@@ -75,6 +75,7 @@
     <ClCompile Include="SlotData.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="mod_info.json" />
     <None Include="Source.def" />
   </ItemGroup>
   <ItemGroup>

@@ -12,7 +12,7 @@ bool GUI::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
         for (auto& window : windows) {
             if (auto Iwindow = dynamic_cast<InfoWindow*>(window.get())) {
                 Iwindow->ToggleVisibility();
-                API::LogPluginMessage("Toggle InfoWindow window.");
+                Logging::log("Toggle InfoWindow window.");
                 break;
             }
         }
@@ -21,7 +21,7 @@ bool GUI::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
         for (auto& window : windows) {
             if (auto Lwindow = dynamic_cast<LoginWindow*>(window.get())) {
                 Lwindow->ToggleVisibility();
-                API::LogPluginMessage("Toggle LoginWindow window.");
+                Logging::log("Toggle LoginWindow window.");
                 break;
             }
         }
@@ -96,7 +96,7 @@ void GUI::Initialize() {
 
     windows.push_back(std::make_unique<InfoWindow>());
     windows.push_back(std::make_unique<LoginWindow>());
-    //windows.push_back(std::make_unique<LoggerWindow>());
+    windows.push_back(std::make_unique<LoggerWindow>());
 
     API::LogPluginMessage("Initialized ImGui successfully.");
     GUI::init = true;

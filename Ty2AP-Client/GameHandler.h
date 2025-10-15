@@ -57,6 +57,7 @@ public:
 	static bool hasRunSetup;
 
 	static void RunLoadSetup(SlotData* slotdata);
+	static void SetShopItems(SlotData* slotdata);
 	static void SetMissionRequirements(BarrierUnlock unlockType, int mission_goal);
 private:
 	static bool doesSaveExist();

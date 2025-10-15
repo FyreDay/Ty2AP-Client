@@ -387,19 +387,19 @@ void GameHandler::OnChunkLoaded() {
 			uintptr_t objptr = MKObject::GetMKObject(pad);
 			if (objptr != 0) {
 				*(short*)(objptr + 0x1a) = 0x0016;
-				API::LogPluginMessage(std::to_string(pad) + " enabled");
+				Logging::log(std::to_string(pad) + " enabled");
 			}
 		}
 		else {
 			uintptr_t objptr = MKObject::GetMKObject(pad);
 			if (objptr != 0) {
 				*(short*)(objptr + 0x1a) = 0x0000;
-				API::LogPluginMessage(std::to_string(pad) + " disabled");
+				Logging::log(std::to_string(pad) + " disabled");
 			}
 		}
 	}
 	
-	API::LogPluginMessage("OnChunkLoaded");
+	Logging::log("OnChunkLoaded");
 }
 
 
@@ -437,7 +437,7 @@ void GameHandler::TryEditFourbieTrigger(bool enable) {
 		*flagPtr = enable;
 	}
 	else {
-		API::LogPluginMessage("Trigger name does not match.");
+		Logging::log("Trigger name does not match.");
 
 	}
 }
@@ -474,7 +474,7 @@ bool GameHandler::doesSaveExist() {
 
 void GameHandler::LoadAPSaveFile() {
 	std::string filePath = "./Saves/" + ArchipelagoHandler::GetSaveIdentifier();
-	API::LogPluginMessage(filePath);
+	/*API::LogPluginMessage(filePath);*/
 	createDirectoriesIfNeeded(filePath);
 	std::ifstream file(filePath + ".bin", std::ios::binary);
 	if (file.is_open()) {
@@ -488,7 +488,7 @@ void GameHandler::LoadAPSaveFile() {
 				delete[] saveFileBuffer;
 				saveFileBuffer = nullptr;
 				saveFileLength = 0;
-				API::LogPluginMessage("Failed to read save file.");
+				//API::LogPluginMessage("Failed to read save file.");
 			}
 		}
 
@@ -528,7 +528,7 @@ void GameHandler::LoadAPSaveFile() {
 
 	}
 	else {
-		API::LogPluginMessage("Save file not found.");
+		Logging::log("Save file not found.");
 		saveFileLength = 0;
 		saveFileBuffer = nullptr;
 	}
@@ -543,7 +543,7 @@ int GameHandler::SaveFile(const char* filename, void* data, int size) {
 	if (fopen_s(&f, (filePath + ".bin").c_str(), "wb") == 0 && f) {
 		fwrite(data, 1, size, f);
 		fclose(f);
-		API::LogPluginMessage("Save file Saved.");
+		Logging::log("Save file Saved.");
 	}
 
 	write_json_file(filePath + ".json");
@@ -560,6 +560,8 @@ void GameHandler::write_json_file(const std::string& filename) {
 
 	// Populate the JSON object
 	j["LastRecievedIndex"] = ArchipelagoHandler::customSaveData->pLastReceivedIndex;
+	j["CogCount"] = SaveData::GetData()->CogCollected;
+	j["OrbCount"] = SaveData::GetData()->OrbCollected;
 	j["ShopData"] = ArchipelagoHandler::customSaveData->ItemMap;
 	j["UnlockedParkingBays"] = ArchipelagoHandler::customSaveData->UnlockedParkingPads;
 
@@ -585,6 +587,8 @@ void GameHandler::read_json_file(const std::string& filename) {
 
 	// Access data
 	ArchipelagoHandler::customSaveData->pLastReceivedIndex = j["LastRecievedIndex"];
+	ArchipelagoHandler::customSaveData->cogCount = j["CogCount"];
+	ArchipelagoHandler::customSaveData->orbCount = j["OrbCount"];
 	ArchipelagoHandler::customSaveData->ItemMap = j["ShopData"].get<std::map<int, bool>>();
 	ArchipelagoHandler::customSaveData->UnlockedParkingPads = j["UnlockedParkingBays"].get<std::list<int>>();
 }
@@ -600,8 +604,19 @@ bool GameHandler::IsInGame() {
 
 bool GameHandler::hasRunSetup = false;
 void GameHandler::RunLoadSetup(SlotData* slotdata) {
+	SaveData::GetData()->CogCollected = ArchipelagoHandler::customSaveData->cogCount;
+	SaveData::GetData()->OrbCollected = ArchipelagoHandler::customSaveData->orbCount;
+	SetShopItems(slotdata);
+
 	ItemHandler::HandleStoredItems();
 
+
+	SetMissionRequirements(ArchipelagoHandler::slotdata->barrierUnlockStyle, ArchipelagoHandler::slotdata->missionsToGoal);
+
+	hasRunSetup = true;
+}
+
+void GameHandler::SetShopItems(SlotData* slotdata) {
 	int index = 0;
 	SaveData::ItemList(1).forEach([&index, slotdata](ItemWrapper item) {
 		if (item.getCurrencyType() == 0) {
@@ -609,7 +624,7 @@ void GameHandler::RunLoadSetup(SlotData* slotdata) {
 			item.setPuchusedStatus(!ArchipelagoHandler::customSaveData->hasBoughtItem(item.getID()));
 			index++;
 		}
-	});
+		});
 
 	index = 0;
 	SaveData::ItemList(1).forEach([&index, slotdata](ItemWrapper item) {
@@ -622,7 +637,7 @@ void GameHandler::RunLoadSetup(SlotData* slotdata) {
 
 			index++;
 		}
-	});
+		});
 
 	index = 0;
 	SaveData::ItemList(2).forEach([&index, slotdata](ItemWrapper item) {
@@ -631,7 +646,7 @@ void GameHandler::RunLoadSetup(SlotData* slotdata) {
 			item.setPuchusedStatus(!ArchipelagoHandler::customSaveData->hasBoughtItem(item.getID()));
 			index++;
 		}
-	});
+		});
 
 	index = 0;
 	SaveData::ItemList(3).forEach([&index, slotdata](ItemWrapper item) {
@@ -640,7 +655,7 @@ void GameHandler::RunLoadSetup(SlotData* slotdata) {
 			item.setPuchusedStatus(!ArchipelagoHandler::customSaveData->hasBoughtItem(item.getID()));
 			index++;
 		}
-	});
+		});
 
 	index = 0;
 	SaveData::ItemList(4).forEach([&index, slotdata](ItemWrapper item) {
@@ -650,14 +665,10 @@ void GameHandler::RunLoadSetup(SlotData* slotdata) {
 			if (item.getID() > 5) {
 				item.setLocked(ArchipelagoHandler::customSaveData->hasBoughtItem(item.getID() - 1));
 			}
-			
+
 			index++;
 		}
-	});
-
-	SetMissionRequirements(ArchipelagoHandler::slotdata->barrierUnlockStyle, ArchipelagoHandler::slotdata->missionsToGoal);
-
-	hasRunSetup = true;
+		});
 }
 
 void GameHandler::SetMissionRequirements(BarrierUnlock unlockType, int mission_goal) {
@@ -672,7 +683,7 @@ void GameHandler::SetMissionRequirements(BarrierUnlock unlockType, int mission_g
 }
 
 void __fastcall GameHandler::DeathHook(void* thisptr, int edx, int state, int source) {
-	API::LogPluginMessage("State: " + std::to_string(state) + " Source: " + std::to_string(source));
+	//API::LogPluginMessage("State: " + std::to_string(state) + " Source: " + std::to_string(source));
 	if (source != 9000 && state == 0xe) {
 		ArchipelagoHandler::SendDeath();
 	}
@@ -695,7 +706,7 @@ void GameHandler::EnableLoadButtons()
 	}
 	auto buttongroup = MKUI::FindChildElementByName(MKUI::GetMainMenu(), "MainMenuButtons");
 	if (buttongroup == nullptr) {
-		API::LogPluginMessage("Button group does not exist here");
+		Logging::log("Button group does not exist here");
 		return;
 	}
 	if (doesSaveExist()) {
@@ -735,7 +746,7 @@ void GameHandler::DisableLoadButtons()
 		loadgame->Red = 0.4f;
 		loadgame->Blue = 0.4f;
 		loadgame->Green = 0.4f;
-		API::LogPluginMessage("Disable load game");
+		Logging::log("Disable load game");
 	}
 	UIElementStruct* newgame = MKUI::FindChildElementByName(buttongroup, "NewGame");
 	if (newgame != nullptr) {

@@ -13,6 +13,7 @@
 #include "imgui_stdlib.h"
 #include "imgui_impl_win32.h"
 #include "../TygerMemory2/Core.h"
+#include "../TygerMemory2/Logging.h"
 #include <../TygerMemory2/MKObject.h>
 #include <../TygerMemory2/Missions.h>
 #include <../TygerMemory2/SaveData.h>

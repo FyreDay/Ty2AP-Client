@@ -9,11 +9,11 @@ void ItemHandler::HandleItem(APClient::NetworkItem item)
 		storedItems.push(item);
 		return;
 	}
-	API::LogPluginMessage("lastindex: " + std::to_string(ArchipelagoHandler::customSaveData->pLastReceivedIndex) + " index: " + std::to_string(item.index));
+	Logging::log("lastindex: " + std::to_string(ArchipelagoHandler::customSaveData->pLastReceivedIndex) + " index: " + std::to_string(item.index));
 	if (item.index <= ArchipelagoHandler::customSaveData->pLastReceivedIndex) {
 		return;
 	}
-	LoggerWindow::Log("item recieved: " + ArchipelagoHandler::GetItemName(item.item, item.player));
+
 	ArchipelagoHandler::customSaveData->pLastReceivedIndex++;
 
 	if (item.item < 0x16) {
@@ -121,6 +121,9 @@ void ItemHandler::HandleItem(APClient::NetworkItem item)
 			Missions::UpdateMissionState((MissionStruct*)mission982.value().address, 5, 0);
 		}
 	}
+	std::string filePath = "./Saves/" + ArchipelagoHandler::GetSaveIdentifier();
+
+	GameHandler::write_json_file(filePath + ".json");
 }
 
 void ItemHandler::HandleRang(int id)
@@ -138,6 +141,21 @@ void ItemHandler::HandleRang(int id)
 	}
 	if (id == 0x0b) {
 		CollectItem(3,20);
+		CollectItem(2, 12);
+	}
+	if (id == 0x04) {
+		
+	}
+	if (id == 0x05) {
+		CollectItem(3, 5);
+		CollectItem(2, 4);
+	}
+	if (id == 0x02) {
+		
+	}
+	if (id == 0x03) {
+		CollectItem(3, 3);
+		CollectItem(2, 2);
 	}
 }
 
@@ -153,11 +171,11 @@ void ItemHandler::CollectItem(int shopId, int itemId)
 	LinkedList<ItemWrapper> items = SaveData::ItemList(shopId);
 	std::optional<ItemWrapper> item = SaveData::findItemByID(items, itemId);
 	if (item.has_value()) {
-		API::LogPluginMessage("item has value: " + std::to_string(itemId) + "  " + std::to_string(item.value().address));
+		Logging::log("item has value: " + std::to_string(itemId) + "  " + std::to_string(item.value().address));
 		item.value().setPuchusedStatus(true);
 	}
 	else {
-		API::LogPluginMessage("No Item with id " + std::to_string(itemId));
+		Logging::log("No Item with id " + std::to_string(itemId));
 	}
 }
 

@@ -119,6 +119,9 @@ void ArchipelagoHandler::ConnectAP(LoginWindow* login)
 			login->SetMessage("Connection refused");
 		}
 	});
+	ap->set_print_json_handler([](const APClient::PrintJSONArgs& args) {
+		LoggerWindow::LogNodes(args);  
+		});
 	ap->set_room_info_handler([login]() {
 		std::list<std::string> tags;
 		ap->ConnectSlot(login->slot, login->password, 0b111, tags, { 0,6,0 });
@@ -239,7 +242,21 @@ std::string ArchipelagoHandler::GetItemName(int64_t id, int player) {
 	if (ap) {
 		return ap->get_item_name(id, ap->get_player_game(player));
 	}
-	return "";
+	return "item id: " + id;
+}
+
+std::string ArchipelagoHandler::GetLocationName(int64_t id, int player) {
+	if (ap) {
+		return ap->get_location_name(id, ap->get_player_game(player));
+	}
+	return "loc id: " + id;
+}
+
+std::string ArchipelagoHandler::GetPlayerName(int player){
+	if (ap) {
+		return ap->get_player_alias(player);
+	}
+	return "player slot: " + player;
 }
 
 std::string ArchipelagoHandler::GetItemDesc(int player) {

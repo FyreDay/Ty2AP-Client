@@ -20,7 +20,6 @@ void TickBeforeGame(float deltaSeconds) {
             }
             else {
                 *(DWORD*)(GameHandler::g_SaveCallback.esi + 0x238) = 0;  // Mark save complete
-                API::LogPluginMessage("Set to 0.");
             }
             GameHandler::g_SaveCallback.active = false;
             

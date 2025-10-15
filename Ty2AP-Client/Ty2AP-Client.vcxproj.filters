@@ -136,6 +136,7 @@
     <None Include="Source.def">
       <Filter>Source Files</Filter>
     </None>
+    <None Include="mod_info.json" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="info.txt" />
