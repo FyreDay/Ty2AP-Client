@@ -10,7 +10,7 @@
       "dep_url": "https://github.com/FyreDay/TygerMemory2/releases/download/V1.0.1/TygerMemory2.dll"
     }
   ],
-  "conflicts": "",
+  "conflicts": [],
   "author": "FyreDay",
   "download_url": "https://github.com/FyreDay/Ty2AP-Client/releases/download/v0.1.0/Ty2AP-Client.dll",
   "icon_url": "https://raw.githubusercontent.com/xMcacutt/Ty1AP-Client/refs/heads/master/favico.ico",
