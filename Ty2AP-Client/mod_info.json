@@ -5,7 +5,7 @@
   "version": "0.1.0",
   "dependencies": [
     {
-      "dep_name": "Tyger Memory 2",
+      "dep_name": "TygerMemory2",
       "dep_version": "1.0.1",
       "dep_url": "https://github.com/FyreDay/TygerMemory2/releases/download/V1.0.1/TygerMemory2.dll"
     }
