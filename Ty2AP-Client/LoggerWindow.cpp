@@ -221,7 +221,6 @@ void LoggerWindow::LogNodes(APClient::PrintJSONArgs printdata)
         if (auto logger = dynamic_cast<LoggerWindow*>(window.get())) {
             std::string message;
             for (const auto& text : printdata.data) {
-                API::LogPluginMessage(text.text + " " + text.type);
                 if (text.type == "") {
                     auto it = logger->apKeywordColors.find(text.color);
                     std::string colorHex = (it != logger->apKeywordColors.end()) ? it->second : "FFFFFF";
@@ -240,7 +239,6 @@ void LoggerWindow::LogNodes(APClient::PrintJSONArgs printdata)
                 }
             }
             logger->AddLogMessage(message);
-            API::LogPluginMessage(message);
 
             break;
         }

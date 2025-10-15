@@ -126,8 +126,13 @@ void CheckHandler::OnCompleteMission(void* mission, int status) {
 	
 	int id = *reinterpret_cast<int*>(base + 0x4);
 	ArchipelagoHandler::SendLocation(id);
-
+	
 	short value = *reinterpret_cast<short*>(base + 0x4); // read short
+
+	if (value == 83) { //this is the cass boss fight id
+		API::LogPluginMessage("GOALLLLL");
+		ArchipelagoHandler::gameFinished();
+	}
 	char letter = *reinterpret_cast<char*>(base + 0x7);  // read char
 	std::string Sid = std::string(1, letter) + std::to_string(value);
 	for (auto& window : GUI::windows) {
@@ -150,9 +155,7 @@ void CheckHandler::OnCompleteMission(void* mission, int status) {
 		}
 	}
 
-	if (id == 99) {
-		ArchipelagoHandler::gameFinished();
-	}
+	
 }
 
 void CheckHandler::OnBuyItem(void* item) {
