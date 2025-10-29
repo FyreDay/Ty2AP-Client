@@ -120,6 +120,13 @@ void ArchipelagoHandler::ConnectAP(LoginWindow* login)
 		}
 	});
 	ap->set_print_json_handler([](const APClient::PrintJSONArgs& args) {
+		if (!ap->is_data_package_valid()) {
+			if (!ap_sync_queued) {
+				ap_sync_queued = true;
+				ap->Sync();
+			}
+			return;
+		}
 		LoggerWindow::LogNodes(args);  
 		});
 	ap->set_room_info_handler([login]() {
@@ -128,6 +135,13 @@ void ArchipelagoHandler::ConnectAP(LoginWindow* login)
 	});
 
 	ap->set_items_received_handler([](const std::list<APClient::NetworkItem>& items) {
+		if (!ap->is_data_package_valid()) {
+			if (!ap_sync_queued) {
+				ap_sync_queued = true;
+				ap->Sync();
+			}
+			return;
+		}
 		for (const auto& item : items) {
 			
 			std::string sender = ap->get_player_alias(item.player);
