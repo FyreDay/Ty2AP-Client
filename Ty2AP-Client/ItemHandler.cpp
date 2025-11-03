@@ -9,7 +9,7 @@ void ItemHandler::HandleItem(APClient::NetworkItem item)
 		storedItems.push(item);
 		return;
 	}
-	Logging::log("lastindex: " + std::to_string(ArchipelagoHandler::customSaveData->pLastReceivedIndex) + " index: " + std::to_string(item.index));
+	API::LogPluginMessage("lastindex: " + std::to_string(ArchipelagoHandler::customSaveData->pLastReceivedIndex) + " index: " + std::to_string(item.index));
 	if (item.index <= ArchipelagoHandler::customSaveData->pLastReceivedIndex) {
 		return;
 	}
@@ -104,21 +104,21 @@ void ItemHandler::HandleItem(APClient::NetworkItem item)
 	}
 
 	if (item.item == 980) {
-		std::optional<MissionWrapper> mission980 = SaveData::findMissionByID(980);
+		std::optional<MissionStruct> mission980 = SaveData::findMissionByID(980);
 		if (mission980.has_value()) {
-			Missions::UpdateMissionState((MissionStruct*)mission980.value().address, 5, 0);
+			Missions::UpdateMissionState(&mission980.value(), 5, 0);
 		}
 	}
 	if (item.item == 981) {
-		std::optional<MissionWrapper> mission981 = SaveData::findMissionByID(981);
+		std::optional<MissionStruct> mission981 = SaveData::findMissionByID(981);
 		if (mission981.has_value()) {
-			Missions::UpdateMissionState((MissionStruct*)mission981.value().address, 5, 0);
+			Missions::UpdateMissionState(&mission981.value(), 5, 0);
 		}
 	}
 	if (item.item == 982) {
-		std::optional<MissionWrapper> mission982 = SaveData::findMissionByID(982);
+		std::optional<MissionStruct> mission982 = SaveData::findMissionByID(982);
 		if (mission982.has_value()) {
-			Missions::UpdateMissionState((MissionStruct*)mission982.value().address, 5, 0);
+			Missions::UpdateMissionState(&mission982.value(), 5, 0);
 		}
 	}
 	std::string filePath = "./Saves/" + ArchipelagoHandler::GetSaveIdentifier();
@@ -162,20 +162,20 @@ void ItemHandler::HandleRang(int id)
 void ItemHandler::HandleParkingPad(int id)
 {
 	ArchipelagoHandler::customSaveData->UnlockedParkingPads.push_back(id);
-	//updates parkingpads if its loaded nned to queue for next frame
+	//updates parkingpads if its loaded need to queue for next frame
 	GameHandler::OnChunkLoaded();
 }
 
 void ItemHandler::CollectItem(int shopId, int itemId)
 {
-	LinkedList<ItemWrapper> items = SaveData::ItemList(shopId);
-	std::optional<ItemWrapper> item = SaveData::findItemByID(items, itemId);
+	LinkedList<ItemStruct> items = SaveData::GetShopItemList(shopId);
+	std::optional<ItemStruct> item = SaveData::findItemByID(items, itemId);
 	if (item.has_value()) {
-		Logging::log("item has value: " + std::to_string(itemId) + "  " + std::to_string(item.value().address));
-		item.value().setPuchusedStatus(true);
+		API::LogPluginMessage("item has value: " + std::to_string(itemId));
+		item.value().purchased = true;
 	}
 	else {
-		Logging::log("No Item with id " + std::to_string(itemId));
+		API::LogPluginMessage("No Item with id " + std::to_string(itemId));
 	}
 }
 

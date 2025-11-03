@@ -12,7 +12,7 @@ bool GUI::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
         for (auto& window : windows) {
             if (auto Iwindow = dynamic_cast<InfoWindow*>(window.get())) {
                 Iwindow->ToggleVisibility();
-                Logging::log("Toggle InfoWindow window.");
+                API::LogPluginMessage("Toggle InfoWindow window.");
                 break;
             }
         }
@@ -21,7 +21,7 @@ bool GUI::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
         for (auto& window : windows) {
             if (auto Lwindow = dynamic_cast<LoginWindow*>(window.get())) {
                 Lwindow->ToggleVisibility();
-                Logging::log("Toggle LoginWindow window.");
+                API::LogPluginMessage("Toggle LoginWindow window.");
                 break;
             }
         }

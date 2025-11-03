@@ -41,6 +41,17 @@ void LoginWindow::Draw(int outerWidth, int outerHeight, float uiScale, ImFont* f
                 SaveLoginData(server, slot, password);
                 ArchipelagoHandler::ConnectAP(this);
                 SetMessage("Connecting to " + std::string(server) + "...");
+                API::LogPluginMessage(std::to_string(SaveData::GetData()->TotalItems));
+                ShopStruct* shop = reinterpret_cast<ShopStruct*>(SaveData::GetData()->FirstShop + (2 - 1));
+
+                API::LogPluginMessage(std::to_string(shop->firstItem->itemId));
+                if (SaveData::GetShopItemList(2).getHead().isValid()) {
+                    API::LogPluginMessage(std::to_string(SaveData::GetShopItemList(2).getHead().address));
+                    API::LogPluginMessage(std::to_string(SaveData::GetShopItemList(2).getHead().getData().itemId));
+                }
+                else {
+                    API::LogPluginMessage("fuck");
+                }
             }
             else {
                 SetMessage("Please enter server and slot name");

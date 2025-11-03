@@ -104,7 +104,7 @@ void CheckHandler::OnCollectCollectible(int type, int id) {
 	case 4: ArchipelagoHandler::SendLocation(('S' << 8) | id); break;
 	case 5: ArchipelagoHandler::SendLocation(('F' << 8) | id); break;
 	default:
-		Logging::log("Failure on collectable Type");
+		API::LogPluginMessage("Failure on collectable Type");
 	}
 	
 
@@ -141,17 +141,17 @@ void CheckHandler::OnCompleteMission(void* mission, int status) {
 		}
 	}
 	int missioncount = 0;
-	SaveData::MissionList(5).forEach([&missioncount](MissionWrapper m) {
-		if (m.getID() < 100 && m.getID() != 86) {
+	SaveData::MissionList(5).forEach([&missioncount](MissionStruct m) {
+		if (m.id < 100 && m.id != 86) {
 			missioncount++;
 		}
 	});
-	Logging::log("misionsdone: " + std::to_string(missioncount) + " Need: " + std::to_string(ArchipelagoHandler::slotdata->missionsToGoal));
+	API::LogPluginMessage("misions done: " + std::to_string(missioncount) + " Need: " + std::to_string(ArchipelagoHandler::slotdata->missionsToGoal));
 	if (missioncount >= ArchipelagoHandler::slotdata->missionsToGoal - 1) {
-		std::optional<MissionWrapper> mission = SaveData::findMissionByID(99);
-		if (mission.has_value() && mission.value().getStatus() == 0) {
-			mission.value().setNumberOfMissionsRequired(0);
-			Missions::UpdateMissionState((MissionStruct*)mission.value().address, 1, 0);
+		std::optional<MissionStruct> mission = SaveData::findMissionByID(99);
+		if (mission.has_value() && mission.value().status == 0) {
+			mission.value().numberPreconditionMissionNeeded = 0;
+			Missions::UpdateMissionState(&mission.value(), 1, 0);
 		}
 	}
 

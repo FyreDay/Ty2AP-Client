@@ -387,19 +387,19 @@ void GameHandler::OnChunkLoaded() {
 			uintptr_t objptr = MKObject::GetMKObject(pad);
 			if (objptr != 0) {
 				*(short*)(objptr + 0x1a) = 0x0016;
-				Logging::log(std::to_string(pad) + " enabled");
+				API::LogPluginMessage(std::to_string(pad) + " enabled");
 			}
 		}
 		else {
 			uintptr_t objptr = MKObject::GetMKObject(pad);
 			if (objptr != 0) {
 				*(short*)(objptr + 0x1a) = 0x0000;
-				Logging::log(std::to_string(pad) + " disabled");
+				API::LogPluginMessage(std::to_string(pad) + " disabled");
 			}
 		}
 	}
 	
-	Logging::log("OnChunkLoaded");
+	API::LogPluginMessage("OnChunkLoaded");
 }
 
 
@@ -437,7 +437,7 @@ void GameHandler::TryEditFourbieTrigger(bool enable) {
 		*flagPtr = enable;
 	}
 	else {
-		Logging::log("Trigger name does not match.");
+		API::LogPluginMessage("Trigger name does not match.");
 
 	}
 }
@@ -528,7 +528,7 @@ void GameHandler::LoadAPSaveFile() {
 
 	}
 	else {
-		Logging::log("Save file not found.");
+		API::LogPluginMessage("Save file not found.");
 		saveFileLength = 0;
 		saveFileBuffer = nullptr;
 	}
@@ -543,7 +543,7 @@ int GameHandler::SaveFile(const char* filename, void* data, int size) {
 	if (fopen_s(&f, (filePath + ".bin").c_str(), "wb") == 0 && f) {
 		fwrite(data, 1, size, f);
 		fclose(f);
-		Logging::log("Save file Saved.");
+		API::LogPluginMessage("Save file Saved.");
 	}
 
 	write_json_file(filePath + ".json");
@@ -616,23 +616,34 @@ void GameHandler::RunLoadSetup(SlotData* slotdata) {
 	hasRunSetup = true;
 }
 
+int bobsCogRequirementArrays[9];
+
+
 void GameHandler::SetShopItems(SlotData* slotdata) {
 	int index = 0;
-	SaveData::ItemList(1).forEach([&index, slotdata](ItemWrapper item) {
-		if (item.getCurrencyType() == 0) {
-			item.setPrice(slotdata->copPrices[index]);
-			item.setPuchusedStatus(!ArchipelagoHandler::customSaveData->hasBoughtItem(item.getID()));
+	SaveData::GetShopItemList(1).forEach([&index, slotdata](ItemStruct& item) {
+		if (item.currencyType == 0) {
+			item.price = slotdata->copPrices[index];
+			item.purchased = !ArchipelagoHandler::customSaveData->hasBoughtItem(item.itemId);
 			index++;
 		}
 		});
 
 	index = 0;
-	SaveData::ItemList(1).forEach([&index, slotdata](ItemWrapper item) {
-		if (item.getCurrencyType() == 2) {
-			item.setPrice(slotdata->cogPrices[index]);
-			item.setPuchusedStatus(!ArchipelagoHandler::customSaveData->hasBoughtItem(item.getID()));
-			if (item.getID() > 79) {
-				item.setLocked(ArchipelagoHandler::customSaveData->hasBoughtItem(item.getID() - 1));
+	uintptr_t lastitemptr;
+	SaveData::GetShopItemList(1).forEach([&index, slotdata, &lastitemptr](ItemStruct& item) {
+		if (item.currencyType == 2) {
+			lastitemptr = (uintptr_t)&item;
+			item.price = slotdata->cogPrices[index];
+			item.purchased = !ArchipelagoHandler::customSaveData->hasBoughtItem(item.itemId);
+			//if (item.itemId == 7) {
+			//	item.locked = false;
+			//	item.requirementsArrayLength = 0;
+			//}
+			if (item.itemId > 79) {
+				bobsCogRequirementArrays[item.itemId - 80] = lastitemptr;
+				item.setItemRequirements((uintptr_t)&bobsCogRequirementArrays[item.itemId - 80], 1);
+				item.locked = true;
 			}
 
 			index++;
@@ -640,30 +651,31 @@ void GameHandler::SetShopItems(SlotData* slotdata) {
 		});
 
 	index = 0;
-	SaveData::ItemList(2).forEach([&index, slotdata](ItemWrapper item) {
-		if (item.getCurrencyType() == 0) {
-			item.setPrice(slotdata->rangPrices[index]);
-			item.setPuchusedStatus(!ArchipelagoHandler::customSaveData->hasBoughtItem(item.getID()));
+	SaveData::GetShopItemList(2).forEach([&index, slotdata](ItemStruct& item) {
+		if (item.currencyType == 0) {
+			item.price = slotdata->rangPrices[index];
+			item.purchased = !ArchipelagoHandler::customSaveData->hasBoughtItem(item.itemId);
 			index++;
 		}
 		});
 
 	index = 0;
-	SaveData::ItemList(3).forEach([&index, slotdata](ItemWrapper item) {
-		if (item.getCurrencyType() == 0) {
-			item.setPrice(slotdata->slyPrices[index]);
-			item.setPuchusedStatus(!ArchipelagoHandler::customSaveData->hasBoughtItem(item.getID()));
+	SaveData::GetShopItemList(3).forEach([&index, slotdata](ItemStruct& item) {
+		if (item.currencyType == 0) {
+			item.price = slotdata->slyPrices[index];
+			item.purchased = !ArchipelagoHandler::customSaveData->hasBoughtItem(item.itemId);
+			item.locked = false;
 			index++;
 		}
 		});
 
 	index = 0;
-	SaveData::ItemList(4).forEach([&index, slotdata](ItemWrapper item) {
-		if (item.getCurrencyType() == 1) {
-			item.setPrice(slotdata->orbPrices[index]);
-			item.setPuchusedStatus(!ArchipelagoHandler::customSaveData->hasBoughtItem(item.getID()));
-			if (item.getID() > 5) {
-				item.setLocked(ArchipelagoHandler::customSaveData->hasBoughtItem(item.getID() - 1));
+	SaveData::GetShopItemList(4).forEach([&index, slotdata](ItemStruct& item) {
+		if (item.currencyType == 1) {
+			item.price = slotdata->orbPrices[index];
+			item.purchased = !ArchipelagoHandler::customSaveData->hasBoughtItem(item.itemId);
+			if (item.itemId > 5) {
+				item.locked = ArchipelagoHandler::customSaveData->hasBoughtItem(item.itemId - 1);
 			}
 
 			index++;
@@ -672,12 +684,12 @@ void GameHandler::SetShopItems(SlotData* slotdata) {
 }
 
 void GameHandler::SetMissionRequirements(BarrierUnlock unlockType, int mission_goal) {
-	SaveData::MissionList(0).forEach([](MissionWrapper mission) { //52 is oil rig
-		if (mission.getID() == 99) {
-			mission.setNumberOfMissionsRequired(44);
+	SaveData::MissionList(0).forEach([](MissionStruct& mission) { //52 is oil rig
+		if (mission.id == 99) {
+			mission.numberPreconditionMissionNeeded = 44;
 		}
-		else  if (mission.getID() != 83 and mission.getID() != 82) { //82 and 83 have only 1 precondition that I dont want to mess with
-			mission.setNumberOfMissionsRequired(0);
+		else  if (mission.id != 83 and mission.id != 82) { //82 and 83 have only 1 precondition that I dont want to mess with
+			mission.numberPreconditionMissionNeeded = 0;
 		}
 	});
 }
@@ -706,7 +718,7 @@ void GameHandler::EnableLoadButtons()
 	}
 	auto buttongroup = MKUI::FindChildElementByName(MKUI::GetMainMenu(), "MainMenuButtons");
 	if (buttongroup == nullptr) {
-		Logging::log("Button group does not exist here");
+		API::LogPluginMessage("Button group does not exist here");
 		return;
 	}
 	if (doesSaveExist()) {
@@ -746,7 +758,7 @@ void GameHandler::DisableLoadButtons()
 		loadgame->Red = 0.4f;
 		loadgame->Blue = 0.4f;
 		loadgame->Green = 0.4f;
-		Logging::log("Disable load game");
+		API::LogPluginMessage("Disable load game");
 	}
 	UIElementStruct* newgame = MKUI::FindChildElementByName(buttongroup, "NewGame");
 	if (newgame != nullptr) {
