@@ -75,19 +75,19 @@ void ItemHandler::HandleItem(APClient::NetworkItem item)
 		SaveData::GetData()->OrbCollected++;
 	}
 	if (item.item == 0x22) {
-		AddOpals(1);
-	}
-	if (item.item == 0x23) {
-		AddOpals(10);
-	}
-	if (item.item == 0x24) {
-		AddOpals(25);
-	}
-	if (item.item == 0x25) {
 		AddOpals(100);
 	}
-	if (item.item == 0x26) {
+	if (item.item == 0x23) {
 		AddOpals(200);
+	}
+	if (item.item == 0x24) {
+		AddOpals(500);
+	}
+	if (item.item == 0x25) {
+		AddOpals(1000);
+	}
+	if (item.item == 0x26) {
+		AddOpals(5000);
 	}
 	if (item.item == 0x27) {
 		int* health = reinterpret_cast<int*>(Core::moduleBase + 0x4BC304);
@@ -104,21 +104,21 @@ void ItemHandler::HandleItem(APClient::NetworkItem item)
 	}
 
 	if (item.item == 980) {
-		std::optional<MissionStruct> mission980 = SaveData::findMissionByID(980);
-		if (mission980.has_value()) {
-			Missions::UpdateMissionState(&mission980.value(), 5, 0);
+		auto mission980 = SaveData::findMissionByID(980);
+		if (mission980) {
+			Missions::UpdateMissionState(mission980, 5, 0);
 		}
 	}
 	if (item.item == 981) {
-		std::optional<MissionStruct> mission981 = SaveData::findMissionByID(981);
-		if (mission981.has_value()) {
-			Missions::UpdateMissionState(&mission981.value(), 5, 0);
+		auto mission981 = SaveData::findMissionByID(981);
+		if (mission981) {
+			Missions::UpdateMissionState(mission981, 5, 0);
 		}
 	}
 	if (item.item == 982) {
-		std::optional<MissionStruct> mission982 = SaveData::findMissionByID(982);
-		if (mission982.has_value()) {
-			Missions::UpdateMissionState(&mission982.value(), 5, 0);
+		auto mission982 = SaveData::findMissionByID(982);
+		if (mission982) {
+			Missions::UpdateMissionState(mission982, 5, 0);
 		}
 	}
 	std::string filePath = "./Saves/" + ArchipelagoHandler::GetSaveIdentifier();
@@ -169,10 +169,10 @@ void ItemHandler::HandleParkingPad(int id)
 void ItemHandler::CollectItem(int shopId, int itemId)
 {
 	LinkedList<ItemStruct> items = SaveData::GetShopItemList(shopId);
-	std::optional<ItemStruct> item = SaveData::findItemByID(items, itemId);
-	if (item.has_value()) {
+	auto item = SaveData::findItemByID(items, itemId);
+	if (item) {
 		API::LogPluginMessage("item has value: " + std::to_string(itemId));
-		item.value().purchased = true;
+		item->purchased = true;
 	}
 	else {
 		API::LogPluginMessage("No Item with id " + std::to_string(itemId));
@@ -207,14 +207,38 @@ static const std::map <int, itemStrings> shop3Ids =
 { {15, {191,211} },{16, {193,213} },{17, {195,215} },{18, {196,216} },{19, {199,219} },{20, {201,221} },{21, {203,223} },{22, {205,225} },
 	{23, {206,226} },{24, {207,227} },{25, {1188,1189} } };
 static const std::map <int, itemStrings> shop4Ids = { {5, {558,559} },{6, {560,561} },{7, {562,563} } };
-static bool shop1Scouted = false;
-static bool shop2Scouted = false;
-static bool shop3Scouted = false;
-static bool shop4Scouted = false;
+
+
+std::optional<int> getItemIdFromString(int stringId) {
+	const std::map<int, itemStrings>* shops[] = { &shop1Ids, &shop2Ids, &shop3Ids, &shop4Ids };
+
+	for (auto shop : shops) {
+		for (const auto& pair : *shop) {
+			if (pair.second.titleId == stringId || pair.second.descId == stringId) {
+				return pair.first; // return the item ID
+			}
+		}
+	}
+
+	return std::nullopt; // not found
+}
+
+std::list<int64_t> scouteditems;
 
 static const char* unknown = "Unknown AP Item";
 
 const char* ItemHandler::GetShopItemName(int strId) {
+	auto itemIdOpt = getItemIdFromString(strId);
+	if (itemIdOpt.has_value()) {
+		int64_t itemId = static_cast<int64_t>(itemIdOpt.value());
+		if (std::find(scouteditems.begin(), scouteditems.end(), itemId) == scouteditems.end()) {
+			std::list<int64_t> newList;
+			newList.push_back(itemId);
+			ArchipelagoHandler::ScoutLocations(newList, 1);
+
+			scouteditems.push_back(itemId);
+		}
+	}
 	{
 		std::lock_guard<std::mutex> lock(strIDtoTitleTextMutex);
 		auto it = strIDtoTitleText.find(strId);
@@ -229,31 +253,8 @@ const char* ItemHandler::GetShopItemName(int strId) {
 			return it->second.c_str();
 		}
 	}
-	auto checkAndScoutOnce = [&](const std::map<int, itemStrings>& shopMap, bool& hasScouted) -> bool {
-		for (const auto& [itemId, strings] : shopMap) {
-			if (strings.titleId == strId || strings.descId == strId) {
-				if (!hasScouted) {
-					std::list<int64_t> itemList;
-					for (const auto& [id, _] : shopMap) {
-						itemList.push_back(id);
-					}
-					ArchipelagoHandler::ScoutLocations(itemList, 1);
-					hasScouted = true;
-				}
-				return true;
-			}
-		}
-		return false;
-	};
 
-	if (checkAndScoutOnce(shop1Ids, shop1Scouted) ||
-		checkAndScoutOnce(shop2Ids, shop2Scouted) ||
-		checkAndScoutOnce(shop3Ids, shop3Scouted) ||
-		checkAndScoutOnce(shop4Ids, shop4Scouted)) {
-		return unknown;
-	}
-
-	return nullptr;
+	return unknown;
 }
 
 void ItemHandler::FillShopItemNames(const std::list<APClient::NetworkItem>& items) {

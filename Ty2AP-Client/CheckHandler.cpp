@@ -142,16 +142,16 @@ void CheckHandler::OnCompleteMission(void* mission, int status) {
 	}
 	int missioncount = 0;
 	SaveData::MissionList(5).forEach([&missioncount](MissionStruct m) {
-		if (m.id < 100 && m.id != 86) {
+		if (m.missionId < 100 && m.missionId != 86) {
 			missioncount++;
 		}
 	});
 	API::LogPluginMessage("misions done: " + std::to_string(missioncount) + " Need: " + std::to_string(ArchipelagoHandler::slotdata->missionsToGoal));
 	if (missioncount >= ArchipelagoHandler::slotdata->missionsToGoal - 1) {
-		std::optional<MissionStruct> mission = SaveData::findMissionByID(99);
-		if (mission.has_value() && mission.value().status == 0) {
-			mission.value().numberPreconditionMissionNeeded = 0;
-			Missions::UpdateMissionState(&mission.value(), 1, 0);
+		auto mission = SaveData::findMissionByID(99);
+		if (mission && mission->status == 0) {
+			mission->numberPreconditionMissionNeeded = 0;
+			Missions::UpdateMissionState(mission, 1, 0);
 		}
 	}
 
@@ -165,7 +165,11 @@ void CheckHandler::OnBuyItem(void* item) {
 	short value = *reinterpret_cast<short*>(base + 0x4); // read short
 	char letter = *reinterpret_cast<char*>(base + 0x7);  // read char
 	ArchipelagoHandler::customSaveData->updateBoughtItem(value, false);
-	
+	if ((value > 79 && value <= 88) || (value > 5 && value <= 7)) {
+		auto item = SaveData::findItemByID(SaveData::GetShopItemList(1), value - 1);
+		item->locked = false;
+	}
+
 	ArchipelagoHandler::SendLocation(value);
 
 	std::string id = std::string(1, letter) + std::to_string(value);

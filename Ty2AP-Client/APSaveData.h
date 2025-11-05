@@ -8,7 +8,7 @@ public:
 
 	APSaveData();
 	bool hasBoughtItem(int id) {
-		return ItemMap[id];
+		return !ItemMap[id];
 	}
 	void updateBoughtItem(int id, bool bought) {
 		ItemMap[id] = bought;

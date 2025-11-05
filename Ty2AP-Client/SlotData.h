@@ -13,6 +13,7 @@ public:
 	bool deathlink;
 	bool requireBosses;
 	bool progressiveRangs;
+	bool skipCurrawong;
 	int missionsToGoal;
 	BarrierUnlock barrierUnlockStyle;
 	std::vector<int> rangPrices;

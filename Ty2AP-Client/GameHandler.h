@@ -38,7 +38,6 @@ public:
 
 	static bool OnItemAvailable(void* itemPtr);
 	static void OnChunkLoaded();
-	static void PatchStartingLevel();
 	static void NopInstructions(void* address, size_t size);
 	static void TryDisableFourbieTrigger();
 	static void TryEditFourbieTrigger(bool enable);
@@ -52,6 +51,7 @@ public:
 	static void KillTy();
 	static void EnableLoadButtons();
 	static void DisableLoadButtons();
+	static void removeCurrawong();
 	static void __fastcall DeathHook(void* thisptr, int edx, int state, int source);
 
 	static bool hasRunSetup;

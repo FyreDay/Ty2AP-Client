@@ -294,6 +294,9 @@ void GameHandler::SetupHooks() {
 	//remove the steam finish saveload code
 	NopInstructions((void*)(Core::moduleBase + 0x377b34), 20);
 	NopInstructions((void*)(Core::moduleBase + 0x377b4b), 8);
+	////allow exit level in currawong
+	//NopInstructions((void*)(Core::moduleBase + 0x27ca25), 2);
+	
 	//save
 	SaveFileOriginReturnAddr = Core::moduleBase + 0x376d6f+5;
 	auto saveaddr = (char*)(Core::moduleBase + 0x376d6f);
@@ -303,31 +306,6 @@ void GameHandler::SetupHooks() {
 
 	//remove write to collectablecount
 	NopInstructions((void*)(Core::moduleBase + 0x11b2e1), 6);
-	}
-
-void GameHandler::PatchStartingLevel() {
-	// Address of the instruction to patch (PUSH 0x00851738)
-	uintptr_t address = Core::moduleBase + 0x234504;
-
-	// New bytes: PUSH 0x00454D74 -> 68 74 4D 45 00
-	uintptr_t stringAddr = Core::moduleBase + 0x454D74;
-
-	BYTE patch[5];
-	patch[0] = 0x68; // PUSH opcode
-	*reinterpret_cast<uint32_t*>(&patch[1]) = static_cast<uint32_t>(stringAddr);
-	// Unprotect memory region
-	DWORD oldProtect;
-	if (VirtualProtect(reinterpret_cast<LPVOID>(address), sizeof(patch), PAGE_EXECUTE_READWRITE, &oldProtect)) {
-		// Apply patch
-		memcpy(reinterpret_cast<void*>(address), patch, sizeof(patch));
-
-		// Restore old protection
-		VirtualProtect(reinterpret_cast<LPVOID>(address), sizeof(patch), oldProtect, &oldProtect);
-		std::cout << "Patch applied successfully." << std::endl;
-	}
-	else {
-		std::cerr << "Failed to change memory protection." << std::endl;
-	}
 }
 
 void GameHandler::NopInstructions(void* address, size_t size) {
@@ -610,22 +588,35 @@ void GameHandler::RunLoadSetup(SlotData* slotdata) {
 
 	ItemHandler::HandleStoredItems();
 
+	if (slotdata->skipCurrawong) {
+		API::LogPluginMessage("SKIPPP");
+		auto currawong = SaveData::findMissionByID(84);
+		API::LogPluginMessage("UpdateCurrawong " + std::to_string(reinterpret_cast<uintptr_t>(currawong)));
+		if (currawong) {
+			API::LogPluginMessage("UpdateCurrawong " + std::to_string(reinterpret_cast<uintptr_t>(currawong)));
+			Missions::UpdateMissionState(currawong, 5, 0);
+		}
 
+	}
 	SetMissionRequirements(ArchipelagoHandler::slotdata->barrierUnlockStyle, ArchipelagoHandler::slotdata->missionsToGoal);
+
+
 
 	hasRunSetup = true;
 }
 
 int bobsCogRequirementArrays[9];
 
+static std::string apLogo = "Fe_999_rita";
 
 void GameHandler::SetShopItems(SlotData* slotdata) {
 	int index = 0;
 	SaveData::GetShopItemList(1).forEach([&index, slotdata](ItemStruct& item) {
 		if (item.currencyType == 0) {
 			item.price = slotdata->copPrices[index];
-			item.purchased = !ArchipelagoHandler::customSaveData->hasBoughtItem(item.itemId);
+			item.purchased = ArchipelagoHandler::customSaveData->hasBoughtItem(item.itemId);
 			index++;
+			item.ShopIconNameString = const_cast<char*>(apLogo.c_str()); //todo REDO TO BE WRITE SAFE
 		}
 		});
 
@@ -636,16 +627,19 @@ void GameHandler::SetShopItems(SlotData* slotdata) {
 			lastitemptr = (uintptr_t)&item;
 			item.price = slotdata->cogPrices[index];
 			item.purchased = !ArchipelagoHandler::customSaveData->hasBoughtItem(item.itemId);
-			//if (item.itemId == 7) {
-			//	item.locked = false;
-			//	item.requirementsArrayLength = 0;
-			//}
+			if (item.itemId >= 17 && item.itemId <= 25) {
+				item.locked = false;
+			}
+			if (item.itemId == 78) {
+				item.locked = false;
+				item.requirementsArrayLength = 0;
+			}
 			if (item.itemId > 79) {
 				bobsCogRequirementArrays[item.itemId - 80] = lastitemptr;
 				item.setItemRequirements((uintptr_t)&bobsCogRequirementArrays[item.itemId - 80], 1);
-				item.locked = true;
+				item.locked = ArchipelagoHandler::customSaveData->hasBoughtItem(item.itemId - 1);
 			}
-
+			item.ShopIconNameString = const_cast<char*>(apLogo.c_str()); //todo REDO TO BE WRITE SAFE
 			index++;
 		}
 		});
@@ -654,8 +648,9 @@ void GameHandler::SetShopItems(SlotData* slotdata) {
 	SaveData::GetShopItemList(2).forEach([&index, slotdata](ItemStruct& item) {
 		if (item.currencyType == 0) {
 			item.price = slotdata->rangPrices[index];
-			item.purchased = !ArchipelagoHandler::customSaveData->hasBoughtItem(item.itemId);
+			item.purchased = ArchipelagoHandler::customSaveData->hasBoughtItem(item.itemId);
 			index++;
+			item.ShopIconNameString = const_cast<char*>(apLogo.c_str()); //todo REDO TO BE WRITE SAFE
 		}
 		});
 
@@ -663,9 +658,10 @@ void GameHandler::SetShopItems(SlotData* slotdata) {
 	SaveData::GetShopItemList(3).forEach([&index, slotdata](ItemStruct& item) {
 		if (item.currencyType == 0) {
 			item.price = slotdata->slyPrices[index];
-			item.purchased = !ArchipelagoHandler::customSaveData->hasBoughtItem(item.itemId);
+			item.purchased = ArchipelagoHandler::customSaveData->hasBoughtItem(item.itemId);
 			item.locked = false;
 			index++;
+			item.ShopIconNameString = const_cast<char*>(apLogo.c_str()); //todo REDO TO BE WRITE SAFE
 		}
 		});
 
@@ -673,11 +669,11 @@ void GameHandler::SetShopItems(SlotData* slotdata) {
 	SaveData::GetShopItemList(4).forEach([&index, slotdata](ItemStruct& item) {
 		if (item.currencyType == 1) {
 			item.price = slotdata->orbPrices[index];
-			item.purchased = !ArchipelagoHandler::customSaveData->hasBoughtItem(item.itemId);
+			item.purchased = ArchipelagoHandler::customSaveData->hasBoughtItem(item.itemId);
 			if (item.itemId > 5) {
-				item.locked = ArchipelagoHandler::customSaveData->hasBoughtItem(item.itemId - 1);
+				item.locked = !ArchipelagoHandler::customSaveData->hasBoughtItem(item.itemId - 1);
 			}
-
+			item.ShopIconNameString = const_cast<char*>(apLogo.c_str()); //todo REDO TO BE WRITE SAFE
 			index++;
 		}
 		});
@@ -685,10 +681,10 @@ void GameHandler::SetShopItems(SlotData* slotdata) {
 
 void GameHandler::SetMissionRequirements(BarrierUnlock unlockType, int mission_goal) {
 	SaveData::MissionList(0).forEach([](MissionStruct& mission) { //52 is oil rig
-		if (mission.id == 99) {
+		if (mission.missionId == 99) {
 			mission.numberPreconditionMissionNeeded = 44;
 		}
-		else  if (mission.id != 83 and mission.id != 82) { //82 and 83 have only 1 precondition that I dont want to mess with
+		else  if (mission.missionId != 83 and mission.missionId != 82) { //82 and 83 have only 1 precondition that I dont want to mess with
 			mission.numberPreconditionMissionNeeded = 0;
 		}
 	});
@@ -769,6 +765,13 @@ void GameHandler::DisableLoadButtons()
 		newgame->Blue = 0.4f;
 		newgame->Green = 0.4f;
 	}
+}
+
+void GameHandler::removeCurrawong() {
+	//no load currawong 
+	NopInstructions((void*)(Core::moduleBase + 0x1192eF), 2);
+	//no load currawong on save
+	NopInstructions((void*)(Core::moduleBase + 0x2698ED), 2);
 }
 
 /*

@@ -81,6 +81,9 @@ void ArchipelagoHandler::ConnectAP(LoginWindow* login)
 		if (data.find("BarrierUnlock") != data.end()) {
 			slotdata->barrierUnlockStyle = static_cast<BarrierUnlock>(data["BarrierUnlock"].get<int>());
 		}
+		if (data.find("SkipCurrawong") != data.end()) {
+			slotdata->skipCurrawong = data["SkipCurrawong"].get<int>() == 1;
+		}
 
 		if (data.find("RangPrices") != data.end() && data["RangPrices"].is_array()) {
 			auto rangprices = data["RangPrices"].get<std::vector<int>>();
@@ -105,8 +108,10 @@ void ArchipelagoHandler::ConnectAP(LoginWindow* login)
 			auto orbprices = data["OrbPrices"].get<std::vector<int>>();
 			slotdata->orbPrices = orbprices;
 		}
-
-		GameHandler::SetMissionRequirements(slotdata->barrierUnlockStyle, slotdata->missionsToGoal);
+		if (slotdata->skipCurrawong) {
+			GameHandler::removeCurrawong();
+		}
+		//GameHandler::SetMissionRequirements(slotdata->barrierUnlockStyle, slotdata->missionsToGoal);
 		GameHandler::EnableLoadButtons();
 	});
 	ap->set_slot_disconnected_handler([login]() { 
