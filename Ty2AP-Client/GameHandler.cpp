@@ -74,12 +74,12 @@ __declspec(naked) void __stdcall GameHandler::ItemAvailableLogicHook() {
 
 		equal:
 		pop eax
-			pop esi
-			pop ecx
-			pop edi
-			pop edx
-			pop ebx
-			jmp dword ptr[ItemAvailableLogicBranchReturnAddr]
+		pop esi
+		pop ecx
+		pop edi
+		pop edx
+		pop ebx
+		jmp dword ptr[ItemAvailableLogicBranchReturnAddr]
 	}
 }
 FunctionType ItemAvailableClickOrigin = nullptr;
@@ -319,7 +319,8 @@ void GameHandler::NopInstructions(void* address, size_t size) {
 bool GameHandler::OnItemAvailable(void* itemPtr) {
 	uint8_t* base = static_cast<uint8_t*>(itemPtr);
 	short id = *reinterpret_cast<short*>(base + 0x4);
-	return ArchipelagoHandler::customSaveData->hasBoughtItem(id);
+	//true means purchaseable
+	return !ArchipelagoHandler::customSaveData->hasBoughtItem(id);
 }
 
 static std::string PadDisabled = "Pad Disabled By AP";
@@ -605,8 +606,8 @@ void GameHandler::RunLoadSetup(SlotData* slotdata) {
 	hasRunSetup = true;
 }
 
-int bobsCogRequirementArrays[9];
-
+uintptr_t GameHandler::bobsCogRequirementArrays[9];
+uintptr_t GameHandler::OrbRequirementArrays[3];
 static std::string apLogo = "Fe_999_rita";
 
 void GameHandler::SetShopItems(SlotData* slotdata) {
@@ -614,7 +615,11 @@ void GameHandler::SetShopItems(SlotData* slotdata) {
 	SaveData::GetShopItemList(1).forEach([&index, slotdata](ItemStruct& item) {
 		if (item.currencyType == 0) {
 			item.price = slotdata->copPrices[index];
-			
+			if (item.itemId == 78) {
+				API::LogPluginMessage("Changing locked for platinum paw " + std::to_string(item.itemId));
+				item.locked = false;
+				item.requirementsArrayLength = 0;
+			}
 			index++;
 			item.ShopIconNameString = const_cast<char*>(apLogo.c_str()); //todo REDO TO BE WRITE SAFE
 		}
@@ -626,18 +631,11 @@ void GameHandler::SetShopItems(SlotData* slotdata) {
 		if (item.currencyType == 2) {
 			lastitemptr = (uintptr_t)&item;
 			item.price = slotdata->cogPrices[index];
-			
-			if (item.itemId >= 17 && item.itemId <= 25) {
-				item.locked = false;
-			}
-			if (item.itemId == 78) {
-				item.locked = false;
-				item.requirementsArrayLength = 0;
-			}
 			if (item.itemId > 79) {
-				bobsCogRequirementArrays[item.itemId - 80] = lastitemptr;
-				item.setItemRequirements((uintptr_t)&bobsCogRequirementArrays[item.itemId - 80], 1);
-				item.locked = ArchipelagoHandler::customSaveData->hasBoughtItem(item.itemId - 1);
+				API::LogPluginMessage("Changing locked for cog stuff " + std::to_string(item.itemId));
+				GameHandler::bobsCogRequirementArrays[item.itemId - 80] = lastitemptr;
+				item.setItemRequirements((uintptr_t)&GameHandler::bobsCogRequirementArrays[item.itemId - 80], 1);
+				item.locked = !ArchipelagoHandler::customSaveData->hasBoughtItem(item.itemId - 1);
 			}
 			item.ShopIconNameString = const_cast<char*>(apLogo.c_str()); //todo REDO TO BE WRITE SAFE
 			index++;
@@ -648,7 +646,7 @@ void GameHandler::SetShopItems(SlotData* slotdata) {
 	SaveData::GetShopItemList(2).forEach([&index, slotdata](ItemStruct& item) {
 		if (item.currencyType == 0) {
 			item.price = slotdata->rangPrices[index];
-			
+				item.locked = false;
 			index++;
 			item.ShopIconNameString = const_cast<char*>(apLogo.c_str()); //todo REDO TO BE WRITE SAFE
 		}
@@ -666,11 +664,13 @@ void GameHandler::SetShopItems(SlotData* slotdata) {
 		});
 
 	index = 0;
-	SaveData::GetShopItemList(4).forEach([&index, slotdata](ItemStruct& item) {
+	SaveData::GetShopItemList(4).forEach([&index, slotdata, &lastitemptr](ItemStruct& item) {
 		if (item.currencyType == 1) {
 			item.price = slotdata->orbPrices[index];
-
+			lastitemptr = (uintptr_t)&item;
 			if (item.itemId > 5) {
+				GameHandler::OrbRequirementArrays[item.itemId - 6] = lastitemptr;
+				item.setItemRequirements((uintptr_t)&GameHandler::OrbRequirementArrays[item.itemId - 6], 1);
 				item.locked = !ArchipelagoHandler::customSaveData->hasBoughtItem(item.itemId - 1);
 			}
 			item.ShopIconNameString = const_cast<char*>(apLogo.c_str()); //todo REDO TO BE WRITE SAFE
@@ -702,7 +702,11 @@ void __fastcall GameHandler::DeathHook(void* thisptr, int edx, int state, int so
 void GameHandler::KillTy() {
 	if (GameHandler::IsInGame()) {
 		auto transitionFunc = (StateTransitionFunc)(Core::moduleBase + 0x0022c7d0);
-		void* tyStateHandler = (void*)(MKObject::GetMKObject(204) + 0x470);
+		auto ty = MKObject::GetMKObject(204);
+		if (!ty) {
+			return;
+		}
+		void* tyStateHandler = (void*)(ty + 0x470);
 		int stateid = 0xe;
 		int source = 9000;
 		transitionFunc(tyStateHandler, stateid, source);

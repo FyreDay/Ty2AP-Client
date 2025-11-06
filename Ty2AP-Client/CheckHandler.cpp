@@ -164,10 +164,17 @@ void CheckHandler::OnBuyItem(void* item) {
 
 	short value = *reinterpret_cast<short*>(base + 0x4); // read short
 	char letter = *reinterpret_cast<char*>(base + 0x7);  // read char
-	ArchipelagoHandler::customSaveData->updateBoughtItem(value, false);
-	if ((value > 79 && value <= 88) || (value > 5 && value <= 7)) {
-		auto item = SaveData::findItemByID(SaveData::GetShopItemList(1), value - 1);
-		item->locked = false;
+	ArchipelagoHandler::customSaveData->updateBoughtItem(value, true);
+	if (value >= 79 && value < 88) {
+		if (auto nextItem = SaveData::findItemByID(SaveData::GetShopItemList(1), value + 1)) {
+			nextItem->locked = false;
+		}
+	}
+
+	if (value >= 5 && value < 7) {
+		if (auto nextItem = SaveData::findItemByID(SaveData::GetShopItemList(4), value + 1)) {
+			nextItem->locked = false;
+		}
 	}
 
 	ArchipelagoHandler::SendLocation(value);

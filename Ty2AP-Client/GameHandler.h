@@ -60,5 +60,7 @@ public:
 	static void SetShopItems(SlotData* slotdata);
 	static void SetMissionRequirements(BarrierUnlock unlockType, int mission_goal);
 private:
+	static uintptr_t bobsCogRequirementArrays[9];
+	static uintptr_t OrbRequirementArrays[3];
 	static bool doesSaveExist();
 };
