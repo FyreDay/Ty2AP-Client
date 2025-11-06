@@ -254,7 +254,7 @@ const char* ItemHandler::GetShopItemName(int strId) {
 		}
 	}
 
-	return unknown;
+	return nullptr;
 }
 
 void ItemHandler::FillShopItemNames(const std::list<APClient::NetworkItem>& items) {

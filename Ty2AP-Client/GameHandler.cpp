@@ -614,7 +614,7 @@ void GameHandler::SetShopItems(SlotData* slotdata) {
 	SaveData::GetShopItemList(1).forEach([&index, slotdata](ItemStruct& item) {
 		if (item.currencyType == 0) {
 			item.price = slotdata->copPrices[index];
-			item.purchased = ArchipelagoHandler::customSaveData->hasBoughtItem(item.itemId);
+			
 			index++;
 			item.ShopIconNameString = const_cast<char*>(apLogo.c_str()); //todo REDO TO BE WRITE SAFE
 		}
@@ -626,7 +626,7 @@ void GameHandler::SetShopItems(SlotData* slotdata) {
 		if (item.currencyType == 2) {
 			lastitemptr = (uintptr_t)&item;
 			item.price = slotdata->cogPrices[index];
-			item.purchased = !ArchipelagoHandler::customSaveData->hasBoughtItem(item.itemId);
+			
 			if (item.itemId >= 17 && item.itemId <= 25) {
 				item.locked = false;
 			}
@@ -648,7 +648,7 @@ void GameHandler::SetShopItems(SlotData* slotdata) {
 	SaveData::GetShopItemList(2).forEach([&index, slotdata](ItemStruct& item) {
 		if (item.currencyType == 0) {
 			item.price = slotdata->rangPrices[index];
-			item.purchased = ArchipelagoHandler::customSaveData->hasBoughtItem(item.itemId);
+			
 			index++;
 			item.ShopIconNameString = const_cast<char*>(apLogo.c_str()); //todo REDO TO BE WRITE SAFE
 		}
@@ -658,7 +658,7 @@ void GameHandler::SetShopItems(SlotData* slotdata) {
 	SaveData::GetShopItemList(3).forEach([&index, slotdata](ItemStruct& item) {
 		if (item.currencyType == 0) {
 			item.price = slotdata->slyPrices[index];
-			item.purchased = ArchipelagoHandler::customSaveData->hasBoughtItem(item.itemId);
+		
 			item.locked = false;
 			index++;
 			item.ShopIconNameString = const_cast<char*>(apLogo.c_str()); //todo REDO TO BE WRITE SAFE
@@ -669,7 +669,7 @@ void GameHandler::SetShopItems(SlotData* slotdata) {
 	SaveData::GetShopItemList(4).forEach([&index, slotdata](ItemStruct& item) {
 		if (item.currencyType == 1) {
 			item.price = slotdata->orbPrices[index];
-			item.purchased = ArchipelagoHandler::customSaveData->hasBoughtItem(item.itemId);
+
 			if (item.itemId > 5) {
 				item.locked = !ArchipelagoHandler::customSaveData->hasBoughtItem(item.itemId - 1);
 			}
@@ -700,11 +700,13 @@ void __fastcall GameHandler::DeathHook(void* thisptr, int edx, int state, int so
 }
 
 void GameHandler::KillTy() {
-	auto transitionFunc = (StateTransitionFunc)(Core::moduleBase + 0x0022c7d0);
-	void* tyStateHandler = (void*)(MKObject::GetMKObject(204) + 0x470);
-	int stateid = 0xe;
-	int source = 9000;
-	transitionFunc(tyStateHandler, stateid, source);
+	if (GameHandler::IsInGame()) {
+		auto transitionFunc = (StateTransitionFunc)(Core::moduleBase + 0x0022c7d0);
+		void* tyStateHandler = (void*)(MKObject::GetMKObject(204) + 0x470);
+		int stateid = 0xe;
+		int source = 9000;
+		transitionFunc(tyStateHandler, stateid, source);
+	}
 }
 
 void GameHandler::EnableLoadButtons()

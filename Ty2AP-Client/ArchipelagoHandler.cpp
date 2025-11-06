@@ -113,6 +113,14 @@ void ArchipelagoHandler::ConnectAP(LoginWindow* login)
 		}
 		//GameHandler::SetMissionRequirements(slotdata->barrierUnlockStyle, slotdata->missionsToGoal);
 		GameHandler::EnableLoadButtons();
+
+		if (!ap->is_data_package_valid()) {
+			if (!ap_sync_queued) {
+				ap_sync_queued = true;
+				ap->Sync();
+			}
+			return;
+		}
 	});
 	ap->set_slot_disconnected_handler([login]() { 
 		LoggerWindow::Log("Slot disconnected");

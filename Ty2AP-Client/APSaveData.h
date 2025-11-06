@@ -8,7 +8,7 @@ public:
 
 	APSaveData();
 	bool hasBoughtItem(int id) {
-		return !ItemMap[id];
+		return ItemMap[id];
 	}
 	void updateBoughtItem(int id, bool bought) {
 		ItemMap[id] = bought;
@@ -60,42 +60,42 @@ public:
 		3972
 	};
 	std::map<int, bool> ItemMap = {
-	{8, true}, //True is can purchuse
-	{9, true},
-	{10, true},
-	{11, true},
-	{12, true},
-	{13, true},
-	{14, true},
-	{26, true},
-	{15, true},
-	{16, true},
-	{17, true},
-	{18, true},
-	{19, true},
-	{20, true},
-	{21, true},
-	{22, true},
-	{23, true},
-	{24, true},
-	{25, true},
-	{1, true},
-	{2, true},
-	{59, true},
-	{77, true},
-	{78, true},
-	{79, true},
-	{80, true},
-	{81, true},
-	{82, true},
-	{83, true},
-	{84, true},
-	{85, true},
-	{86, true},
-	{87, true},
-	{88, true},
-	{5, true},
-	{6, true},
-	{7, true},
+	{8, false}, //True is purchused
+	{9, false},
+	{10, false},
+	{11, false},
+	{12, false},
+	{13, false},
+	{14, false},
+	{26, false},
+	{15, false},
+	{16, false},
+	{17, false},
+	{18, false},
+	{19, false},
+	{20, false},
+	{21, false},
+	{22, false},
+	{23, false},
+	{24, false},
+	{25, false},
+	{1, false},
+	{2, false},
+	{59, false},
+	{77, false},
+	{78, false},
+	{79, false},
+	{80, false},
+	{81, false},
+	{82, false},
+	{83, false},
+	{84, false},
+	{85, false},
+	{86, false},
+	{87, false},
+	{88, false},
+	{5, false},
+	{6, false},
+	{7, false},
 	};
 };
