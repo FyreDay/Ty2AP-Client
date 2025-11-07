@@ -31,7 +31,7 @@ jobs:
           .\vcpkg integrate install
 
       - name: Build
-        run: msbuild Ty2AP-Client.sln /p:Configuration=Release /p:Platform=x86 /p:VcpkgEnableManifest=true /m
+        run: msbuild Ty2AP-Client.sln /p:Configuration=Release /p:Platform=x86 /p:VcpkgEnableManifest=true /p:PostBuildEventUseInBuild=false /m
 
       - name: Upload DLL artifact
         uses: actions/upload-artifact@v4
