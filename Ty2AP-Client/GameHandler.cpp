@@ -602,7 +602,7 @@ void GameHandler::RunLoadSetup(SlotData* slotdata) {
 	SetMissionRequirements(ArchipelagoHandler::slotdata->barrierUnlockStyle, ArchipelagoHandler::slotdata->missionsToGoal);
 
 
-
+	//set m169 to 5
 	hasRunSetup = true;
 }
 
