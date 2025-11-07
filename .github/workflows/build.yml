@@ -38,5 +38,5 @@ jobs:
         with:
           name: Ty2AP-Client
           path: |
-            Ty2AP-Client/Release/*.dll
+            Release/*.dll
           if-no-files-found: error
