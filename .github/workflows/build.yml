@@ -25,6 +25,11 @@ jobs:
         with:
           vcpkgJsonGlob: "vcpkg.json"
 
+      - name: Integrate vcpkg with MSBuild
+        run: |
+          cd $env:VCPKG_ROOT
+          .\vcpkg integrate install
+
       - name: Build
         run: msbuild Ty2AP-Client.sln /p:Configuration=Release /p:Platform=x86 /p:VcpkgEnableManifest=true /m
 
