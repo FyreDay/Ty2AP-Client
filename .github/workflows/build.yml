@@ -1,0 +1,42 @@
+name: Build
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Setup vcpkg
+        uses: lukka/run-vcpkg@v11
+        with:
+          vcpkgJsonGlob: "vcpkg.json"
+
+      - name: Integrate vcpkg with MSBuild
+        run: |
+          cd $env:VCPKG_ROOT
+          .\vcpkg integrate install
+
+      - name: Build
+        run: msbuild Ty2AP-Client.sln /p:Configuration=Release /p:Platform=x86 /p:VcpkgEnableManifest=true /p:PostBuildEventUseInBuild=false /m
+
+      - name: Upload DLL artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Ty2AP-Client
+          path: |
+            Release/*.dll
+          if-no-files-found: error
