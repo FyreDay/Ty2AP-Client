@@ -4,9 +4,6 @@
 #include <apuuid.hpp>
 
 #define UUID_FILE "uuid" // TODO: place in %appdata%
-#define GAME_NAME "Ty the Tasmanian Tiger 2"
-
-#define VERSION_STRING "0.0.1"
 
 using nlohmann::json;
 bool ap_connect_sent = false;
@@ -19,6 +16,7 @@ std::string ArchipelagoHandler::seed;
 std::string ArchipelagoHandler::slotname = "";
 bool ArchipelagoHandler::ap_sync_queued = false;
 bool ArchipelagoHandler::polling = false;
+bool ArchipelagoHandler::wrongVersion = false;
 
 SlotData* ArchipelagoHandler::slotdata = new SlotData();
 APSaveData* ArchipelagoHandler::customSaveData = new APSaveData();
@@ -61,10 +59,18 @@ void ArchipelagoHandler::ConnectAP(LoginWindow* login)
 		}
 		ap->ConnectUpdate(false, 0b111, true, tags);
 		ap->StatusUpdate(APClient::ClientStatus::PLAYING);
-
-		if (data.find("ModVersion") == data.end() || data["ModVersion"] != VERSION_STRING)
+		if (data.find("ModVersion") == data.end()) {
+			login->SetMessage("AP world is not Valid");
+			ArchipelagoHandler::DisconnectAP();
+			wrongVersion = true;
+		}
+		else if (data["ModVersion"].get<std::string>() != VERSION_STRING) {
 			LoggerWindow::Log("Your client and apworld versions do not match.");
-
+			login->SetMessage("AP world "+ data["ModVersion"].get<std::string>() +" incompatible");
+			ArchipelagoHandler::DisconnectAP();
+			wrongVersion = true;
+			return;
+		}
 		
 
 		if (data.find("ReqBosses") != data.end()) {
@@ -116,7 +122,10 @@ void ArchipelagoHandler::ConnectAP(LoginWindow* login)
 	});
 	ap->set_slot_disconnected_handler([login]() { 
 		LoggerWindow::Log("Slot disconnected");
-		login->SetMessage("Disconnected");
+		if (!wrongVersion) {
+			login->SetMessage("Disconnected");
+		}
+		
 	});
 	ap->set_slot_refused_handler([login](const std::list<std::string>& errors) {
 		for (const auto& error : errors) {

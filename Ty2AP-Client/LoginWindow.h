@@ -3,10 +3,11 @@
 #include <sstream>
 #include <iomanip>
 #include "Window.h"
+#include "Version.h"
 
 class LoginWindow : public Window {
 public:
-    LoginWindow() : Window("Login") {
+    LoginWindow() : Window(std::string("Login v") + VERSION_STRING) {
         std::string savedServer, savedSlot, savedPassword;
         isVisible = true;
         if (LoadLoginData(savedServer, savedSlot, savedPassword)) {

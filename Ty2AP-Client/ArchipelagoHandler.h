@@ -5,12 +5,15 @@
 #include "APSaveData.h"
 #include "SlotData.h"
 #include "ItemHandler.h"
+#include "Version.h"
 
-#define UUID_FILE "uuid"
 #define CERT_STORE "cacert.pem"
 class LoginWindow;
 
-#define GAME_NAME "Ty the Tasmanian Tiger 2"
+#define UUID_FILE "uuid" // TODO: place in %appdata%
+
+
+
 class ArchipelagoHandler
 {
 public:
@@ -29,6 +32,7 @@ public:
 	static std::string uuid;
 	static bool ap_connected;
 	static bool polling;
+	static bool wrongVersion;
 	static std::string seed;
 	static std::string slotname;
 
