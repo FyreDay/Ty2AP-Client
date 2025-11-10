@@ -193,6 +193,9 @@ static std::mutex strIDtoTitleTextMutex;
 static std::map<int, std::string> strIDtoDescText = {};
 static std::mutex strIDtoDescTextMutex;
 
+static std::map<int, std::string> strIDtoImgText = {};
+static std::mutex strIDtoImgTextMutex;
+
 struct itemStrings {
 	int titleId;
 	int descId;
@@ -227,16 +230,18 @@ std::list<int64_t> scouteditems;
 
 static const char* unknown = "Unknown AP Item";
 
-const char* ItemHandler::GetShopItemName(int strId) {
+const char* ItemHandler::GetShopItemName(int strId, bool hint) {
 	auto itemIdOpt = getItemIdFromString(strId);
 	if (itemIdOpt.has_value()) {
 		int64_t itemId = static_cast<int64_t>(itemIdOpt.value());
 		if (std::find(scouteditems.begin(), scouteditems.end(), itemId) == scouteditems.end()) {
 			std::list<int64_t> newList;
 			newList.push_back(itemId);
-			ArchipelagoHandler::ScoutLocations(newList, 1);
+			ArchipelagoHandler::ScoutLocations(newList, hint);
 
-			scouteditems.push_back(itemId);
+			if (hint) {
+				scouteditems.push_back(itemId);
+			}
 		}
 	}
 	{
@@ -280,6 +285,14 @@ void ItemHandler::FillShopItemNames(const std::list<APClient::NetworkItem>& item
 		{
 			std::lock_guard<std::mutex> lock(strIDtoDescTextMutex);
 			strIDtoDescText[strs->descId] = ArchipelagoHandler::GetItemDesc(item.player);
+		}
+		API::LogPluginMessage("Find Item");
+		ItemStruct* shopItem = SaveData::findItemByID((int)item.location);
+		API::LogPluginMessage("Check item");
+		if (shopItem) {
+			API::LogPluginMessage("Set Item");
+			shopItem->ShopIconNameString = const_cast<char*>(ItemHandler::getImagePtr(ArchipelagoHandler::GetItemName(item.item, item.player), item.flags));
+			API::LogPluginMessage("Set Item Image");
 		}
 	}
 }

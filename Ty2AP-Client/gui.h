@@ -5,7 +5,6 @@
 #include "InfoWindow.h"
 #include "LoggerWindow.h"
 #include <cstdio>
-#include "resource.h"
 #include "windows.h"
 
 

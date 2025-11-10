@@ -343,7 +343,7 @@ int __cdecl GameHandler::HookedGetString(int param_1) {
 	}
 	int* state = reinterpret_cast<int*>(Core::moduleBase + 0x4EB508);
 	if (*state == 2) {
-		const char* itemname = ItemHandler::GetShopItemName(param_1);
+		const char* itemname = ItemHandler::GetShopItemName(param_1, true);
 		if (itemname) {
 			return (int)itemname;
 		}
@@ -621,7 +621,7 @@ void GameHandler::SetShopItems(SlotData* slotdata) {
 				item.requirementsArrayLength = 0;
 			}
 			index++;
-			item.ShopIconNameString = const_cast<char*>(apLogo.c_str()); //todo REDO TO BE WRITE SAFE
+			ItemHandler::GetShopItemName(item.titleId, false);
 		}
 		});
 
@@ -637,7 +637,7 @@ void GameHandler::SetShopItems(SlotData* slotdata) {
 				item.setItemRequirements((uintptr_t)&GameHandler::bobsCogRequirementArrays[item.itemId - 80], 1);
 				item.locked = !ArchipelagoHandler::customSaveData->hasBoughtItem(item.itemId - 1);
 			}
-			item.ShopIconNameString = const_cast<char*>(apLogo.c_str()); //todo REDO TO BE WRITE SAFE
+			ItemHandler::GetShopItemName(item.titleId, false);
 			index++;
 		}
 		});
@@ -648,7 +648,7 @@ void GameHandler::SetShopItems(SlotData* slotdata) {
 			item.price = slotdata->rangPrices[index];
 				item.locked = false;
 			index++;
-			item.ShopIconNameString = const_cast<char*>(apLogo.c_str()); //todo REDO TO BE WRITE SAFE
+			ItemHandler::GetShopItemName(item.titleId, false);
 		}
 		});
 
@@ -659,7 +659,7 @@ void GameHandler::SetShopItems(SlotData* slotdata) {
 		
 			item.locked = false;
 			index++;
-			item.ShopIconNameString = const_cast<char*>(apLogo.c_str()); //todo REDO TO BE WRITE SAFE
+			ItemHandler::GetShopItemName(item.titleId, false);
 		}
 		});
 
@@ -673,7 +673,7 @@ void GameHandler::SetShopItems(SlotData* slotdata) {
 				item.setItemRequirements((uintptr_t)&GameHandler::OrbRequirementArrays[item.itemId - 6], 1);
 				item.locked = !ArchipelagoHandler::customSaveData->hasBoughtItem(item.itemId - 1);
 			}
-			item.ShopIconNameString = const_cast<char*>(apLogo.c_str()); //todo REDO TO BE WRITE SAFE
+			ItemHandler::GetShopItemName(item.titleId, false);
 			index++;
 		}
 		});

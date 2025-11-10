@@ -113,14 +113,6 @@ void ArchipelagoHandler::ConnectAP(LoginWindow* login)
 		}
 		//GameHandler::SetMissionRequirements(slotdata->barrierUnlockStyle, slotdata->missionsToGoal);
 		GameHandler::EnableLoadButtons();
-
-		if (!ap->is_data_package_valid()) {
-			if (!ap_sync_queued) {
-				ap_sync_queued = true;
-				ap->Sync();
-			}
-			return;
-		}
 	});
 	ap->set_slot_disconnected_handler([login]() { 
 		LoggerWindow::Log("Slot disconnected");
@@ -132,15 +124,11 @@ void ArchipelagoHandler::ConnectAP(LoginWindow* login)
 			login->SetMessage("Connection refused");
 		}
 	});
-	ap->set_print_json_handler([](const APClient::PrintJSONArgs& args) {
-		if (!ap->is_data_package_valid()) {
-			if (!ap_sync_queued) {
-				ap_sync_queued = true;
-				ap->Sync();
-			}
-			return;
-		}
-		LoggerWindow::LogNodes(args);  
+	ap->set_print_json_handler([](const std::list<APClient::TextNode>& msg) {
+		LoggerWindow::Log(ap->render_json(msg, APClient::RenderFormat::TEXT));
+		});
+	ap->set_print_handler([](const std::string& msg) {
+		LoggerWindow::Log(msg);
 		});
 	ap->set_room_info_handler([login]() {
 		std::list<std::string> tags;
