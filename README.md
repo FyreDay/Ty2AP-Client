@@ -2,8 +2,8 @@
 
 For the AP world see [Ty 2 AP World](https://github.com/FyreDay/Archipelago-TyTheTasmanianTiger2/releases/latest)
 
-#### Manual Installation
-#####Requirements:
+### Manual Installation
+#### Requirements:
 - [Latest Release](https://github.com/FyreDay/Ty2AP-Client/releases/latest)
 
 - [TygerFramework](https://github.com/ElusiveFluffy/TygerFramework/releases/latest)
