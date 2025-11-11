@@ -6,7 +6,7 @@
   "dependencies": [
     {
       "dep_name": "TygerMemory2",
-      "dep_version": "1.0.1",
+      "dep_version": "1.0.2",
       "dep_url": "https://github.com/FyreDay/TygerMemory2/releases/download/v1.0.2/TygerMemory2.dll"
     }
   ],
