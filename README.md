@@ -67,3 +67,14 @@ The Parking bays that allow you to get out of Shazza's Fourbie are locked until 
 #### Junk
 - Opals bags
 
+## Credits
+Thanks to xMcatutt and Dashiswag92 for being resources during development
+
+Thanks to all the testers:
+-xMcatutt
+-Dashiswag92
+-Bored_Banana
+-DrFizzles
+-JacobMIX
+-Skeleman588
+
