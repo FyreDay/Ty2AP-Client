@@ -67,7 +67,7 @@ private:
         {"Doomerang", "Fe_900_Doomerang"},
         {"Craftyrang", "Fe_900_Craftyrang"},
 
-        {"Progressive Boomerang", "Fe_900_Camerarang"},
+        {"Progressive Boomerang", "Fe_900_Multirang"},
         {"Progressive Flamerang", "Fe_900_Flamerang"},
         {"Progressive Frostyrang", "Fe_900_Frostyrang"},
         {"Progressive Zappyrang", "Fe_900_Zappyrang"},

@@ -28,28 +28,43 @@ __declspec(naked) void __stdcall CheckHandler::CollectCollectibleHook() {
 FunctionType CompleteMissionOrigin = nullptr;
 uintptr_t CompleteMissionOriginReturnAddr;
 uintptr_t CompleteMissionBranchReturnAddr;
+uintptr_t CompleteMissionConditionReturnAddr;
+
+static bool __stdcall IsVanilla() {
+	return ArchipelagoHandler::slotdata->barrierUnlockStyle == BarrierUnlock::Vanilla;
+}
 
 __declspec(naked) void __stdcall CheckHandler::CompleteMissionHook() {
 	_asm {
-		push ebx
-		push edi
-		push eax
-		push esi
-		push edx
-		push ecx
+		pushfd
+		pushad
 		call CheckHandler::OnCompleteMission
-		pop ecx
-		pop edx
-		pop esi
+		call IsVanilla
+		cmp al, 1
+		je is_vanilla
+		popad
+		popfd
+		push eax
+		movzx eax, word ptr[ecx+0x4]
+		cmp eax, 980
+		je barrier
+		cmp eax, 981
+		je barrier
+		cmp eax, 982
+		je barrier
 		pop eax
-		pop edi
-		pop ebx
-		cmp edx, 05
+	is_vanilla:
+		cmp edx, 5
 		jne not_equal
 		
 		jmp dword ptr[CompleteMissionOriginReturnAddr]
-		not_equal:
+	not_equal:
 		jmp dword ptr[CompleteMissionBranchReturnAddr]
+	barrier:
+		pop eax
+		push esi 
+		mov esi,[ecx+0x2C]
+		jmp dword ptr[CompleteMissionConditionReturnAddr]
 	}
 }
 
@@ -86,6 +101,7 @@ void CheckHandler::SetupHooks() {
 
 	CompleteMissionOriginReturnAddr = Core::moduleBase + 0x0029734f + 5;
 	CompleteMissionBranchReturnAddr = Core::moduleBase + 0x00297364;
+	CompleteMissionConditionReturnAddr = Core::moduleBase + 0x29736b;
 	auto cmaddr = (char*)(Core::moduleBase + 0x0029734f);
 	MH_CreateHook((LPVOID)cmaddr, &CompleteMissionHook, reinterpret_cast<LPVOID*>(&CompleteMissionOrigin));
 
@@ -107,8 +123,6 @@ void CheckHandler::OnCollectCollectible(int type, int id) {
 		API::LogPluginMessage("Failure on collectable Type");
 	}
 	
-
-
 	for (auto& window : GUI::windows) {
 		if (auto infowindow = dynamic_cast<InfoWindow*>(window.get())) {
 			infowindow->AddLogMessage(collectibles[type].name + " " +  std::to_string(id));
@@ -121,12 +135,19 @@ void CheckHandler::OnCompleteMission(void* mission, int status) {
 	if (status != 5) {
 		return;
 	}
+
 	uint8_t* base = static_cast<uint8_t*>(mission);
 	//short status = *reinterpret_cast<short*>(base + 0x10); // read status
 	
 	int id = *reinterpret_cast<int*>(base + 0x4);
+	int shortId = *reinterpret_cast<char*>(base + 0x4);
+
+	if ( shortId >= 980 && shortId <= 982) {
+		return;
+	}
+
 	ArchipelagoHandler::SendLocation(id);
-	
+
 	short value = *reinterpret_cast<short*>(base + 0x4); // read short
 
 	if (value == 83) { //this is the cass boss fight id
@@ -154,8 +175,6 @@ void CheckHandler::OnCompleteMission(void* mission, int status) {
 			Missions::UpdateMissionState(mission, 1, 0);
 		}
 	}
-
-	
 }
 
 void CheckHandler::OnBuyItem(void* item) {

@@ -92,27 +92,27 @@ void ArchipelagoHandler::ConnectAP(LoginWindow* login)
 		}
 
 		if (data.find("RangPrices") != data.end() && data["RangPrices"].is_array()) {
-			auto rangprices = data["RangPrices"].get<std::vector<int>>();
-			slotdata->rangPrices = rangprices;
+			auto rangPrices = data["RangPrices"].get<std::vector<int>>();
+			slotdata->rangPrices = rangPrices;
 		}
 
 		if (data.find("SlyPrices") != data.end() && data["SlyPrices"].is_array()) {
-			auto slyprices = data["SlyPrices"].get<std::vector<int>>();
-			slotdata->slyPrices = slyprices;
+			auto slyPrices = data["SlyPrices"].get<std::vector<int>>();
+			slotdata->slyPrices = slyPrices;
 		}
 
-		if (data.find("CopPrices") != data.end() && data["CopPrices"].is_array()) {
-			auto copprices = data["CopPrices"].get<std::vector<int>>();
-			slotdata->copPrices = copprices;
+		if (data.find("TraderBobPrices") != data.end() && data["TraderBobPrices"].is_array()) {
+			auto traderBobPrices = data["TraderBobPrices"].get<std::vector<int>>();
+			slotdata->traderBobPrices = traderBobPrices;
 		}
 
 		if (data.find("CogPrices") != data.end() && data["CogPrices"].is_array()) {
-			auto cogprices = data["CogPrices"].get<std::vector<int>>();
-			slotdata->cogPrices = cogprices;
+			auto cogPrices = data["CogPrices"].get<std::vector<int>>();
+			slotdata->cogPrices = cogPrices;
 		}
 		if (data.find("OrbPrices") != data.end() && data["OrbPrices"].is_array()) {
-			auto orbprices = data["OrbPrices"].get<std::vector<int>>();
-			slotdata->orbPrices = orbprices;
+			auto orbPrices = data["OrbPrices"].get<std::vector<int>>();
+			slotdata->orbPrices = orbPrices;
 		}
 		if (slotdata->skipCurrawong) {
 			GameHandler::removeCurrawong();

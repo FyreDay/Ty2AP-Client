@@ -104,22 +104,16 @@ void ItemHandler::HandleItem(APClient::NetworkItem item)
 	}
 
 	if (item.item == 980) {
-		auto mission980 = SaveData::findMissionByID(980);
-		if (mission980) {
-			Missions::UpdateMissionState(mission980, 5, 0);
-		}
+		ArchipelagoHandler::customSaveData->UnlockedBarriers.push_back(980);
+		GameHandler::OnChunkLoaded();
 	}
 	if (item.item == 981) {
-		auto mission981 = SaveData::findMissionByID(981);
-		if (mission981) {
-			Missions::UpdateMissionState(mission981, 5, 0);
-		}
+		ArchipelagoHandler::customSaveData->UnlockedBarriers.push_back(981);
+		GameHandler::OnChunkLoaded();
 	}
 	if (item.item == 982) {
-		auto mission982 = SaveData::findMissionByID(982);
-		if (mission982) {
-			Missions::UpdateMissionState(mission982, 5, 0);
-		}
+		ArchipelagoHandler::customSaveData->UnlockedBarriers.push_back(982);
+		GameHandler::OnChunkLoaded();
 	}
 	std::string filePath = "./Saves/" + ArchipelagoHandler::GetSaveIdentifier();
 

@@ -359,29 +359,76 @@ int __cdecl GameHandler::HookedGetString(int param_1) {
 }
 
 void GameHandler::OnChunkLoaded() {
-	
+	SetParkingPads();
+	SetBarriers();
+	API::LogPluginMessage("OnChunkLoaded");
+}
+
+void GameHandler::SetParkingPads() {
 	for (int pad : ArchipelagoHandler::customSaveData->AllParkingPads) {
-		
-		if (std::find(ArchipelagoHandler::customSaveData->UnlockedParkingPads.begin(), ArchipelagoHandler::customSaveData->UnlockedParkingPads.end(), pad) != ArchipelagoHandler::customSaveData->UnlockedParkingPads.end()){
+
+		if (std::find(ArchipelagoHandler::customSaveData->UnlockedParkingPads.begin(), ArchipelagoHandler::customSaveData->UnlockedParkingPads.end(), pad) != ArchipelagoHandler::customSaveData->UnlockedParkingPads.end()) {
 			uintptr_t objptr = MKObject::GetMKObject(pad);
-			if (objptr != 0) {
+			if (objptr != NULL) {
 				*(short*)(objptr + 0x1a) = 0x0016;
 				API::LogPluginMessage(std::to_string(pad) + " enabled");
+			}
+			uintptr_t lightPtr = MKObject::GetMKObject(pad + 10000);
+			if (lightPtr != NULL) {
+				*(short*)(lightPtr + 0x1a) = 0x0016;
 			}
 		}
 		else {
 			uintptr_t objptr = MKObject::GetMKObject(pad);
-			if (objptr != 0) {
+			if (objptr != NULL) {
 				*(short*)(objptr + 0x1a) = 0x0000;
 				API::LogPluginMessage(std::to_string(pad) + " disabled");
 			}
+			uintptr_t lightPtr = MKObject::GetMKObject(pad + 10000);
+			if (lightPtr != NULL) {
+				*(short*)(lightPtr + 0x1a) = 0x0000;
+			}
 		}
 	}
-	
-	API::LogPluginMessage("OnChunkLoaded");
 }
 
-
+void GameHandler::SetBarriers() {
+	for (int barrierType = 980; barrierType < 983; barrierType++) {
+	
+		if (std::find(ArchipelagoHandler::customSaveData->UnlockedBarriers.begin(), ArchipelagoHandler::customSaveData->UnlockedBarriers.end(), barrierType) != ArchipelagoHandler::customSaveData->UnlockedBarriers.end()) {
+			auto endId = 0;
+			auto endCollideId = 0;
+			if (barrierType == 980) {
+				endId = 49;
+				endCollideId = 30;
+			}
+			if (barrierType == 981) {
+				endId = 16;
+				endCollideId = 10;
+			}
+			if (barrierType == 982) {
+				endId = 18;
+				endCollideId = 6;
+			} 
+			for (int collidePropId = barrierType * 1000 + 100; collidePropId < barrierType * 1000 + 100 + endCollideId; collidePropId++)
+			{
+				uintptr_t objptr = MKObject::GetMKObject(collidePropId);
+				if (objptr != NULL) {
+					*(int*)(objptr + 0x18) = 0x0;
+					*(int*)(objptr + 0x24) = 0x0;
+				}
+			}
+			for (int visualPropId = barrierType * 1000; visualPropId < barrierType * 1000 + endId; visualPropId++)
+			{
+				uintptr_t objptr = MKObject::GetMKObject(visualPropId);
+				if (objptr != NULL) {
+					*(int*)(objptr + 0x18) = 0x0;
+					*(int*)(objptr + 0x24) = 0x0;
+				}
+			}
+		}
+	}
+}
 
 void GameHandler::TryDisableFourbieTrigger() {
 	int* closestID = reinterpret_cast<int*>(Core::moduleBase + 0x4BDD00);
@@ -543,6 +590,7 @@ void GameHandler::write_json_file(const std::string& filename) {
 	j["OrbCount"] = SaveData::GetData()->OrbCollected;
 	j["ShopData"] = ArchipelagoHandler::customSaveData->ItemMap;
 	j["UnlockedParkingBays"] = ArchipelagoHandler::customSaveData->UnlockedParkingPads;
+	j["UnlockedBarriers"] = ArchipelagoHandler::customSaveData->UnlockedBarriers;
 
 	// Write to file
 	std::ofstream file(filename);
@@ -570,6 +618,7 @@ void GameHandler::read_json_file(const std::string& filename) {
 	ArchipelagoHandler::customSaveData->orbCount = j["OrbCount"];
 	ArchipelagoHandler::customSaveData->ItemMap = j["ShopData"].get<std::map<int, bool>>();
 	ArchipelagoHandler::customSaveData->UnlockedParkingPads = j["UnlockedParkingBays"].get<std::list<int>>();
+	ArchipelagoHandler::customSaveData->UnlockedBarriers = j["UnlockedBarriers"].get<std::list<int>>();
 }
 
 bool GameHandler::IsInGame() {
@@ -590,7 +639,7 @@ void GameHandler::RunLoadSetup(SlotData* slotdata) {
 	ItemHandler::HandleStoredItems();
 
 	if (slotdata->skipCurrawong) {
-		API::LogPluginMessage("SKIPPP");
+		API::LogPluginMessage("SKIP");
 		auto currawong = SaveData::findMissionByID(84);
 		API::LogPluginMessage("UpdateCurrawong " + std::to_string(reinterpret_cast<uintptr_t>(currawong)));
 		if (currawong) {
@@ -614,7 +663,7 @@ void GameHandler::SetShopItems(SlotData* slotdata) {
 	int index = 0;
 	SaveData::GetShopItemList(1).forEach([&index, slotdata](ItemStruct& item) {
 		if (item.currencyType == 0) {
-			item.price = slotdata->copPrices[index];
+			item.price = slotdata->traderBobPrices[index];
 			if (item.itemId == 78) {
 				API::LogPluginMessage("Changing locked for platinum paw " + std::to_string(item.itemId));
 				item.locked = false;

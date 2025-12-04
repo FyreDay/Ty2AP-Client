@@ -2,5 +2,6 @@
 #include "APSaveData.h"
 
 APSaveData::APSaveData() {
-	UnlockedParkingPads = { 3951, 3285 };
+	UnlockedParkingPads = { };
+	UnlockedBarriers = { };
 }

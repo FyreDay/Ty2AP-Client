@@ -4,7 +4,7 @@
 void InfoWindow::ToggleVisibility() {
     isVisible = !isVisible;
 }
-
+            void AddLogMessage(const std::string& message);
 void InfoWindow::AddLogMessage(const std::string& message) {
     if (logMessages.size() >= maxLogMessages)
         logMessages.pop_front(); // remove oldest

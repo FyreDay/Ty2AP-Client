@@ -24,7 +24,6 @@ public:
 	static void __stdcall ItemAvailableLogicHook();
 	static void __stdcall ItemAvailableClickHook();
 	static void __stdcall ItemAvailableClick2Hook();
-	
 
 	static void __stdcall ChunkLoadedHook();
 	static void __stdcall TriggerHitHook();
@@ -38,6 +37,8 @@ public:
 
 	static bool OnItemAvailable(void* itemPtr);
 	static void OnChunkLoaded();
+	static void SetBarriers();
+	static void SetParkingPads();
 	static void NopInstructions(void* address, size_t size);
 	static void TryDisableFourbieTrigger();
 	static void TryEditFourbieTrigger(bool enable);

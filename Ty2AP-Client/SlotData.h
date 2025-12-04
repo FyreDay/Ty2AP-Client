@@ -18,7 +18,7 @@ public:
 	BarrierUnlock barrierUnlockStyle;
 	std::vector<int> rangPrices;
 	std::vector<int> slyPrices;
-	std::vector<int> copPrices;
+	std::vector<int> traderBobPrices;
 	std::vector<int> cogPrices;
 	std::vector<int> orbPrices;
 };
