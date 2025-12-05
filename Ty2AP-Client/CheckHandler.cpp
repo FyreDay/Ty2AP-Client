@@ -38,12 +38,16 @@ __declspec(naked) void __stdcall CheckHandler::CompleteMissionHook() {
 	_asm {
 		pushfd
 		pushad
+		push edx
+		push ecx
 		call CheckHandler::OnCompleteMission
+		pop ecx
+		pop edx
+		popad
+		popfd
 		call IsVanilla
 		cmp al, 1
 		je is_vanilla
-		popad
-		popfd
 		push eax
 		movzx eax, word ptr[ecx+0x4]
 		cmp eax, 980
@@ -56,7 +60,6 @@ __declspec(naked) void __stdcall CheckHandler::CompleteMissionHook() {
 	is_vanilla:
 		cmp edx, 5
 		jne not_equal
-		
 		jmp dword ptr[CompleteMissionOriginReturnAddr]
 	not_equal:
 		jmp dword ptr[CompleteMissionBranchReturnAddr]
@@ -142,7 +145,7 @@ void CheckHandler::OnCompleteMission(void* mission, int status) {
 	int id = *reinterpret_cast<int*>(base + 0x4);
 	int shortId = *reinterpret_cast<char*>(base + 0x4);
 
-	if ( shortId >= 980 && shortId <= 982) {
+	if (shortId >= 980 && shortId <= 982) {
 		return;
 	}
 

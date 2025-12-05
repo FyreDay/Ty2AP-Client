@@ -2,7 +2,7 @@
   "name": "Ty2 AP Client",
   "description": "This is a mod to connect to the multi world randomizer archipelago.",
   "dll_name": "Ty2AP-Client",
-  "version": "0.1.3",
+  "version": "0.1.5",
   "dependencies": [
     {
       "dep_name": "TygerMemory2",
@@ -12,9 +12,9 @@
   ],
   "conflicts": [],
   "author": "FyreDay",
-  "download_url": "https://github.com/FyreDay/Ty2AP-Client/releases/download/v0.1.2/Ty2AP-Client.zip",
+  "download_url": "https://github.com/FyreDay/Ty2AP-Client/releases/latest/download/Ty2AP-Client.zip",
   "icon_url": "https://raw.githubusercontent.com/xMcacutt/Ty1AP-Client/refs/heads/master/favico.ico",
-  "last_updated": "2025-12-04",
+  "last_updated": "2025-12-05",
   "website": "https://github.com/FyreDay/Ty2AP-Client?tab=readme-ov-file#ty-the-tasmanian-tiger-2---archipelago-client-plugin",
   "games": [ "Ty 2" ]
 }
