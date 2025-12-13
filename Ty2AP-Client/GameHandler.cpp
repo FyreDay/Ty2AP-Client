@@ -558,8 +558,6 @@ void GameHandler::LoadAPSaveFile() {
 		saveFileLength = 0;
 		saveFileBuffer = nullptr;
 	}
-
-
 }
 
 int GameHandler::SaveFile(const char* filename, void* data, int size) {

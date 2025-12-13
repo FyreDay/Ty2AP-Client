@@ -130,22 +130,21 @@ void ItemHandler::HandleRang(int id)
 	base[id] = true;
 	//if infrarang or x rang update that ty has them
 	if (id == 0x0a) {
-		
-		CollectItem(2,12);
+		CollectItem(2, 12);
 	}
 	if (id == 0x0b) {
-		CollectItem(3,20);
+		CollectItem(3, 20);
 		CollectItem(2, 12);
 	}
 	if (id == 0x04) {
-		
+		CollectItem(2, 9);
 	}
 	if (id == 0x05) {
-		CollectItem(3, 5);
-		CollectItem(2, 4);
+		CollectItem(3, 17);
+		CollectItem(2, 9);
 	}
 	if (id == 0x02) {
-		
+		CollectItem(2, 2);
 	}
 	if (id == 0x03) {
 		CollectItem(3, 3);
