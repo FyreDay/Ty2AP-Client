@@ -361,7 +361,7 @@ int __cdecl GameHandler::HookedGetString(int param_1) {
 void GameHandler::OnChunkLoaded() {
 	SetParkingPads();
 	SetBarriers();
-	API::LogPluginMessage("OnChunkLoaded");
+	//API::LogPluginMessage("OnChunkLoaded");
 }
 
 void GameHandler::SetParkingPads() {
@@ -371,7 +371,6 @@ void GameHandler::SetParkingPads() {
 			uintptr_t objptr = MKObject::GetMKObject(pad);
 			if (objptr != NULL) {
 				*(short*)(objptr + 0x1a) = 0x0016;
-				API::LogPluginMessage(std::to_string(pad) + " enabled");
 			}
 			uintptr_t lightPtr = MKObject::GetMKObject(pad + 10000);
 			if (lightPtr != NULL) {
@@ -382,7 +381,6 @@ void GameHandler::SetParkingPads() {
 			uintptr_t objptr = MKObject::GetMKObject(pad);
 			if (objptr != NULL) {
 				*(short*)(objptr + 0x1a) = 0x0000;
-				API::LogPluginMessage(std::to_string(pad) + " disabled");
 			}
 			uintptr_t lightPtr = MKObject::GetMKObject(pad + 10000);
 			if (lightPtr != NULL) {
@@ -589,6 +587,14 @@ void GameHandler::write_json_file(const std::string& filename) {
 	j["ShopData"] = ArchipelagoHandler::customSaveData->ItemMap;
 	j["UnlockedParkingBays"] = ArchipelagoHandler::customSaveData->UnlockedParkingPads;
 	j["UnlockedBarriers"] = ArchipelagoHandler::customSaveData->UnlockedBarriers;
+	j["MissionsCompleted"] = ArchipelagoHandler::customSaveData->missionsCompleted;
+	j["HasThermoKey"] = ArchipelagoHandler::customSaveData->hasThermoKey;
+	j["HasSubKey"] = ArchipelagoHandler::customSaveData->hasSubKey;
+	j["HasLifterKey"] = ArchipelagoHandler::customSaveData->hasLifterKey;
+	j["HasGoldPaw"] = ArchipelagoHandler::customSaveData->hasGoldPaw;
+	j["HasBilbyMap"] = ArchipelagoHandler::customSaveData->hasBilbyMap;
+	j["HasCogMap"] = ArchipelagoHandler::customSaveData->hasCogMap;
+	j["HasSteveMap"] = ArchipelagoHandler::customSaveData->hasSteveMap;
 
 	// Write to file
 	std::ofstream file(filename);
@@ -610,13 +616,21 @@ void GameHandler::read_json_file(const std::string& filename) {
 	json j;
 	file >> j;
 
-	// Access data
+	// Access data 
 	ArchipelagoHandler::customSaveData->pLastReceivedIndex = j["LastRecievedIndex"];
 	ArchipelagoHandler::customSaveData->cogCount = j["CogCount"];
 	ArchipelagoHandler::customSaveData->orbCount = j["OrbCount"];
 	ArchipelagoHandler::customSaveData->ItemMap = j["ShopData"].get<std::map<int, bool>>();
 	ArchipelagoHandler::customSaveData->UnlockedParkingPads = j["UnlockedParkingBays"].get<std::list<int>>();
 	ArchipelagoHandler::customSaveData->UnlockedBarriers = j["UnlockedBarriers"].get<std::list<int>>();
+	ArchipelagoHandler::customSaveData->missionsCompleted = j["MissionsCompleted"];
+	ArchipelagoHandler::customSaveData->hasThermoKey = j["HasThermoKey"].get<bool>();
+	ArchipelagoHandler::customSaveData->hasSubKey = j["HasSubKey"].get<bool>();
+	ArchipelagoHandler::customSaveData->hasLifterKey = j["HasLifterKey"].get<bool>();
+	ArchipelagoHandler::customSaveData->hasGoldPaw = j["HasGoldPaw"].get<bool>();
+	ArchipelagoHandler::customSaveData->hasBilbyMap = j["HasBilbyMap"].get<bool>();
+	ArchipelagoHandler::customSaveData->hasCogMap = j["HasCogMap"].get<bool>();
+	ArchipelagoHandler::customSaveData->hasSteveMap = j["HasSteveMap"].get<bool>();
 }
 
 bool GameHandler::IsInGame() {
@@ -637,19 +651,13 @@ void GameHandler::RunLoadSetup(SlotData* slotdata) {
 	ItemHandler::HandleStoredItems();
 
 	if (slotdata->skipCurrawong) {
-		API::LogPluginMessage("SKIP");
-		auto currawong = SaveData::findMissionByID(84);
-		API::LogPluginMessage("UpdateCurrawong " + std::to_string(reinterpret_cast<uintptr_t>(currawong)));
+		auto currawong = SaveData::findMissionByID(Mission::CURRAWONG_JAIL_BREAK);
 		if (currawong) {
-			API::LogPluginMessage("UpdateCurrawong " + std::to_string(reinterpret_cast<uintptr_t>(currawong)));
 			Missions::UpdateMissionState(currawong, 5, 0);
+			ArchipelagoHandler::SendLocation(0x6d000000 + Mission::CURRAWONG_JAIL_BREAK);
 		}
-
 	}
 	SetMissionRequirements(ArchipelagoHandler::slotdata->barrierUnlockStyle, ArchipelagoHandler::slotdata->missionsToGoal);
-
-
-	//set m169 to 5
 	hasRunSetup = true;
 }
 
@@ -663,7 +671,6 @@ void GameHandler::SetShopItems(SlotData* slotdata) {
 		if (item.currencyType == 0) {
 			item.price = slotdata->traderBobPrices[index];
 			if (item.itemId == 78) {
-				API::LogPluginMessage("Changing locked for platinum paw " + std::to_string(item.itemId));
 				item.locked = false;
 				item.requirementsArrayLength = 0;
 			}
@@ -679,7 +686,6 @@ void GameHandler::SetShopItems(SlotData* slotdata) {
 			lastitemptr = (uintptr_t)&item;
 			item.price = slotdata->cogPrices[index];
 			if (item.itemId > 79) {
-				API::LogPluginMessage("Changing locked for cog stuff " + std::to_string(item.itemId));
 				GameHandler::bobsCogRequirementArrays[item.itemId - 80] = lastitemptr;
 				item.setItemRequirements((uintptr_t)&GameHandler::bobsCogRequirementArrays[item.itemId - 80], 1);
 				item.locked = !ArchipelagoHandler::customSaveData->hasBoughtItem(item.itemId - 1);
@@ -822,9 +828,9 @@ void GameHandler::DisableLoadButtons()
 
 void GameHandler::removeCurrawong() {
 	//no load currawong 
-	NopInstructions((void*)(Core::moduleBase + 0x1192eF), 2);
+	NopInstructions((void*)(Core::moduleBase + 0x1192ef), 2);
 	//no load currawong on save
-	NopInstructions((void*)(Core::moduleBase + 0x2698ED), 2);
+	NopInstructions((void*)(Core::moduleBase + 0x2698ed), 2);
 }
 
 /*

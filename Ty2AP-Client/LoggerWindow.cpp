@@ -5,10 +5,9 @@ void LoggerWindow::ToggleVisibility() {
     isVisible = !isVisible;
 }
 
-void LoggerWindow::Draw(int outerWidth, int outerHeight, float uiScale, ImFont* font) {
+void LoggerWindow::Draw(int outerWidth, int outerHeight, float uiScale) {
     if (!isVisible)
         return;
-
 
     UpdateVisibleMessages();
 
@@ -16,10 +15,7 @@ void LoggerWindow::Draw(int outerWidth, int outerHeight, float uiScale, ImFont* 
     ImGui::SetNextWindowPos(ImVec2(10, outerHeight - 500 - 10), ImGuiCond_Always);
     ImGui::SetNextWindowSize(ImVec2(500, 500), ImGuiCond_Always);
     ImGui::Begin(name.c_str(), nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoTitleBar);
-    
-    if (font) {
-        ImGui::PushFont(font);
-    }
+    ImGui::SetWindowFontScale(uiScale + 0.3f);
 
     // Get the window draw list for custom drawing
     ImDrawList* draw_list = ImGui::GetWindowDrawList();
@@ -95,93 +91,115 @@ void LoggerWindow::Draw(int outerWidth, int outerHeight, float uiScale, ImFont* 
         // Add space between messages for separation
         y_pos -= 5.0f;  // Adjust this space for gap between messages
     }
-    if (font) {
-        ImGui::PopFont();
-    }
     ImGui::End();
 }
 
 // Function to remove color tags from the text
 std::string LoggerWindow::RemoveColorTags(const std::string& text) {
-    std::string result;
-    result.reserve(text.size());
-
-    bool insideTag = false;
-    for (size_t i = 0; i < text.size(); ++i) {
-        if (text[i] == '[') {
-            insideTag = true;
-        }
-        else if (text[i] == ']') {
-            insideTag = false;
-        }
-        else if (!insideTag) {
-            result += text[i];
-        }
-    }
-
-    return result;
+    static const std::regex colorTag(R"(\[color\s*=\s*[0-9a-fA-F]{8}\])");
+    return std::regex_replace(text, colorTag, "");
 }
-
 
 void LoggerWindow::RenderFormattedText(ImDrawList* draw_list, const char* text, ImVec2 pos) {
     // Define keywords and associated colors
-    static const std::unordered_map<std::string, ImU32> keywordColors = {
-        //{"Golden Cog", IM_COL32(252, 210, 16, 255)},
+    const std::unordered_map<std::string, ImU32> keywordColors = {
+        {"Boomerang", IM_COL32(0xB8, 0x80, 0x5E, 0xFF)},
+        {"Multirang", IM_COL32(0xC4, 0x86, 0x3B, 0xFF)},
+        {"Flamerang", IM_COL32(0xD1, 0x50, 0x36, 0xFF)},
+        {"Lavarang", IM_COL32(0xC9, 0x25, 0x04, 0xFF)},
+        {"Frostyrang", IM_COL32(0x4B, 0xAA, 0xF2, 0xFF)},
+        {"Freezerang", IM_COL32(0x13, 0x92, 0xF2, 0xFF)},
+        {"Zappyrang", IM_COL32(0x4F, 0xE0, 0xE3, 0xFF)},
+        {"Thunderang", IM_COL32(0x0F, 0xF2, 0xCC, 0xFF)},
+        {"Lasharang", IM_COL32(0xF7, 0x96, 0x05, 0xFF)},
+        {"Warperang", IM_COL32(0x96, 0x05, 0xF7, 0xFF)},
+        {"Infrarang", IM_COL32(0xF7, 0x05, 0x1D, 0xFF)},
+        {"X-Rang", IM_COL32(0xB5, 0x04, 0x15, 0xFF)},
+        {"Smasharang", IM_COL32(0x85, 0x83, 0x83, 0xFF)},
+        {"Kaboomarang", IM_COL32(0xB3, 0xAF, 0xAF, 0xFF)},
+        {"Megarang", IM_COL32(0xC9, 0xC1, 0xC2, 0xFF)},
+        {"Omegarang", IM_COL32(0xCF, 0xC0, 0xC2, 0xFF)},
+        {"Deadlyrang", IM_COL32(0x9E, 0x3A, 0x44, 0xFF)},
+        {"Doomerang", IM_COL32(0xB3, 0xA4, 0x02, 0xFF)},
+        {"Aquarang", IM_COL32(0xFF, 0xD0, 0x00, 0xFF)},
+        {"Camerang", IM_COL32(0xF5, 0xF2, 0x58, 0xFF)},
+        {"Parking Bay", IM_COL32(0x69, 0x69, 0x69, 0xFF)},
+        {"Kromium Orb", IM_COL32(0xFC, 0x2B, 0x2B, 0xFF)},
+        {"Bilby", IM_COL32(0x51, 0x66, 0xA6, 0xFF)},
+        {"Steve", IM_COL32(0x35, 0x91, 0x23, 0xFF)},
+        {"Opals", IM_COL32(0xCC, 0x33, 0x4D, 0xFF)},
+        {"Platinum Cog", IM_COL32(0xC4, 0xE9, 0xF5, 0xFF)},
+        {"Full Pie", IM_COL32(0x9C, 0x8C, 0x52, 0xFF)},
+        {"Barriers", IM_COL32(0x77, 0x74, 0x96, 0xFF)},
+        {"Sub Bunyip", IM_COL32(0x8A, 0x91, 0x3F, 0xFF)},
+        {"Thermo Bunyip", IM_COL32(0x33, 0x2C, 0xF5, 0xFF)},
+        {"Lifter Bunyip", IM_COL32(0xE9, 0xED, 0x07, 0xFF)},
+        {"Health Paw", IM_COL32(0xD4, 0xA8, 0x17, 0xFF)},
+        {"Missing Persons Map", IM_COL32(0x51, 0x66, 0xA6, 0xFF)},
+        {"Cog Map", IM_COL32(0xC4, 0xE9, 0xF5, 0xFF)},
+        {"Mysterious Anomalies Map", IM_COL32(0x35, 0x91, 0x23, 0xFF)},
+        {"Sly", IM_COL32(0xD6, 0x77, 0x2D, 0xFF)},
+        {"Fourbie", IM_COL32(0xFF, 0xA9, 0x00, 0xFF)},
+        {"Rang", IM_COL32(0xCF, 0x87, 0x00, 0xFF)},
+        {"Steve", IM_COL32(0x77, 0xB5, 0x2B, 0xFF)},
+        {"Picture Frame", IM_COL32(0xF5, 0xC6, 0x1D, 0xFF)},
+        {"Mission", IM_COL32(0x1D, 0xF5, 0x21, 0xFF)},
+        {"Shop", IM_COL32(0xF5, 0xE0, 0x1D, 0xFF)},
     };
 
     ImU32 current_color = IM_COL32(255, 255, 255, 255); // Default white
     const char* segment_start = text;
     const char* s = text;
     float x_pos = pos.x;
+    std::cmatch match;
 
+    static const std::regex colorTag(R"(\[color\s*=\s*([0-9a-fA-F]{8})\])");
     while (*s) {
-        // Check for color tag "[color=XXXXXX]"
-        if (*s == '[' && *(s + 1) == 'c' && strncmp(s, "[color=", 7) == 0) {
+        if (std::regex_search(s, match, colorTag)) {
             if (segment_start < s) {
                 draw_list->AddText(ImVec2(x_pos, pos.y), current_color, segment_start, s);
                 x_pos += ImGui::CalcTextSize(segment_start, s).x;
             }
 
-            // Parse color code
-            s += 7; // Skip "[color="
-            unsigned int r, g, b, a = 255;
-            if (sscanf_s(s, "%2x%2x%2x%2x", &r, &g, &b, &a) >= 3) {
-                current_color = IM_COL32(r, g, b, a);
-            }
+            unsigned int rgba;
+            sscanf_s(match[1].first, "%8x", &rgba);
+            unsigned int r = (rgba >> 24) & 0xFF;
+            unsigned int g = (rgba >> 16) & 0xFF;
+            unsigned int b = (rgba >> 8) & 0xFF;
+            unsigned int a = (rgba >> 0) & 0xFF;
+            ImU32 color = IM_COL32(r, g, b, a);
+            s = match[0].second;
 
-            // Move past the color tag
-            while (*s && *s != ']') s++;
-            if (*s == ']') s++;
             segment_start = s;
             continue;
         }
 
-        // Check for keywords and apply coloring
+        bool keyword_hit = false;
         for (const auto& [keyword, color] : keywordColors) {
             size_t len = keyword.length();
-            if (strncmp(s, keyword.c_str(), len) == 0 && (s[len] == ' ' || s[len] == '\0')) {
+            if (compareStrings(s, keyword.c_str(), len) && (s[len] == ' ' || s[len] == '\0')) {
                 // Draw previous segment before keyword
                 if (segment_start < s) {
                     draw_list->AddText(ImVec2(x_pos, pos.y), current_color, segment_start, s);
                     x_pos += ImGui::CalcTextSize(segment_start, s).x;
                 }
-
                 // Draw keyword in highlighted color
                 draw_list->AddText(ImVec2(x_pos, pos.y), color, s, s + len);
                 x_pos += ImGui::CalcTextSize(s, s + len).x;
-
                 s += len;
                 segment_start = s;
+                keyword_hit = true;
                 break; // Restart loop from new position
             }
         }
+        if (keyword_hit)
+            continue;
 
         s++;
     }
-
-    // Draw remaining text
     if (segment_start < s) {
         draw_list->AddText(ImVec2(x_pos, pos.y), current_color, segment_start, s);
+        x_pos += ImGui::CalcTextSize(segment_start, s).x;
     }
 }
 
@@ -215,33 +233,3 @@ void LoggerWindow::Log(const std::string& message)
     }
 }
 
-void LoggerWindow::LogNodes(APClient::PrintJSONArgs printdata)
-{
-    for (auto& window : GUI::windows) {
-        if (auto logger = dynamic_cast<LoggerWindow*>(window.get())) {
-            std::string message;
-            for (const auto& text : printdata.data) {
-                if (text.type == "") {
-                    auto it = logger->apKeywordColors.find(text.color);
-                    std::string colorHex = (it != logger->apKeywordColors.end()) ? it->second : "FFFFFF";
-                    message += text.text;
-                }
-                if (text.type == "player_id") {
-                    int value = std::atoi(text.text.c_str());
-                    message += ArchipelagoHandler::GetPlayerName(value);
-                }
-                if (text.type == "item_id") {
-                    message += ArchipelagoHandler::GetItemName(printdata.item->item, printdata.item->player);
-                }
-                if (text.type == "location_id") {
-                    int value = std::atoi(text.text.c_str());
-                    message += ArchipelagoHandler::GetLocationName(value, printdata.item->player);
-                }
-            }
-            logger->AddLogMessage(message);
-
-            break;
-        }
-    }
-    
-}

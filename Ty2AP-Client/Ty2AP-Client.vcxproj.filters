@@ -63,13 +63,37 @@
     <ClInclude Include="Version.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="collectible_info.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RobotoMedium.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="stb_image.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Mission.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Item.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Shop.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="InfoWindow.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TrackerWindow.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="pch.cpp">
-      <Filter>Source Files\Dependencies</Filter>
     </ClCompile>
     <ClCompile Include="CheckHandler.cpp">
       <Filter>Source Files</Filter>
@@ -98,9 +122,6 @@
     <ClCompile Include="gui.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="InfoWindow.h">
-      <Filter>Header Files</Filter>
-    </ClCompile>
     <ClCompile Include="InfoWindow.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -125,6 +146,12 @@
     <ClCompile Include="SlotData.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="TrackerWindow.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="pch.cpp">
+      <Filter>Source Files\Dependencies</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Source.def">
@@ -134,5 +161,54 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="info.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Ty2AP-Client.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Resource\barrier_b.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Resource\barrier_f.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Resource\barrier_p.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Resource\battlebunyip.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Resource\bilbymap.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Resource\cog.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Resource\cogmap.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Resource\icon.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Resource\lifterbunyip.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Resource\Mission.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Resource\orb.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Resource\stevemap.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Resource\subbunyip.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Resource\thermobunyip.png">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>

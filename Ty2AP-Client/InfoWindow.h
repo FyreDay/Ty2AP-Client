@@ -1,18 +1,16 @@
 #pragma once
-#include "pch.h"
 #include "Window.h"
-#include <deque>
+#include "gui.h"
+#include "collectible_info.h"
 
-
-class InfoWindow : public Window {
+class InfoWindow : public Window
+{
 public:
-	InfoWindow() : Window("GetObject") {
+	InfoWindow() : Window("Collectible Info") {
 		isVisible = false;
 	};
 	void ToggleVisibility() override;
-	void Draw(int outerWidth, int outerHeight, float uiScale, ImFont* font) override;
-	void AddLogMessage(const std::string& message);
+	void Draw(int outerWidth, int outerHeight, float uiScale) override;
 private:
-	std::deque<std::string> logMessages;
-	const int maxLogMessages = 20;
+	void CreateTree(LevelCollectibleInfo levelInfo);
 };

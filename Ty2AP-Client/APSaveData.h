@@ -1,4 +1,6 @@
 #pragma once
+#include "ArchipelagoHandler.h"
+#include "Mission.h"
 
 class APSaveData
 {
@@ -10,12 +12,63 @@ public:
 	void updateBoughtItem(int id, bool bought) {
 		ItemMap[id] = bought;
 	}
+	void CheckGoal();
 	int pLastReceivedIndex = -1;
 	int cogCount = 0;
 	int orbCount = 0;
+	int missionsCompleted = 0;
+	bool hasThermoKey = false;
+	bool hasSubKey = false;
+	bool hasLifterKey = false;
+	bool hasGoldPaw = false;
+	bool hasBilbyMap = false;
+	bool hasCogMap = false;
+	bool hasSteveMap = false;
 	std::list<int> UnlockedParkingPads = {
 	};
 	std::list<int> UnlockedBarriers = {
+	};
+	static inline std::list<int64_t> missionLocs = {
+		0x6d000000 + Mission::METAL_MENACE,
+		0x6d000000 + Mission::EXPLOSIVE_CARGO,
+		0x6d000000 + Mission::BOSS_CASS_BUST_UP,
+		0x6d000000 + Mission::HAUNTED_HASSLE,
+		0x6d000000 + Mission::TREE_RESCUE,
+		0x6d000000 + Mission::CROUCHING_BIRREL_HIDDEN_SQUEAVER,
+		0x6d000000 + Mission::CURRAWONG_JAIL_BREAK,
+		0x6d000000 + Mission::DENNIS_DASH,
+		0x6d000000 + Mission::ROCKY_ROAD,
+		0x6d000000 + Mission::LAVA_CHILL_OUT,
+		0x6d000000 + Mission::CANOPY_CAPERS,
+		0x6d000000 + Mission::CROC_STOCK_PILE,
+		0x6d000000 + Mission::FIRE_FIGHT,
+		0x6d000000 + Mission::TRUCK_TRAGEDY,
+		0x6d000000 + Mission::PLUTONIUM_PANIC,
+		0x6d000000 + Mission::NEED_A_SPARE,
+		0x6d000000 + Mission::KING_SQUEAVER_AND_BIRREL_HOOD,
+		0x6d000000 + Mission::MUSICAL_MOMMY,
+		0x6d000000 + Mission::TOURIST_TRAP,
+		0x6d000000 + Mission::CROCODILE_CHAOS,
+		0x6d000000 + Mission::SHEEP_DIP,
+		0x6d000000 + Mission::DENNIS_FREEWAY,
+		0x6d000000 + Mission::TEETER_TOTTERING_INFERNO,
+		0x6d000000 + Mission::GRINDSTONE_COWBOY,
+		0x6d000000 + Mission::VOLCANO_RESCUE,
+		0x6d000000 + Mission::BUSH_FIRE,
+		0x6d000000 + Mission::TRUCK_STOP,
+		0x6d000000 + Mission::SEA_LAB,
+		0x6d000000 + Mission::GRUB_GRAB,
+		0x6d000000 + Mission::BIG_BANG,
+		0x6d000000 + Mission::SNAKE_EYES,
+		0x6d000000 + Mission::HIDDEN_DANGER,
+		0x6d000000 + Mission::OIL_RIG_FIRE,
+		0x6d000000 + Mission::FREEWAY_TRAINING_GROUNDS,
+		0x6d000000 + Mission::BEACH_TRAINING_GROUNDS,
+		0x6d000000 + Mission::RIPPER_NIPPER,
+		0x6d000000 + Mission::ATTACK_OF_THE_50_FOOT_SQUEAVER,
+		0x6d000000 + Mission::DEEP_SEA_SCARE,
+		0x6d000000 + Mission::BUSH_RESCUE_TRAINING_PROGRAM,
+		0x6d000000 + Mission::THATS_A_CROC
 	};
 	const std::list<int> AllParkingPads = 
 	{ 

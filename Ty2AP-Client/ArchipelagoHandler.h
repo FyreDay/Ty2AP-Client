@@ -9,10 +9,9 @@
 
 #define CERT_STORE "cacert.pem"
 class LoginWindow;
+class APSaveData;
 
 #define UUID_FILE "uuid" // TODO: place in %appdata%
-
-
 
 class ArchipelagoHandler
 {
@@ -27,11 +26,12 @@ public:
 	static std::string GetItemName(int64_t id, int player);
 	static std::string GetPlayerName(int player);
 	static std::string GetLocationName(int64_t id, int player);
+	static int CountLocationsChecked(const std::list<int64_t>& locationIds);
 	static bool ScoutLocations(std::list<int64_t> locations, int create_as_hint = 0);
 	static void SendLocation(int64_t locationId);
 	static std::string uuid;
 	static bool ap_connected;
-	static bool polling;
+	static std::atomic<bool> polling;
 	static bool wrongVersion;
 	static std::string seed;
 	static std::string slotname;

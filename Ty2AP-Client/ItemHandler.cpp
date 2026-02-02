@@ -16,80 +16,96 @@ void ItemHandler::HandleItem(APClient::NetworkItem item)
 
 	ArchipelagoHandler::customSaveData->pLastReceivedIndex++;
 
-	if (item.item < 0x16) {
-		HandleRang(item.item);
-	}
-	if (item.item == 0x16) {
+	if (item.item < (int)APItem::PROGRESSIVE_BOOMERANG)
+		HandleRang((APItem)item.item);
+
+	if ((APItem)item.item == APItem::PROGRESSIVE_BOOMERANG) 
 		HandleRang(progressiveBoomerang());
-	}
-	if (item.item == 0x17) {
+
+	if ((APItem)item.item == APItem::PROGRESSIVE_FLAMERANG) 
 		HandleRang(progressiveFlamerang());
-	}
-	if (item.item == 0x18) {
+
+	if ((APItem)item.item == APItem::PROGRESSIVE_FROSTYRANG) 
 		HandleRang(progressiveFrostyrang());
-	}
-	if (item.item == 0x19) {
+
+	if ((APItem)item.item == APItem::PROGRESSIVE_ZAPPYRANG) 
 		HandleRang(progressiveZappyrang());
-	}
-	if (item.item == 0x1a) {
+
+	if ((APItem)item.item == APItem::PROGRESSIVE_LASHARANG) 
 		HandleRang(progressiveLasharang());
-	}
-	if (item.item == 0x1b) {
+
+	if ((APItem)item.item == APItem::PROGRESSIVE_INFRARANG)
 		HandleRang(progressiveInfrarang());
-	}
-	if (item.item == 0x1c) {
+
+	if ((APItem)item.item == APItem::PROGRESSIVE_SMASHARANG)
 		HandleRang(progressiveSmasharang());
+
+	if ((APItem)item.item == APItem::LIFTER_KEY) {
+		ArchipelagoHandler::customSaveData->hasLifterKey = true;
+		CollectItem(Shop::TRADER_BOBS, (int)Item::LIFTER_KEY);
 	}
 
-	if (item.item == 51) {
-		CollectItem(1, 1);
-	}
-	if (item.item == 52) {
-		CollectItem(1, 2);
-	}
+	if ((APItem)item.item == APItem::THERMO_KEY) {
+		ArchipelagoHandler::customSaveData->hasThermoKey = true;
+		CollectItem(Shop::TRADER_BOBS, (int)Item::THERMO_KEY);
+	} 
 	
-	if (item.item == 59) {
-		CollectItem(1, 59);
-	}
-	if (item.item == 55) {
-		CollectItem(4, 55);
-	}
-	if (item.item == 56) {
-		CollectItem(4, 56);
-	}
-	if (item.item == 57) {
-		CollectItem(4, 57);
+	if ((APItem)item.item == APItem::SUB_KEY) {
+		ArchipelagoHandler::customSaveData->hasSubKey = true;
+		CollectItem(Shop::TRADER_BOBS, (int)Item::SUB_KEY);
 	}
 
-	if (item.item == 77) {
-		CollectItem(1,77);
-	}
-	if (item.item == 78) {
-		CollectItem(1,78);
+	if ((APItem)item.item == APItem::MAP_BILBY) {
+		ArchipelagoHandler::customSaveData->hasBilbyMap;
+		CollectItem(Shop::MADAME_MOPOKES, (int)Item::MAP_BILBY);
 	}
 
-	if (item.item == 0x20) {
+	if ((APItem)item.item == APItem::MAP_COGS) {
+		ArchipelagoHandler::customSaveData->hasCogMap;
+		CollectItem(Shop::MADAME_MOPOKES, (int)Item::MAP_COGS);
+	}
+
+	if ((APItem)item.item == APItem::MAP_STEVE) {
+		ArchipelagoHandler::customSaveData->hasSteveMap;
+		CollectItem(Shop::MADAME_MOPOKES, (int)Item::MAP_STEVE);
+	}
+
+	if ((APItem)item.item == APItem::PROGRESSIVE_PAW) {
+		if (!ArchipelagoHandler::customSaveData->hasGoldPaw) {
+			CollectItem(Shop::TRADER_BOBS, (int)Item::GOLD_PAW);
+			ArchipelagoHandler::customSaveData->hasGoldPaw = true;
+		}
+		else {
+			CollectItem(Shop::TRADER_BOBS, (int)Item::PLATINUM_PAW);
+		}
+	}
+
+	if ((APItem)item.item == APItem::PLATINUM_COG) {
+		ArchipelagoHandler::customSaveData->cogCount++;
 		SaveData::GetData()->CogCollected++;
 	}
-	if (item.item == 0x21) {
+
+	if ((APItem)item.item == APItem::KROMIUM_ORB) {
+		ArchipelagoHandler::customSaveData->orbCount++;
 		SaveData::GetData()->OrbCollected++;
 	}
-	if (item.item == 0x22) {
+
+	if ((APItem)item.item == APItem::OPALS_100)
 		AddOpals(100);
-	}
-	if (item.item == 0x23) {
+
+	if ((APItem)item.item == APItem::OPALS_200)
 		AddOpals(200);
-	}
-	if (item.item == 0x24) {
+
+	if ((APItem)item.item == APItem::OPALS_500)
 		AddOpals(500);
-	}
-	if (item.item == 0x25) {
+
+	if ((APItem)item.item == APItem::OPALS_1000)
 		AddOpals(1000);
-	}
-	if (item.item == 0x26) {
+
+	if ((APItem)item.item == APItem::OPALS_5000)
 		AddOpals(5000);
-	}
-	if (item.item == 0x27) {
+
+	if ((APItem)item.item == APItem::FULL_PIE) {
 		int* health = reinterpret_cast<int*>(Core::moduleBase + 0x4BC304);
 		int* healthPer = reinterpret_cast<int*>(Core::moduleBase + 0x4BC2FC);
 		int* numPaws = reinterpret_cast<int*>(Core::moduleBase + 0x4BC300);
@@ -103,59 +119,64 @@ void ItemHandler::HandleItem(APClient::NetworkItem item)
 		}
 	}
 
-	if (item.item == 980) {
-		ArchipelagoHandler::customSaveData->UnlockedBarriers.push_back(980);
+	if ((APItem)item.item == APItem::PATCHY_BARRIERS) {
+		ArchipelagoHandler::customSaveData->UnlockedBarriers.push_back((int)Item::PATCHY_BARRIERS);
 		GameHandler::OnChunkLoaded();
 	}
-	if (item.item == 981) {
-		ArchipelagoHandler::customSaveData->UnlockedBarriers.push_back(981);
+
+	if ((APItem)item.item == APItem::FLUFFY_BARRIERS) {
+		ArchipelagoHandler::customSaveData->UnlockedBarriers.push_back((int)Item::FLUFFY_BARRIERS);
 		GameHandler::OnChunkLoaded();
 	}
-	if (item.item == 982) {
-		ArchipelagoHandler::customSaveData->UnlockedBarriers.push_back(982);
+
+	if ((APItem)item.item == APItem::BUSTER_BARRIERS) {
+		ArchipelagoHandler::customSaveData->UnlockedBarriers.push_back((int)Item::BUSTER_BARRIERS);
 		GameHandler::OnChunkLoaded();
 	}
+
 	std::string filePath = "./Saves/" + ArchipelagoHandler::GetSaveIdentifier();
 
 	GameHandler::write_json_file(filePath + ".json");
 }
 
-void ItemHandler::HandleRang(int id)
+void ItemHandler::HandleRang(APItem item)
 {
 	//clause for boomerang
-	if (id == 0x13) {
-		id = 0;
+	if (item == APItem::BOOMERANG) {
+		item = APItem::NONE;
 	}
+
 	bool* base = &SaveData::GetData()->GotBoomerang;
-	base[id] = true;
-	//if infrarang or x rang update that ty has them
-	if (id == 0x0a) {
-		CollectItem(2, 12);
+	base[(int)item] = true;
+
+	if (item == APItem::INFRARANG) {
+		CollectItem(Shop::RANG_SHOP, (int)Item::INFRARANG);
 	}
-	if (id == 0x0b) {
-		CollectItem(3, 20);
-		CollectItem(2, 12);
+	if (item == APItem::XRANG) {
+		CollectItem(Shop::SLYS_SHACK, (int)Item::XRANG);
+		CollectItem(Shop::RANG_SHOP, (int)Item::INFRARANG);
 	}
-	if (id == 0x04) {
-		CollectItem(2, 9);
+
+	if (item == APItem::FROSTYRANG) {
+		CollectItem(Shop::RANG_SHOP, (int)Item::FROSTYRANG);
 	}
-	if (id == 0x05) {
-		CollectItem(3, 17);
-		CollectItem(2, 9);
+	if (item == APItem::FREEZERANG) {
+		CollectItem(Shop::SLYS_SHACK, (int)Item::FREEZERANG);
+		CollectItem(Shop::RANG_SHOP, (int)Item::FROSTYRANG);
 	}
-	if (id == 0x02) {
-		CollectItem(2, 2);
+
+	if (item == APItem::FLAMERANG) {
+		CollectItem(Shop::RANG_SHOP, (int)Item::FLAMERANG);
 	}
-	if (id == 0x03) {
-		CollectItem(3, 3);
-		CollectItem(2, 2);
+	if (item == APItem::LAVARANG) {
+		CollectItem(Shop::SLYS_SHACK, (int)Item::LAVARANG);
+		CollectItem(Shop::RANG_SHOP, (int)Item::FLAMERANG);
 	}
 }
 
 void ItemHandler::HandleParkingPad(int id)
 {
 	ArchipelagoHandler::customSaveData->UnlockedParkingPads.push_back(id);
-	//updates parkingpads if its loaded need to queue for next frame
 	GameHandler::OnChunkLoaded();
 }
 
@@ -167,9 +188,8 @@ void ItemHandler::CollectItem(int shopId, int itemId)
 		API::LogPluginMessage("item has value: " + std::to_string(itemId));
 		item->purchased = true;
 	}
-	else {
+	else
 		API::LogPluginMessage("No Item with id " + std::to_string(itemId));
-	}
 }
 
 void ItemHandler::HandleStoredItems()
@@ -279,13 +299,9 @@ void ItemHandler::FillShopItemNames(const std::list<APClient::NetworkItem>& item
 			std::lock_guard<std::mutex> lock(strIDtoDescTextMutex);
 			strIDtoDescText[strs->descId] = ArchipelagoHandler::GetItemDesc(item.player);
 		}
-		API::LogPluginMessage("Find Item");
 		ItemStruct* shopItem = SaveData::findItemByID((int)item.location);
-		API::LogPluginMessage("Check item");
 		if (shopItem) {
-			API::LogPluginMessage("Set Item");
 			shopItem->ShopIconNameString = const_cast<char*>(ItemHandler::getImagePtr(ArchipelagoHandler::GetItemName(item.item, item.player), item.flags));
-			API::LogPluginMessage("Set Item Image");
 		}
 	}
 }

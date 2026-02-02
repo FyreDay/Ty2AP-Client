@@ -94,9 +94,6 @@ __declspec(naked) void __stdcall CheckHandler::PurchaseItemHook() {
 	}
 }
 
-
-
-
 void CheckHandler::SetupHooks() {
 	CollectCollectibleOriginReturnAddr = Core::moduleBase + 0x0011b2ba + 5;
 	auto ccaddr = (char*)(Core::moduleBase + 0x0011b2ba);
@@ -125,13 +122,6 @@ void CheckHandler::OnCollectCollectible(int type, int id) {
 	default:
 		API::LogPluginMessage("Failure on collectable Type");
 	}
-	
-	for (auto& window : GUI::windows) {
-		if (auto infowindow = dynamic_cast<InfoWindow*>(window.get())) {
-			infowindow->AddLogMessage(collectibles[type].name + " " +  std::to_string(id));
-		}
-	}
-	//API::LogPluginMessage("maybe id: " + std::to_string(id) + " maybe type: " + std::to_string(type));
 }
 
 void CheckHandler::OnCompleteMission(void* mission, int status) {
@@ -140,8 +130,7 @@ void CheckHandler::OnCompleteMission(void* mission, int status) {
 	}
 
 	uint8_t* base = static_cast<uint8_t*>(mission);
-	//short status = *reinterpret_cast<short*>(base + 0x10); // read status
-	
+
 	int id = *reinterpret_cast<int*>(base + 0x4);
 	int shortId = *reinterpret_cast<char*>(base + 0x4);
 
@@ -149,40 +138,20 @@ void CheckHandler::OnCompleteMission(void* mission, int status) {
 		return;
 	}
 
-	ArchipelagoHandler::SendLocation(id);
-
 	short value = *reinterpret_cast<short*>(base + 0x4); // read short
-
-	if (value == 83) { //this is the cass boss fight id
+	if (value == Mission::FINAL_BOSS) {
 		API::LogPluginMessage("GOALLLLL");
 		ArchipelagoHandler::gameFinished();
 	}
+
+	ArchipelagoHandler::SendLocation(id);
 	char letter = *reinterpret_cast<char*>(base + 0x7);  // read char
-	std::string Sid = std::string(1, letter) + std::to_string(value);
-	for (auto& window : GUI::windows) {
-		if (auto infowindow = dynamic_cast<InfoWindow*>(window.get())) {
-			infowindow->AddLogMessage(Sid + " -> " + std::to_string(status));
-		}
-	}
-	int missioncount = 0;
-	SaveData::MissionList(5).forEach([&missioncount](MissionStruct m) {
-		if (m.missionId < 100 && m.missionId != 86) {
-			missioncount++;
-		}
-	});
-	API::LogPluginMessage("misions done: " + std::to_string(missioncount) + " Need: " + std::to_string(ArchipelagoHandler::slotdata->missionsToGoal));
-	if (missioncount >= ArchipelagoHandler::slotdata->missionsToGoal - 1) {
-		auto mission = SaveData::findMissionByID(99);
-		if (mission && mission->status == 0) {
-			mission->numberPreconditionMissionNeeded = 0;
-			Missions::UpdateMissionState(mission, 1, 0);
-		}
-	}
+
+	ArchipelagoHandler::customSaveData->CheckGoal();
 }
 
 void CheckHandler::OnBuyItem(void* item) {
 	uint8_t* base = static_cast<uint8_t*>(item);
-	//short status = *reinterpret_cast<short*>(base + 0x10); // read status
 
 	short value = *reinterpret_cast<short*>(base + 0x4); // read short
 	char letter = *reinterpret_cast<char*>(base + 0x7);  // read char
@@ -200,13 +169,4 @@ void CheckHandler::OnBuyItem(void* item) {
 	}
 
 	ArchipelagoHandler::SendLocation(value);
-
-	std::string id = std::string(1, letter) + std::to_string(value);
-	for (auto& window : GUI::windows) {
-		if (auto infowindow = dynamic_cast<InfoWindow*>(window.get())) {
-			infowindow->AddLogMessage("Buy " + id);
-		}
-	}
 }
-
-

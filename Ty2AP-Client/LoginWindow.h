@@ -18,7 +18,7 @@ public:
         }
     };
     void ToggleVisibility() override;
-    void Draw(int outerWidth, int outerHeight, float uiScale, ImFont* font) override;
+    void Draw(int outerWidth, int outerHeight, float uiScale) override;
     void SetMessage(std::string);
     bool LoadLoginData(std::string& server, std::string& slot, std::string& password);
     void SaveLoginData(const std::string& server, const std::string& slot, const std::string& password);

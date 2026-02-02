@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -24,13 +24,20 @@
     <ClInclude Include="APSaveData.h" />
     <ClInclude Include="ArchipelagoHandler.h" />
     <ClInclude Include="CheckHandler.h" />
+    <ClInclude Include="collectible_info.h" />
     <ClInclude Include="GameHandler.h" />
     <ClInclude Include="gui.h" />
+    <ClInclude Include="Item.h" />
     <ClInclude Include="ItemHandler.h" />
     <ClInclude Include="LoggerWindow.h" />
     <ClInclude Include="LoginWindow.h" />
+    <ClInclude Include="Mission.h" />
     <ClInclude Include="pch.h" />
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="RobotoMedium.hpp" />
+    <ClInclude Include="Shop.h" />
     <ClInclude Include="SlotData.h" />
+    <ClInclude Include="stb_image.h" />
     <ClInclude Include="Version.h" />
     <ClInclude Include="Window.h" />
   </ItemGroup>
@@ -63,7 +70,7 @@
     <ClCompile Include="GameHandler.cpp" />
     <ClCompile Include="gui.cpp" />
     <ClCompile Include="InfoWindow.cpp" />
-    <ClCompile Include="InfoWindow.h" />
+    <ClInclude Include="InfoWindow.h" />
     <ClCompile Include="ItemHandler.cpp" />
     <ClCompile Include="LoggerWindow.cpp" />
     <ClCompile Include="LoginWindow.cpp" />
@@ -71,6 +78,8 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="SlotData.cpp" />
+    <ClCompile Include="TrackerWindow.cpp" />
+    <ClInclude Include="TrackerWindow.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="mod_info.json" />
@@ -78,6 +87,25 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="info.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Ty2AP-Client.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Resource\barrier_b.png" />
+    <Image Include="Resource\barrier_f.png" />
+    <Image Include="Resource\barrier_p.png" />
+    <Image Include="Resource\battlebunyip.png" />
+    <Image Include="Resource\bilbymap.png" />
+    <Image Include="Resource\cog.png" />
+    <Image Include="Resource\cogmap.png" />
+    <Image Include="Resource\icon.png" />
+    <Image Include="Resource\lifterbunyip.png" />
+    <Image Include="Resource\Mission.png" />
+    <Image Include="Resource\orb.png" />
+    <Image Include="Resource\stevemap.png" />
+    <Image Include="Resource\subbunyip.png" />
+    <Image Include="Resource\thermobunyip.png" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
@@ -90,26 +118,26 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v143</PlatformToolset>
+    <PlatformToolset>v145</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v143</PlatformToolset>
+    <PlatformToolset>v145</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v143</PlatformToolset>
+    <PlatformToolset>v145</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v143</PlatformToolset>
+    <PlatformToolset>v145</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
@@ -160,7 +188,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_CONSOLE;ASIO_STANDALONE;AP_NO_SCHEMA;ASIO_NO_WIN32_LEAN_AND_MEAN;_WIN32_WINNT=0x0600;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_CONSOLE;ASIO_STANDALONE;AP_NO_SCHEMA;ASIO_NO_WIN32_LEAN_AND_MEAN;_WIN32_WINNT=0x0600;_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
@@ -169,6 +197,7 @@
       <AdditionalIncludeDirectories>$(ProjectDir)..\TygerMemory2\TygerMemory2;$(ProjectDir)..\wswrap\include;$(ProjectDir)..\websocketpp;$(ProjectDir)..\apclientpp;$(ProjectDir)..\imgui\backends;$(ProjectDir)..\imgui;$(ProjectDir)..\imgui\misc\cpp</AdditionalIncludeDirectories>
       <ShowIncludes>true</ShowIncludes>
       <AdditionalOptions>/Zc:__cplusplus %(AdditionalOptions)</AdditionalOptions>
+      <MultiProcessorCompilation>false</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

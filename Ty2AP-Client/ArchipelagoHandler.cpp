@@ -15,7 +15,7 @@ bool ArchipelagoHandler::ap_connected = false;
 std::string ArchipelagoHandler::seed;
 std::string ArchipelagoHandler::slotname = "";
 bool ArchipelagoHandler::ap_sync_queued = false;
-bool ArchipelagoHandler::polling = false;
+std::atomic<bool> ArchipelagoHandler::polling(false);
 bool ArchipelagoHandler::wrongVersion = false;
 
 SlotData* ArchipelagoHandler::slotdata = new SlotData();
@@ -23,14 +23,14 @@ APSaveData* ArchipelagoHandler::customSaveData = new APSaveData();
 APClient* ArchipelagoHandler::ap = nullptr;
 
 void ArchipelagoHandler::DisconnectAP() {
-	polling = false;
+	polling.store(false);
 	GameHandler::hasRunSetup = false;
 	LoggerWindow::Log("Try Disconnecting");
 }
 
 void ArchipelagoHandler::ConnectAP(LoginWindow* login)
 {
-	polling = true;
+	polling.store(true);
 	std::string uri = login->server;
 	std::string uuid = ap_get_uuid(UUID_FILE,
 		uri.empty() ? APClient::DEFAULT_URI :
@@ -110,13 +110,16 @@ void ArchipelagoHandler::ConnectAP(LoginWindow* login)
 			auto cogPrices = data["CogPrices"].get<std::vector<int>>();
 			slotdata->cogPrices = cogPrices;
 		}
+
 		if (data.find("OrbPrices") != data.end() && data["OrbPrices"].is_array()) {
 			auto orbPrices = data["OrbPrices"].get<std::vector<int>>();
 			slotdata->orbPrices = orbPrices;
 		}
+
 		if (slotdata->skipCurrawong) {
 			GameHandler::removeCurrawong();
 		}
+
 		//GameHandler::SetMissionRequirements(slotdata->barrierUnlockStyle, slotdata->missionsToGoal);
 		GameHandler::EnableLoadButtons();
 	});
@@ -125,7 +128,6 @@ void ArchipelagoHandler::ConnectAP(LoginWindow* login)
 		if (!wrongVersion) {
 			login->SetMessage("Disconnected");
 		}
-		
 	});
 	ap->set_slot_refused_handler([login](const std::list<std::string>& errors) {
 		for (const auto& error : errors) {
@@ -134,8 +136,17 @@ void ArchipelagoHandler::ConnectAP(LoginWindow* login)
 		}
 	});
 	ap->set_print_json_handler([](const std::list<APClient::TextNode>& msg) {
+		if (GUI::filterToSelf)
+		{
+			bool hasSelf = false;
+			for (const auto& node : msg)
+				if (node.player == ap->get_player_number())
+					hasSelf = true;
+			if (!hasSelf)
+				return;
+		}
 		LoggerWindow::Log(ap->render_json(msg, APClient::RenderFormat::TEXT));
-		});
+	});
 	ap->set_print_handler([](const std::string& msg) {
 		LoggerWindow::Log(msg);
 		});
@@ -155,7 +166,6 @@ void ArchipelagoHandler::ConnectAP(LoginWindow* login)
 		for (const auto& item : items) {
 			
 			std::string sender = ap->get_player_alias(item.player);
-			//std::string location = ap->get_location_name(item.location, );
 			ItemHandler::HandleItem(item);
 		}
 	});
@@ -198,7 +208,7 @@ void ArchipelagoHandler::gameFinished() {
 
 void ArchipelagoHandler::Poll() {
 	while (true) {
-		if (ap && polling) {
+		if (polling.load() && ap) {
 			ap->poll();
 			if (GameHandler::IsInGame()) {
 				if (!GameHandler::hasRunSetup) {
@@ -211,6 +221,7 @@ void ArchipelagoHandler::Poll() {
 		}
 	}
 }
+
 const std::vector<std::string> deathCauses{
 	"didn\'t catch the boomerang",
 	"bit off more than they could chew",
@@ -274,6 +285,18 @@ std::string ArchipelagoHandler::GetLocationName(int64_t id, int player) {
 		return ap->get_location_name(id, ap->get_player_game(player));
 	}
 	return "loc id: " + id;
+}
+
+int ArchipelagoHandler::CountLocationsChecked(const std::list<int64_t>& locationIds)
+{
+	const auto& checked = ap->get_checked_locations();
+	std::size_t count = 0;
+	for (int64_t id : locationIds) {
+		if (std::find(checked.begin(), checked.end(), id) != checked.end()) {
+			++count;
+		}
+	}
+	return count;
 }
 
 std::string ArchipelagoHandler::GetPlayerName(int player){

@@ -3,6 +3,7 @@
 #include "CheckHandler.h"
 #include "APSaveData.h"
 #include <windows.h>
+#include "Mission.h"
 
 typedef int(__cdecl* GetStringFunc)(int id);
 extern GetStringFunc originalGetString;
