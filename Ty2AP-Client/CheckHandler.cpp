@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "CheckHandler.h"
+
 typedef void(__stdcall* FunctionType)();
 FunctionType CollectCollectibleOrigin = nullptr;
 uintptr_t CollectCollectibleOriginReturnAddr;
@@ -147,7 +148,8 @@ void CheckHandler::OnCompleteMission(void* mission, int status) {
 	ArchipelagoHandler::SendLocation(id);
 	char letter = *reinterpret_cast<char*>(base + 0x7);  // read char
 
-	ArchipelagoHandler::customSaveData->CheckGoal();
+	auto adjustment = ArchipelagoHandler::IsLocationChecked(id) ? 0 : 1;
+	ArchipelagoHandler::customSaveData->CheckGoal(adjustment);
 }
 
 void CheckHandler::OnBuyItem(void* item) {
@@ -155,6 +157,13 @@ void CheckHandler::OnBuyItem(void* item) {
 
 	short value = *reinterpret_cast<short*>(base + 0x4); // read short
 	char letter = *reinterpret_cast<char*>(base + 0x7);  // read char
+
+	ItemStruct* mkItem = static_cast<ItemStruct*>(item);
+	if (mkItem->currencyType == 2)
+		ArchipelagoHandler::customSaveData->cogsSpent += mkItem->price;
+	if (mkItem->currencyType == 1)
+		ArchipelagoHandler::customSaveData->orbsSpent += mkItem->price;
+
 	ArchipelagoHandler::customSaveData->updateBoughtItem(value, true);
 	if (value >= 79 && value < 88) {
 		if (auto nextItem = SaveData::findItemByID(SaveData::GetShopItemList(1), value + 1)) {

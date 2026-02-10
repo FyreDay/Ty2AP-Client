@@ -3,6 +3,7 @@
 #include "InfoWindow.h"
 #include "MinHook.h"
 #include "APSaveData.h"
+#include "Item.h"
 
 
 

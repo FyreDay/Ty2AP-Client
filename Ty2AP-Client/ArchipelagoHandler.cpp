@@ -64,7 +64,7 @@ void ArchipelagoHandler::ConnectAP(LoginWindow* login)
 			ArchipelagoHandler::DisconnectAP();
 			wrongVersion = true;
 		}
-		else if (data["ModVersion"].get<std::string>() != VERSION_STRING) {
+		else if (data["ModVersion"].get<std::string>() != COMPAT_VERSION) {
 			LoggerWindow::Log("Your client and apworld versions do not match.");
 			login->SetMessage("AP world "+ data["ModVersion"].get<std::string>() +" incompatible");
 			ArchipelagoHandler::DisconnectAP();
@@ -297,6 +297,12 @@ int ArchipelagoHandler::CountLocationsChecked(const std::list<int64_t>& location
 		}
 	}
 	return count;
+}
+
+bool ArchipelagoHandler::IsLocationChecked(int64_t locationId)
+{
+	const auto& checked = ap->get_checked_locations();
+	return std::find(checked.begin(), checked.end(), locationId) != checked.end();
 }
 
 std::string ArchipelagoHandler::GetPlayerName(int player){

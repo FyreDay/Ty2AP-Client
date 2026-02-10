@@ -127,7 +127,7 @@ void TrackerWindow::Draw(int outerWidth, int outerHeight, float uiScale) {
     
     ImGui::SameLine();
 
-    count = ArchipelagoHandler::customSaveData->orbCount;
+    count = ArchipelagoHandler::customSaveData->orbCount - ArchipelagoHandler::customSaveData->orbsSpent;
     brightness = lowBright;
     tintColor = ImVec4(brightness, brightness, brightness, 1.0f);
     cursorPos = ImGui::GetCursorScreenPos();
@@ -144,7 +144,7 @@ void TrackerWindow::Draw(int outerWidth, int outerHeight, float uiScale) {
     
     ImGui::SameLine();
 
-    count = ArchipelagoHandler::customSaveData->cogCount;
+    count = ArchipelagoHandler::customSaveData->cogCount - ArchipelagoHandler::customSaveData->cogsSpent;
     brightness = lowBright;
     tintColor = ImVec4(brightness, brightness, brightness, 1.0f);
     cursorPos = ImGui::GetCursorScreenPos();

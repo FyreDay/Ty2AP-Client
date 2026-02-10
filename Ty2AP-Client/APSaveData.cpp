@@ -6,9 +6,9 @@ APSaveData::APSaveData() {
 	UnlockedBarriers = { };
 }
 
-void APSaveData::CheckGoal()
+void APSaveData::CheckGoal(int adjustment)
 {
-	missionsCompleted = ArchipelagoHandler::CountLocationsChecked(missionLocs);
+	missionsCompleted = ArchipelagoHandler::CountLocationsChecked(missionLocs) + adjustment;
 
 	if (missionsCompleted < ArchipelagoHandler::slotdata->missionsToGoal) return;
 

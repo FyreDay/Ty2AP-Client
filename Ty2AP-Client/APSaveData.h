@@ -12,10 +12,12 @@ public:
 	void updateBoughtItem(int id, bool bought) {
 		ItemMap[id] = bought;
 	}
-	void CheckGoal();
+	void CheckGoal(int adjustment);
 	int pLastReceivedIndex = -1;
 	int cogCount = 0;
+	int cogsSpent = 0;
 	int orbCount = 0;
+	int orbsSpent = 0;
 	int missionsCompleted = 0;
 	bool hasThermoKey = false;
 	bool hasSubKey = false;

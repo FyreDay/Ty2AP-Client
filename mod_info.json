@@ -2,7 +2,7 @@
   "name": "Ty2 AP Client",
   "description": "Client implementation of Ty2 into the Archipelago.gg project.",
   "dll_name": "Ty2AP-Client",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "dependencies": [
     {
       "dep_name": "TygerMemory2",

@@ -27,6 +27,7 @@ public:
 	static std::string GetPlayerName(int player);
 	static std::string GetLocationName(int64_t id, int player);
 	static int CountLocationsChecked(const std::list<int64_t>& locationIds);
+	static bool IsLocationChecked(int64_t locationId);
 	static bool ScoutLocations(std::list<int64_t> locations, int create_as_hint = 0);
 	static void SendLocation(int64_t locationId);
 	static std::string uuid;

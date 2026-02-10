@@ -595,6 +595,8 @@ void GameHandler::write_json_file(const std::string& filename) {
 	j["HasBilbyMap"] = ArchipelagoHandler::customSaveData->hasBilbyMap;
 	j["HasCogMap"] = ArchipelagoHandler::customSaveData->hasCogMap;
 	j["HasSteveMap"] = ArchipelagoHandler::customSaveData->hasSteveMap;
+	j["CogsSpent"] = ArchipelagoHandler::customSaveData->cogsSpent;
+	j["OrbsSpent"] = ArchipelagoHandler::customSaveData->orbsSpent;
 
 	// Write to file
 	std::ofstream file(filename);
@@ -631,6 +633,8 @@ void GameHandler::read_json_file(const std::string& filename) {
 	ArchipelagoHandler::customSaveData->hasBilbyMap = j["HasBilbyMap"].get<bool>();
 	ArchipelagoHandler::customSaveData->hasCogMap = j["HasCogMap"].get<bool>();
 	ArchipelagoHandler::customSaveData->hasSteveMap = j["HasSteveMap"].get<bool>();
+	ArchipelagoHandler::customSaveData->cogsSpent = j["CogsSpent"].get<int>();
+	ArchipelagoHandler::customSaveData->orbsSpent = j["OrbsSpent"].get<int>();
 }
 
 bool GameHandler::IsInGame() {
@@ -645,7 +649,9 @@ bool GameHandler::IsInGame() {
 bool GameHandler::hasRunSetup = false;
 void GameHandler::RunLoadSetup(SlotData* slotdata) {
 	SaveData::GetData()->CogCollected = ArchipelagoHandler::customSaveData->cogCount;
+	SaveData::GetData()->CogPadding[0] = ArchipelagoHandler::customSaveData->cogsSpent;
 	SaveData::GetData()->OrbCollected = ArchipelagoHandler::customSaveData->orbCount;
+	SaveData::GetData()->OrbPadding[0] = ArchipelagoHandler::customSaveData->orbsSpent;
 	SetShopItems(slotdata);
 
 	ItemHandler::HandleStoredItems();
