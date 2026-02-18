@@ -263,6 +263,8 @@ std::string GetRandomCause() {
 }
 
 void ArchipelagoHandler::SendDeath() {
+	if (!slotdata->deathlink)
+		return;
 	std::string cause = GetRandomCause();
 	LoggerWindow::Log("Death Sent:  " + slotname + " " + cause);
 	json data{
